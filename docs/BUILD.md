@@ -32,7 +32,7 @@ Set these in EAS (`eas env:create`, or the project's Environment variables page)
 | `ORL_ADMOB_ANDROID_REWARDED`, `ORL_ADMOB_ANDROID_INTERSTITIAL` | Android ad unit ids | as above |
 | `ORL_ADS_MODE` | `admob`, `mock` (dev only) or `off` | `admob` |
 | `ORL_ADMOB_ALLOW_TEST_UNITS` | `1` lets a release build use Google test units | unset |
-| `EAS_PROJECT_ID` | written by `eas init` | unset |
+| `EAS_PROJECT_ID` | optional override of the EAS project | `a9ed4e34-…` (set in `app.config.ts`) |
 
 The default identifier `io.github.sarthak2401max.oneroomleft` is based on the GitHub username (hyphens are not allowed in Android package names). Bundle ids cannot be changed after the first release.
 
@@ -40,7 +40,7 @@ The default identifier `io.github.sarthak2401max.oneroomleft` is based on the Gi
 
 ```bash
 npx eas-cli@latest login
-npx eas-cli@latest init                 # creates the EAS project; set EAS_PROJECT_ID from its output
+npx eas-cli@latest init                 # done: project id is in app.config.ts
 npx eas-cli@latest env:create --name ORL_IOS_BUNDLE_ID --value com.yourcompany.oneroomleft --environment production
 # ...repeat for the other variables and for the preview/development environments
 npx eas-cli@latest build --profile development --platform ios

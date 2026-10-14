@@ -9,24 +9,34 @@ import { colors } from '../../theme/theme';
 import { Burst, type BurstSpec } from './Particles';
 import { deriveModel, type TileView } from './derive';
 import {
-  BlockGlyph,
+  BlockGlyph as BlockGlyphRaw,
   CheckpointGlyph,
-  CoinGlyph,
-  CoreGlyph,
+  CoinGlyph as CoinGlyphRaw,
+  CoreGlyph as CoreGlyphRaw,
   CrackGlyph,
   DoorGlyph,
-  DroneGlyph,
-  DroneNextGlyph,
+  DroneGlyph as DroneGlyphRaw,
+  DroneNextGlyph as DroneNextGlyphRaw,
   EmitterGlyph,
   ExitGlyph,
-  KeyGlyph,
+  KeyGlyph as KeyGlyphRaw,
   LockGlyph,
   PlateGlyph,
-  PlayerGlyph,
+  PlayerGlyph as PlayerGlyphRaw,
   SpikesGlyph,
   SwitchGlyph,
   TeleGlyph,
 } from './glyphs';
+
+// Glyphs are SVG and take only primitive props, so memoising them stops every sprite from
+// re-drawing on each move (the main per-move cost on device).
+const BlockGlyph = memo(BlockGlyphRaw);
+const CoinGlyph = memo(CoinGlyphRaw);
+const CoreGlyph = memo(CoreGlyphRaw);
+const DroneGlyph = memo(DroneGlyphRaw);
+const DroneNextGlyph = memo(DroneNextGlyphRaw);
+const KeyGlyph = memo(KeyGlyphRaw);
+const PlayerGlyph = memo(PlayerGlyphRaw);
 
 export interface BoardLook {
   skin: string;
@@ -111,6 +121,15 @@ const TerrainTile = memo(function TerrainTile({
 
 // ---- Dynamic features ----------------------------------------------------------------------
 
+interface FeatureProps {
+  v: TileView;
+  size: number;
+  exitOpen: boolean;
+  exitStyle: string;
+  coresLeft: number;
+  reached: boolean;
+}
+
 const Feature = memo(function Feature({
   v,
   size,
@@ -118,14 +137,7 @@ const Feature = memo(function Feature({
   exitStyle,
   coresLeft,
   reached,
-}: {
-  v: TileView;
-  size: number;
-  exitOpen: boolean;
-  exitStyle: string;
-  coresLeft: number;
-  reached: boolean;
-}) {
+}: FeatureProps) {
   const t = v.tile;
   switch (t.k) {
     case 'exit':
@@ -149,7 +161,29 @@ const Feature = memo(function Feature({
     default:
       return null;
   }
-});
+}, featurePropsEqual);
+
+function shallowEqual(a: object, b: object): boolean {
+  if (a === b) return true;
+  const ka = Object.keys(a) as (keyof typeof a)[];
+  if (ka.length !== Object.keys(b).length) return false;
+  return ka.every((k) => a[k] === b[k]);
+}
+
+/** deriveModel builds fresh TileView objects every move; compare their contents instead. */
+function featurePropsEqual(p: FeatureProps, n: FeatureProps): boolean {
+  return (
+    p.size === n.size &&
+    p.exitOpen === n.exitOpen &&
+    p.exitStyle === n.exitStyle &&
+    p.coresLeft === n.coresLeft &&
+    p.reached === n.reached &&
+    p.v.raised === n.v.raised &&
+    p.v.warning === n.v.warning &&
+    p.v.active === n.v.active &&
+    shallowEqual(p.v.tile, n.v.tile)
+  );
+}
 
 /** Slides to a new cell; jumps (with a flash) when the move is longer than one cell. */
 function Mover({ cell, w, size, reduced, children, z = 1 }: { cell: number; w: number; size: number; reduced: boolean; children: React.ReactNode; z?: number }) {

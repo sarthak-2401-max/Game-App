@@ -3,7 +3,7 @@
 ## Before the first build
 
 - [ ] Choose final bundle id / package name and set `ORL_IOS_BUNDLE_ID`, `ORL_ANDROID_PACKAGE`
-- [ ] `eas init`; set `EAS_PROJECT_ID`
+- [x] `eas init` (project id a9ed4e34-a80e-4cd0-b66b-ed77b486890d is in `app.config.ts`)
 - [ ] Create AdMob apps and units; set all `ORL_ADMOB_*` variables for production
 - [ ] Publish UMP GDPR (and US states) messages and the iOS IDFA explainer in AdMob
 - [ ] Host the privacy policy (template in PRIVACY.md); set `privacyPolicyUrl` and `supportEmail`

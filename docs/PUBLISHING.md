@@ -26,12 +26,14 @@ npx eas-cli@latest login
 npx eas-cli@latest init          # links the project; commit the change it makes to app config if any
 ```
 
-Then create the EAS environment variables. Set each one for the `production`, `preview` and `development` environments (see BUILD.md for the full list):
+Done: the project is `@sarthak10/one-room-left` and its ID is already in `app.config.ts`.
+
+Then create the EAS environment variables (the AdMob IDs in section 4). Set each one for the `production`, `preview` and `development` environments (see BUILD.md for the full list):
 
 The bundle id defaults to `io.github.sarthak2401max.oneroomleft`. Set `ORL_IOS_BUNDLE_ID` / `ORL_ANDROID_PACKAGE` only if you want a different one.
 
 ```bash
-npx eas-cli@latest env:create --environment production --name EAS_PROJECT_ID --value <id from eas init> --visibility plaintext
+npx eas-cli@latest env:create --environment production --name ORL_ADMOB_IOS_APP_ID --value ca-app-pub-XXXX~YYYY --visibility plaintext
 ```
 
 ## 4. AdMob (you)

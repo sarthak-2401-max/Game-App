@@ -24,6 +24,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'One Room Left',
   slug: 'one-room-left',
+  owner: 'sarthak10',
   scheme: 'oneroomleft',
   version: '1.0.0',
   orientation: 'portrait',
@@ -92,6 +93,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       iosInterstitial: env.ORL_ADMOB_IOS_INTERSTITIAL ?? '',
       allowTestUnits: env.ORL_ADMOB_ALLOW_TEST_UNITS === '1',
     },
-    eas: env.EAS_PROJECT_ID ? { projectId: env.EAS_PROJECT_ID } : undefined,
+    // EAS project (expo.dev/accounts/sarthak10/projects/one-room-left). Not a secret.
+    eas: { projectId: env.EAS_PROJECT_ID ?? 'a9ed4e34-a80e-4cd0-b66b-ed77b486890d' },
   },
 });

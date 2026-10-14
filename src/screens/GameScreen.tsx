@@ -75,14 +75,17 @@ export function GameScreen() {
   const inputEnabled = !!session && !paused && !failed && !won && !showHint;
 
   // ---- Layout ----------------------------------------------------------------------------
+  // Size cells from the space the board area actually gets, so the board never grows over the
+  // HUD or the controls (text size, notch and home-indicator insets all vary by device).
+  const [area, setArea] = useState<{ w: number; h: number } | null>(null);
   const cell = useMemo(() => {
     if (!room) return 40;
-    const hud = 112;
-    const controls = settings.showDpad ? 214 : 96;
-    const availH = dims.height - insets.top - insets.bottom - hud - controls;
-    const availW = dims.width - 24;
-    return Math.max(24, Math.floor(Math.min(availW / room.width, availH / room.height, 64)));
-  }, [room, dims, insets, settings.showDpad]);
+    const frame = 10; // boardFrame padding + border, both sides
+    const fallbackH = dims.height - insets.top - insets.bottom - 112 - (settings.showDpad ? 214 : 96);
+    const availW = (area?.w ?? dims.width - 24) - frame;
+    const availH = (area?.h ?? fallbackH) - frame;
+    return Math.max(16, Math.floor(Math.min(availW / room.width, availH / room.height, 64)));
+  }, [room, area, dims, insets, settings.showDpad]);
 
   // ---- Feedback for each action ------------------------------------------------------------
   useEffect(() => {
@@ -370,7 +373,13 @@ export function GameScreen() {
       </View>
 
       {/* Board */}
-      <View style={styles.boardWrap}>
+      <View
+        style={styles.boardWrap}
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setArea((a) => (a && Math.abs(a.w - width) < 1 && Math.abs(a.h - height) < 1 ? a : { w: width, h: height }));
+        }}
+      >
         {introVisible && room.intro && state.moves < 3 && (
           <Animated.View entering={FadeInUp.duration(250)} style={styles.intro}>
             <Icon name="info" size={18} color={colors.cyan} />
@@ -560,7 +569,7 @@ const styles = StyleSheet.create({
   stat: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, paddingHorizontal: 10, paddingVertical: 4, backgroundColor: colors.surface, alignItems: 'center', minWidth: 64 },
   statLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
   statValue: { color: colors.text, fontWeight: '800', fontSize: 14, fontVariant: ['tabular-nums'] },
-  boardWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  boardWrap: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', marginVertical: space.sm, overflow: 'hidden' },
   boardFrame: { padding: 4, borderRadius: radius.md, backgroundColor: '#05070C', borderWidth: 1, borderColor: '#1C2538', shadowColor: colors.cyan, shadowOpacity: 0.15, shadowRadius: 18 },
   intro: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', gap: 8, alignItems: 'center', backgroundColor: '#0B1A24EE', borderColor: colors.cyanDim, borderWidth: 1, borderRadius: radius.md, padding: 10 },
   introText: { color: colors.text, flex: 1, fontWeight: '600', fontSize: 14 },

@@ -59,6 +59,22 @@ class SoundSystem {
     } catch (e) {
       log.warn('audio', 'audio mode unavailable', e);
     }
+    // Load every cue up front: creating a player on first use stalls that move by a frame or two.
+    if (Platform.OS !== 'web') for (const cue of Object.keys(SOURCES) as SoundCue[]) this.player(cue);
+  }
+
+  private player(cue: SoundCue): AudioPlayer | null {
+    let p = this.players.get(cue);
+    if (p) return p;
+    try {
+      p = createAudioPlayer(SOURCES[cue]);
+      p.volume = cue === 'move' ? 0.5 : 0.9;
+      this.players.set(cue, p);
+      return p;
+    } catch (e) {
+      log.debug('audio', `cue ${cue} failed to load`, e);
+      return null;
+    }
   }
 
   configure(opts: { sound: boolean; music: boolean }) {
@@ -76,12 +92,8 @@ class SoundSystem {
   play(cue: SoundCue) {
     if (!this.sfxOn || !this.appActive || !this.unlocked) return;
     try {
-      let p = this.players.get(cue);
-      if (!p) {
-        p = createAudioPlayer(SOURCES[cue]);
-        p.volume = cue === 'move' ? 0.5 : 0.9;
-        this.players.set(cue, p);
-      }
+      const p = this.player(cue);
+      if (!p) return;
       p.seekTo(0).catch(() => undefined);
       p.play();
     } catch (e) {
