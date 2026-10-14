@@ -40,9 +40,9 @@ Host this (completed) at a public URL, then set `privacyPolicyUrl` and `supportE
 ---
 
 **Privacy Policy for One Room Left**
-Last updated: [DATE]
+Last updated: 14 October 2026
 
-[PUBLISHER LEGAL NAME] ("we") publishes the mobile game One Room Left. Contact: [CONTACT EMAIL], [POSTAL ADDRESS IF REQUIRED].
+Sarthak__10 ("we") publishes the mobile game One Room Left. Contact: sarthaksrivastava2413@gmail.com.
 
 **What the game stores.** Your progress, settings and in-game currency are stored only on your device. We do not operate servers for the game and do not receive this data. Uninstalling the game deletes it.
 
@@ -54,7 +54,7 @@ Last updated: [DATE]
 
 **Children.** The game is not directed at children under [13 / the age required in your jurisdiction] and we do not knowingly collect their personal information.
 
-**Your rights.** Depending on where you live you may have rights to access, delete or object to processing of personal data. Because we do not hold your game data, contact Google for advertising data, or reach us at [CONTACT EMAIL].
+**Your rights.** Depending on where you live you may have rights to access, delete or object to processing of personal data. Because we do not hold your game data, contact Google for advertising data, or reach us at sarthaksrivastava2413@gmail.com.
 
 **Changes.** We will post updates on this page.
 

@@ -14,8 +14,8 @@ The exact path from this repository to both stores. Steps marked **(you)** need 
 ## 2. Repository settings (you)
 
 1. **Settings → Pages → Build and deployment → Source: GitHub Actions.** The Pages workflow then publishes `site/`, and the privacy policy is at `https://sarthak-2401-max.github.io/Game-App/privacy.html`.
-2. Fill in `[DEVELOPER NAME]`, `[CONTACT EMAIL]` and `[DATE]` in `site/privacy.html` and `site/index.html`.
-3. Set `privacyPolicyUrl` and `supportEmail` in `src/config/app.ts`.
+2. Done: developer name, contact email and date are filled in `site/privacy.html` and `site/index.html`.
+3. Done: `privacyPolicyUrl` and `supportEmail` are set in `src/config/app.ts`.
 4. **Settings → Secrets and variables → Actions → New secret `EXPO_TOKEN`** (expo.dev → Account settings → Access tokens).
 
 ## 3. Expo project (you, about 5 minutes on any computer with Node)
