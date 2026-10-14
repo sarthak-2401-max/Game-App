@@ -1,0 +1,143 @@
+import type { LevelSpec } from '../levelFormat';
+import { door, drone, laser, sw, tele } from './legend';
+
+// Chapter 7 — Changing Rooms. Teleporters, crumbling floors, checkpoints and rooms that
+// rearrange themselves.
+export const chapter7: LevelSpec[] = [
+  {
+    name: 'Portal',
+    intro: 'Step into a portal to come out of its twin.',
+    map: [
+      '#########',
+      '#P.T#...#',
+      '#...#.T.#',
+      '#...#..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Crumbling',
+    intro: 'Cracked floor collapses after you step off it. You only get one crossing.',
+    map: [
+      '#######',
+      '#P%%%*#',
+      '#%%%%%#',
+      '#*%%%%#',
+      '#%%%%*#',
+      '#####E#',
+      '#######',
+    ],
+  },
+  {
+    name: 'Two Portals',
+    map: [
+      '#########',
+      '#P.T#U.*#',
+      '#...#...#',
+      '#####.###',
+      '#E.U#.T.#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Collapse',
+    hint: 'A block can fill a collapsed hole too.',
+    map: [
+      '#########',
+      '#P..B...#',
+      '#.%%%%%.#',
+      '#.%...%.#',
+      '#.%.*.%.#',
+      '#.%...%.#',
+      '#.%%%%%.#',
+      '#......E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Beam Jumper',
+    legend: { a: laser('down') },
+    map: [
+      '###a#####',
+      '#P....T.#',
+      '#.......#',
+      '#.......#',
+      '#T......#',
+      '#...#..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Shifting Walls',
+    intro: 'One switch rearranges the whole room.',
+    map: [
+      '#########',
+      '#P..x..*#',
+      '#.#####d#',
+      '#s..d..s#',
+      '###x###.#',
+      '#*.....x#',
+      '#######E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Crumble Bridge',
+    map: [
+      '#########',
+      '#P.B....#',
+      '#.......#',
+      '#~~%%%~~#',
+      '#..*.k..#',
+      '#~~%%%~~#',
+      '#...L..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Checkpoint',
+    intro: 'Green checkpoints remember your progress. If you fail, you can restart from the last one.',
+    legend: { X: drone('RRRRR'), Y: drone('LLLLL', 'pingpong', 2) },
+    map: [
+      '#########',
+      '#P..^...#',
+      '#.^.^.^.#',
+      '#.....^.#',
+      '#####C..#',
+      '#.X.....#',
+      '#.....Y.#',
+      '#E......#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Portal Maze',
+    legend: { V: tele(2), F: tele(3) },
+    map: [
+      '#########',
+      '#P.T#U.V#',
+      '#...#...#',
+      '#####.###',
+      '#F..#..T#',
+      '#.U.#V..#',
+      '#####.###',
+      '#E..F...#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Changing Rooms',
+    intro: 'Portals, crumbling floors and two switches. Nothing stays the same.',
+    legend: { S: sw(1), D: door(1), X: door(1, true) },
+    map: [
+      '#########',
+      '#P%%S#*.#',
+      '#.%%.#D.#',
+      '#.##x#.T#',
+      '#.T.s.X.#',
+      '#d#######',
+      '#*%%%%.E#',
+      '#########',
+    ],
+  },
+];

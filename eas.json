@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": { "ORL_ADS_MODE": "admob" }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "ORL_ADS_MODE": "admob", "ORL_ADMOB_ALLOW_TEST_UNITS": "1" }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": { "ORL_ADS_MODE": "admob" }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

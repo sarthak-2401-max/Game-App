@@ -1,0 +1,146 @@
+import type { LevelSpec } from '../levelFormat';
+import { chSpikes, laser, timedSpikes } from './legend';
+
+// Chapter 5 — Time Is Running Out. Real-time countdowns and turn-timed traps.
+// Turn-timed traps move one beat per action; the countdown is real time and pauses with the game.
+export const chapter5: LevelSpec[] = [
+  {
+    name: 'Countdown',
+    intro: 'A countdown! It pauses whenever you pause or leave the app.',
+    timeLimit: 30,
+    map: [
+      '#########',
+      '#P#...#.#',
+      '#.#.#.#.#',
+      '#...#...#',
+      '###.###.#',
+      '#*....#E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Rhythm',
+    intro: 'These spikes rise every other turn. A glow warns you before they rise. Tap Wait to let a turn pass.',
+    map: [
+      '#########',
+      '#P.!i...#',
+      '#######i#',
+      '#E..i!..#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Pulse Laser',
+    intro: 'This laser pulses: two turns on, two turns off.',
+    legend: { a: laser('down', { timing: [4, 2] }), b: laser('up', { timing: [4, 2, 2] }) },
+    map: [
+      '###a#b###',
+      '#P......#',
+      '#.......#',
+      '#.......#',
+      '#...#..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Hurry Up',
+    timeLimit: 35,
+    map: [
+      '#########',
+      '#k..#..$#',
+      '#.#.#.#.#',
+      '#.#...#.#',
+      '#.#####.#',
+      '#P..L..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Syncopation',
+    hint: 'Each trap has its own beat. Watch them for a few turns before you commit.',
+    legend: { a: timedSpikes(3, 1, 0), b: timedSpikes(3, 1, 1), c: timedSpikes(3, 1, 2), e: timedSpikes(3, 2, 0) },
+    map: [
+      '#########',
+      '#P.abc..#',
+      '#######e#',
+      '#.cba...#',
+      '#.#######',
+      '#.e.ae.E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Race the Clock',
+    timeLimit: 40,
+    map: [
+      '#########',
+      '#P..B...#',
+      '#.#.#.#.#',
+      '#..B...B#',
+      '#.##~####',
+      '#*.....E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Order of Operations',
+    legend: { a: timedSpikes(2, 1, 0), W: chSpikes(0, true) },
+    map: [
+      '#########',
+      '#P.s.a..#',
+      '#.###.#.#',
+      '#.ww.*#.#',
+      '#.###.#W#',
+      '#..a....#',
+      '#####E###',
+      '#########',
+    ],
+  },
+  {
+    name: 'Breathing Room',
+    timeLimit: 25,
+    map: [
+      '#######',
+      '#P..!.#',
+      '#.###.#',
+      '#.#$..#',
+      '#.#####',
+      '#....E#',
+      '#######',
+    ],
+  },
+  {
+    name: 'Strobe',
+    legend: {
+      a: laser('right', { timing: [3, 1, 0] }),
+      b: laser('right', { timing: [3, 1, 1] }),
+      c: laser('right', { timing: [3, 1, 2] }),
+    },
+    map: [
+      '#########',
+      '#...P...#',
+      'a.......#',
+      'b.......#',
+      'c.......#',
+      '#..*....#',
+      'b.......#',
+      '#...E...#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Last Second',
+    intro: 'Countdown, timed traps and two cores. Move with purpose.',
+    timeLimit: 45,
+    legend: { a: laser('down', { timing: [4, 2] }), e: timedSpikes(3, 1, 1) },
+    map: [
+      '##a######',
+      '#*.....k#',
+      '#.##.##.#',
+      '#.eePee.#',
+      '#.##L####',
+      '#*.....E#',
+      '#########',
+    ],
+  },
+];

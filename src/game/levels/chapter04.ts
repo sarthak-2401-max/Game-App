@@ -1,0 +1,135 @@
+import type { LevelSpec } from '../levelFormat';
+import { door, laser, plate } from './legend';
+
+// Chapter 4 — Think Ahead. Blocks, pits, shields and move limits.
+export const chapter4: LevelSpec[] = [
+  {
+    name: 'Heavy Lifting',
+    intro: 'Walk into a block to push it. A block can hold a plate down for you.',
+    map: [
+      '#########',
+      '#P.B.._.#',
+      '#.......#',
+      '#####d###',
+      '#E......#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Fill the Gap',
+    intro: 'Push a block into a chasm to make a bridge.',
+    map: [
+      '#########',
+      '#..#..#.#',
+      '#P.B.~.E#',
+      '#..#..#.#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Human Shield',
+    intro: 'Blocks stop lasers. Keep one between you and the beam.',
+    map: [
+      '#########',
+      '#P.B...<#',
+      '#####.###',
+      '#E......#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Counted Steps',
+    intro: 'Limited moves. Every step and every wait counts.',
+    moveLimit: 14,
+    map: [
+      '#########',
+      '#P..#..$#',
+      '#.#.#.#.#',
+      '#.#...#.#',
+      '#.###.#.#',
+      '#.....#E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Two Plates',
+    legend: { o: plate(1), D: door(1) },
+    map: [
+      '#########',
+      '#P..B..o#',
+      '#.B.....#',
+      '#..._...#',
+      '###d#D###',
+      '#E.....*#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Corner Trap',
+    intro: 'A block pushed into a corner never comes back out. Undo is your friend.',
+    map: [
+      '#######',
+      '#P....#',
+      '#.BB..#',
+      '#.....#',
+      '##~~###',
+      '#....E#',
+      '#######',
+    ],
+  },
+  {
+    name: 'Bridge Builder',
+    map: [
+      '#########',
+      '#P..#...#',
+      '#.B.B.B.#',
+      '#.......#',
+      '#~~#_####',
+      '#.~.d..E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Shield Wall',
+    legend: { a: laser('left') },
+    map: [
+      '#########',
+      '#P......#',
+      '#.##.##.#',
+      '#..B...a#',
+      '#.##.##.#',
+      '#*.....E#',
+      '#########',
+    ],
+  },
+  {
+    name: 'Tight Budget',
+    moveLimit: 13,
+    map: [
+      '#######',
+      '#P....#',
+      '#.B.B.#',
+      '#.....#',
+      '#~#~#~#',
+      '#.....#',
+      '#E###.#',
+      '#######',
+    ],
+  },
+  {
+    name: 'Warehouse',
+    intro: 'Plan every push before you make it.',
+    legend: { o: plate(1), D: door(1) },
+    map: [
+      '#########',
+      '#P......#',
+      '#.B.#.B.#',
+      '#..B..._#',
+      '#.#..#..#',
+      '#o......#',
+      '####d#D##',
+      '#E.....*#',
+      '#########',
+    ],
+  },
+];
