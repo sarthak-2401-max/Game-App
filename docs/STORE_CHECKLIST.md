@@ -33,7 +33,7 @@
 - [ ] App Store Connect record, SKU, primary category Games → Puzzle
 - [ ] App Privacy questionnaire (see PRIVACY.md); tracking declared because of ATT
 - [ ] Age rating questionnaire (expected 4+/9+ depending on ad content settings)
-- [ ] Screenshots: 6.9" and 6.5" iPhone (and iPad if `supportsTablet` stays true)
+- [ ] Screenshots: 6.9" iPhone (`store-assets/ios-6.9in`). iPad is off (`supportsTablet: false`), so no iPad screenshots are needed
 - [ ] Description, keywords, support URL, marketing URL, privacy policy URL
 - [ ] Export compliance: `usesNonExemptEncryption: false` is set
 - [ ] `eas build --profile production --platform ios` → `eas submit` → TestFlight → review

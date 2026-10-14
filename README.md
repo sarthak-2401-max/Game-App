@@ -62,12 +62,17 @@ src/components/ screens/     UI (board renderer in components/board)
 src/config/                  economy, ad policy, cosmetics, achievements, app placeholders
 scripts/                     level report, room viewer, forge, asset generators
 docs/                        build, ads, privacy, accounts, assets, tests, checklists
+site/                        landing page + privacy policy (GitHub Pages)
+store-assets/                framed store screenshots, feature graphic, icons
+.github/workflows/           CI, EAS build/submit, Pages
 ```
 
 Navigation is a small stack in the zustand app store (`src/state/useApp.ts`) rather than Expo Router: the game has six screens, no deep links and one modal-heavy gameplay screen, so a file-based router added weight without benefit. Swapping it in later is straightforward.
 
 ## Documentation
 
+- **[PUBLISHING.md](docs/PUBLISHING.md): step-by-step path to the App Store and Google Play**
+- [STORE_LISTING.md](docs/STORE_LISTING.md): store copy, screenshot sizes, questionnaire answers (assets in `store-assets/`)
 - [BUILD.md](docs/BUILD.md): environments, EAS profiles, environment variables, identifiers
 - [ADS.md](docs/ADS.md): AdMob setup, placements, reward integrity, frequency rules
 - [PRIVACY.md](docs/PRIVACY.md): consent flow, data inventory, privacy policy template, store privacy forms

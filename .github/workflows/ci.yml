@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      # Includes the full solver check of all 115 rooms.
+      - run: npm test -- --ci
+      - name: Level solutions are up to date
+        run: |
+          npm run levels:report > /dev/null
+          git diff --exit-code -- src/game/levels/solutions.generated.json
+      - run: npm run export:web

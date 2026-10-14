@@ -11,6 +11,17 @@ const TEST_ADMOB_APP_ID_IOS = 'ca-app-pub-3940256099942544~1458002511';
 const IOS_BUNDLE_ID = env.ORL_IOS_BUNDLE_ID ?? 'com.example.oneroomleft';
 const ANDROID_PACKAGE = env.ORL_ANDROID_PACKAGE ?? 'com.example.oneroomleft';
 
+// Store builds must never ship placeholders or Google test ids.
+if (env.EAS_BUILD_PROFILE === 'production') {
+  const missing = [
+    !env.ORL_IOS_BUNDLE_ID && 'ORL_IOS_BUNDLE_ID',
+    !env.ORL_ANDROID_PACKAGE && 'ORL_ANDROID_PACKAGE',
+    !env.ORL_ADMOB_IOS_APP_ID && 'ORL_ADMOB_IOS_APP_ID',
+    !env.ORL_ADMOB_ANDROID_APP_ID && 'ORL_ADMOB_ANDROID_APP_ID',
+  ].filter(Boolean);
+  if (missing.length) throw new Error(`Production build is missing: ${missing.join(', ')} (see docs/BUILD.md)`);
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'One Room Left',
@@ -24,7 +35,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: IOS_BUNDLE_ID,
     buildNumber: '1',
-    supportsTablet: true,
+    supportsTablet: false,
     requireFullScreen: true,
     config: { usesNonExemptEncryption: false },
     infoPlist: {
