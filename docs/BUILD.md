@@ -24,8 +24,8 @@ Set these in EAS (`eas env:create`, or the project's Environment variables page)
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `ORL_IOS_BUNDLE_ID` | iOS bundle identifier | `com.example.oneroomleft` (placeholder) |
-| `ORL_ANDROID_PACKAGE` | Android application id | `com.example.oneroomleft` (placeholder) |
+| `ORL_IOS_BUNDLE_ID` | iOS bundle identifier | `io.github.sarthak2401max.oneroomleft` |
+| `ORL_ANDROID_PACKAGE` | Android application id | `io.github.sarthak2401max.oneroomleft` |
 | `ORL_ADMOB_IOS_APP_ID` | AdMob iOS app id (`ca-app-pub-…~…`) | Google test app id |
 | `ORL_ADMOB_ANDROID_APP_ID` | AdMob Android app id | Google test app id |
 | `ORL_ADMOB_IOS_REWARDED`, `ORL_ADMOB_IOS_INTERSTITIAL` | iOS ad unit ids (`ca-app-pub-…/…`) | empty → test units in dev, no ads in release |
@@ -34,7 +34,7 @@ Set these in EAS (`eas env:create`, or the project's Environment variables page)
 | `ORL_ADMOB_ALLOW_TEST_UNITS` | `1` lets a release build use Google test units | unset |
 | `EAS_PROJECT_ID` | written by `eas init` | unset |
 
-The `com.example.*` identifiers are placeholders and must be replaced before any store upload: bundle ids cannot be changed after the first release.
+The default identifier `io.github.sarthak2401max.oneroomleft` is based on the GitHub username (hyphens are not allowed in Android package names). Bundle ids cannot be changed after the first release.
 
 ## First-time EAS setup
 

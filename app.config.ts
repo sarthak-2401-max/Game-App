@@ -8,14 +8,12 @@ const env = process.env;
 const TEST_ADMOB_APP_ID_ANDROID = 'ca-app-pub-3940256099942544~3347511713';
 const TEST_ADMOB_APP_ID_IOS = 'ca-app-pub-3940256099942544~1458002511';
 
-const IOS_BUNDLE_ID = env.ORL_IOS_BUNDLE_ID ?? 'com.example.oneroomleft';
-const ANDROID_PACKAGE = env.ORL_ANDROID_PACKAGE ?? 'com.example.oneroomleft';
+const IOS_BUNDLE_ID = env.ORL_IOS_BUNDLE_ID ?? 'io.github.sarthak2401max.oneroomleft';
+const ANDROID_PACKAGE = env.ORL_ANDROID_PACKAGE ?? 'io.github.sarthak2401max.oneroomleft';
 
-// Store builds must never ship placeholders or Google test ids.
+// Store builds must never ship Google's test app ids.
 if (env.EAS_BUILD_PROFILE === 'production') {
   const missing = [
-    !env.ORL_IOS_BUNDLE_ID && 'ORL_IOS_BUNDLE_ID',
-    !env.ORL_ANDROID_PACKAGE && 'ORL_ANDROID_PACKAGE',
     !env.ORL_ADMOB_IOS_APP_ID && 'ORL_ADMOB_IOS_APP_ID',
     !env.ORL_ADMOB_ANDROID_APP_ID && 'ORL_ADMOB_ANDROID_APP_ID',
   ].filter(Boolean);

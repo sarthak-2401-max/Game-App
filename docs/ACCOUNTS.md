@@ -8,7 +8,7 @@ Nothing below has been created for you. Placeholders in the code are marked and 
 | Apple Developer Program membership | iOS builds and App Store | `eas build`, App Store Connect |
 | Google Play Console account (one-time fee; new personal accounts must run a closed test before production) | Android release | Play Console |
 | Expo account | EAS Build/Submit | `eas login`, `EAS_PROJECT_ID` |
-| Final bundle id / package name (reverse domain you control) | Both stores, AdMob | `ORL_IOS_BUNDLE_ID`, `ORL_ANDROID_PACKAGE` |
+| Bundle id / package name (default `io.github.sarthak2401max.oneroomleft`) | Both stores, AdMob | Override with `ORL_IOS_BUNDLE_ID`, `ORL_ANDROID_PACKAGE` |
 | AdMob account, 2 apps, 4 ad units, consent messages | Ads | `ORL_ADMOB_*` env vars, AdMob Privacy & messaging |
 | Developer website with `app-ads.txt` | AdMob verification | Your domain |
 | Hosted privacy policy URL | Both stores, AdMob, in-app link | `src/config/app.ts` → `privacyPolicyUrl` |

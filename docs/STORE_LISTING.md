@@ -8,7 +8,7 @@ Ready to paste. Character counts are checked against each store's limits.
 - **Category:** Games → Puzzle (secondary: Strategy)
 - **Price:** Free, contains ads, no in-app purchases
 - **Support / marketing URL:** your GitHub Pages site (see `site/`) or repo URL
-- **Privacy policy URL:** `https://<username>.github.io/<repo>/privacy.html` once GitHub Pages is on
+- **Privacy policy URL:** `https://sarthak-2401-max.github.io/Game-App/privacy.html` once GitHub Pages is on
 
 ## App Store (iOS)
 

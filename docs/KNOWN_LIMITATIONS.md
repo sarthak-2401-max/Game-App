@@ -25,6 +25,5 @@
 
 ## Placeholders you must replace
 
-- `com.example.oneroomleft` bundle id / package (env vars, BUILD.md)
 - `privacyPolicyUrl` and `supportEmail` in `src/config/app.ts`
 - AdMob app ids and unit ids (env vars, ADS.md)

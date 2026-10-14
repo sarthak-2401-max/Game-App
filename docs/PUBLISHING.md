@@ -13,7 +13,7 @@ The exact path from this repository to both stores. Steps marked **(you)** need 
 
 ## 2. Repository settings (you)
 
-1. **Settings → Pages → Source: GitHub Actions.** The Pages workflow publishes `site/`. Your privacy policy is then at `https://<username>.github.io/<repo>/privacy.html`.
+1. **Settings → Pages → Source: GitHub Actions.** The Pages workflow publishes `site/`. Your privacy policy is then at `https://sarthak-2401-max.github.io/Game-App/privacy.html`.
 2. Fill in `[DEVELOPER NAME]`, `[CONTACT EMAIL]` and `[DATE]` in `site/privacy.html` and `site/index.html`.
 3. Set `privacyPolicyUrl` and `supportEmail` in `src/config/app.ts`.
 4. **Settings → Secrets and variables → Actions → New secret `EXPO_TOKEN`** (expo.dev → Account settings → Access tokens).
@@ -28,9 +28,9 @@ npx eas-cli@latest init          # links the project; commit the change it makes
 
 Then create the EAS environment variables. Set each one for the `production`, `preview` and `development` environments (see BUILD.md for the full list):
 
+The bundle id defaults to `io.github.sarthak2401max.oneroomleft`. Set `ORL_IOS_BUNDLE_ID` / `ORL_ANDROID_PACKAGE` only if you want a different one.
+
 ```bash
-npx eas-cli@latest env:create --environment production --name ORL_IOS_BUNDLE_ID --value io.github.<username>.oneroomleft --visibility plaintext
-npx eas-cli@latest env:create --environment production --name ORL_ANDROID_PACKAGE --value io.github.<username>.oneroomleft --visibility plaintext
 npx eas-cli@latest env:create --environment production --name EAS_PROJECT_ID --value <id from eas init> --visibility plaintext
 ```
 
@@ -40,7 +40,7 @@ npx eas-cli@latest env:create --environment production --name EAS_PROJECT_ID --v
 2. Create a Rewarded and an Interstitial unit in each.
 3. Add `ORL_ADMOB_IOS_APP_ID`, `ORL_ADMOB_ANDROID_APP_ID` and the four unit ids as EAS production variables.
 4. Privacy & messaging: publish a GDPR message, a US states message and the iOS IDFA explainer.
-5. `app-ads.txt` must sit at the root of the developer website you list in the stores. With GitHub Pages that means a repo named `<username>.github.io` that contains `app-ads.txt` (AdMob shows you the line to put in it).
+5. `app-ads.txt` must sit at the root of the developer website you list in the stores. With GitHub Pages that means a repo named `sarthak-2401-max.github.io` that contains `app-ads.txt` (AdMob shows you the line to put in it).
 
 A production build **refuses to start** if the bundle ids or AdMob app ids are missing, so placeholders can't ship by accident.
 
