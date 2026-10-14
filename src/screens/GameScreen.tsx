@@ -277,6 +277,8 @@ export function GameScreen() {
 
   const goNext = async () => {
     const n = room.index + 1;
+    // Close the result sheet before any interstitial so nothing is on screen above the ad.
+    setResult(null);
     if (session.kind === 'campaign' && interstitialDue(room.index)) {
       const shown = await adService.presentInterstitial();
       if (shown) {

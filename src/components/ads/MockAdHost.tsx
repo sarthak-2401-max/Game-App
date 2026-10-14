@@ -1,7 +1,7 @@
 // Renders the DEVELOPMENT ad simulator. Clearly labelled; never present in production builds
 // because the mock provider is only selected when __DEV__ is true.
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import { mockProvider, type MockAdRequest } from '../../services/ads/mockProvider';
 import { colors, radius, space } from '../../theme/theme';
 import { Button } from '../ui';
@@ -21,9 +21,18 @@ export function MockAdHost() {
     const t = setInterval(() => setSeconds((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(t);
   }, [req]);
+  useEffect(() => {
+    if (!req) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      req.dismiss();
+      return true;
+    });
+    return () => sub.remove();
+  }, [req]);
   if (!req) return null;
+  // A plain overlay, not a Modal: it must be able to appear above any open sheet (see Sheet).
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={req.dismiss}>
+    <View style={styles.overlay}>
       <View style={styles.back}>
         <View style={styles.card} accessibilityViewIsModal>
           <Text style={styles.tag}>SIMULATED AD · DEVELOPMENT ONLY</Text>
@@ -42,11 +51,12 @@ export function MockAdHost() {
           <Button label="Simulate failure" variant="danger" onPress={req.fail} />
         </View>
       </View>
-    </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000, elevation: 1000 },
   back: { flex: 1, backgroundColor: '#000000E6', justifyContent: 'center', padding: space.xl },
   card: { backgroundColor: '#14101F', borderColor: colors.violet, borderWidth: 2, borderRadius: radius.xl, padding: space.xl, gap: space.md },
   tag: { color: colors.violet, fontWeight: '900', letterSpacing: 1, textAlign: 'center' },

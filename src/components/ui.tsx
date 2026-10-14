@@ -1,7 +1,7 @@
 // Shared UI primitives: buttons, panels, badges, toggles and the modal sheet.
-import React, { useEffect } from 'react';
-import { Modal, Pressable, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { BackHandler, Pressable, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { sound } from '../services/audio/sound';
 import { colors, radius, space, TOUCH, type } from '../theme/theme';
 import { Icon, type IconName } from './Icon';
@@ -144,21 +144,40 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 /** Bottom-aligned modal card used for room results, pause, hints and ad offers. */
+/**
+ * In-tree overlay rather than a native Modal. iOS cannot present a second modal (or an ad SDK's
+ * full-screen controller) while one is already showing, which left the game waiting forever when
+ * an ad or a second sheet opened over the result sheet. Render order decides stacking: later
+ * sheets sit above earlier ones, and the root-level ad host and toasts sit above all of them.
+ */
 export function Sheet({ visible, onRequestClose, children, title }: { visible: boolean; onRequestClose?: () => void; children: React.ReactNode; title?: string }) {
+  const closeRef = useRef(onRequestClose);
+  useEffect(() => {
+    closeRef.current = onRequestClose;
+  });
+  useEffect(() => {
+    if (!visible) return;
+    // Android back closes the sheet (handlers registered later take precedence).
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      closeRef.current?.();
+      return true;
+    });
+    return () => sub.remove();
+  }, [visible]);
   if (!visible) return null;
   return (
-    <Modal transparent visible animationType="fade" onRequestClose={onRequestClose} statusBarTranslucent>
+    <Animated.View entering={FadeIn.duration(150)} style={styles.overlay}>
       <View style={styles.backdrop}>
-        <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(120)} style={styles.sheet} accessibilityViewIsModal>
+        <View style={styles.sheet} accessibilityViewIsModal>
           {title ? (
             <Text style={styles.sheetTitle} accessibilityRole="header">
               {title}
             </Text>
           ) : null}
           {children}
-        </Animated.View>
+        </View>
       </View>
-    </Modal>
+    </Animated.View>
   );
 }
 
@@ -202,6 +221,7 @@ const styles = StyleSheet.create({
   toggleLabel: { color: colors.text, ...type.body },
   toggleDesc: { color: colors.textMuted, ...type.small, marginTop: 2 },
   section: { color: colors.textDim, ...type.tiny, textTransform: 'uppercase', marginTop: space.lg, marginBottom: space.sm },
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100, elevation: 100 },
   backdrop: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'center', padding: space.lg },
   sheet: { backgroundColor: colors.surface, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.xl, maxWidth: 480, width: '100%', alignSelf: 'center', gap: space.md },
   sheetTitle: { color: colors.text, ...type.h1, textAlign: 'center' },
