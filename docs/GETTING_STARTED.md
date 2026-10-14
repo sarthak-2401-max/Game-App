@@ -54,13 +54,15 @@ A browser tab opens with the game. Use the arrow keys to move. Press `Ctrl+C` in
 3. On the computer:
 
    ```bash
-   npx expo start
+   npx expo start --go
    ```
+
+   The `--go` flag matters: this project also supports development builds, and without it the QR code opens a development build instead of Expo Go.
 
 4. A QR code appears in Terminal. Open the iPhone **Camera** app, point it at the QR code and tap the banner. The game opens in Expo Go.
 5. Edit and save any file and the phone reloads by itself. `Ctrl+C` stops it.
 
-If it doesn't connect (office or hotel Wi-Fi often blocks this), run `npx expo start --tunnel` instead and scan the new code.
+If it doesn't connect (office or hotel Wi-Fi often blocks this), run `npx expo start --go --tunnel` instead and scan the new code.
 
 Things to know about Expo Go:
 
@@ -109,6 +111,6 @@ Once AdMob is set up (see PUBLISHING.md, section 4), follow [PUBLISHING.md](PUBL
 | `command not found: node` / `npm` | Reopen Terminal after installing Node. On Windows, restart the computer. |
 | `npm ERR! EACCES` (Mac) | Don't use `sudo`. Reinstall Node from nodejs.org. |
 | `Cannot find module ...` | Run `npm install` again inside `Game-App`. |
-| QR code doesn't open the game | Same Wi-Fi on both devices, or use `npx expo start --tunnel`. |
+| QR code doesn't open the game | Use `npx expo start --go` (not `npm run web`). Same Wi-Fi on both devices; allow Local Network for Expo Go in iPhone Settings; or use `npx expo start --go --tunnel`. |
 | `Project ID is missing` during a build | Part 5 isn't finished yet: send the project ID to Claude. |
 | A production build stops with "Production build is missing: ORL_ADMOB_..." | Expected until your real AdMob IDs are set. Use the `preview` profile until then. |

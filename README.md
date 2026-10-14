@@ -28,7 +28,7 @@ npx eas-cli@latest build --profile development --platform android   # or ios
 npx expo start --dev-client
 ```
 
-In Expo Go the game runs with the labelled **ad simulator** ("SIMULATED AD · DEVELOPMENT ONLY") in place of AdMob. See [docs/BUILD.md](docs/BUILD.md).
+To try it in Expo Go, run `npm run go` (or `npx expo start --go`). In Expo Go the game runs with the labelled **ad simulator** ("SIMULATED AD · DEVELOPMENT ONLY") in place of AdMob. See [docs/BUILD.md](docs/BUILD.md).
 
 ## Scripts
 

@@ -11,7 +11,7 @@
 | Where | Command | Ads | Notes |
 |---|---|---|---|
 | Browser | `npm run web` | none | Fastest way to play and design rooms. Keyboard: arrows/WASD, Space = wait, Z = undo, R = restart, Esc = pause. |
-| Expo Go | `npx expo start` | simulator | AdMob, UMP and ATT are native modules Expo Go does not contain, so the game falls back to the labelled simulator. |
+| Expo Go | `npx expo start --go` | simulator | AdMob, UMP and ATT are native modules Expo Go does not contain, so the game falls back to the labelled simulator. |
 | Development build | `eas build --profile development` then `npx expo start --dev-client` | AdMob **test** units | The right way to test consent and real SDK callbacks. |
 | Preview (internal) | `eas build --profile preview` | AdMob test units | Release-mode build; `ORL_ADMOB_ALLOW_TEST_UNITS=1` keeps test ads on. Android produces an installable APK. |
 | Production | `eas build --profile production` | your real units | Without real unit IDs a release build shows **no ads** (never test ads, never the simulator). |
