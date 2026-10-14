@@ -13,7 +13,7 @@ The exact path from this repository to both stores. Steps marked **(you)** need 
 
 ## 2. Repository settings (you)
 
-1. **Settings → Pages → Source: GitHub Actions.** The Pages workflow publishes `site/`. Your privacy policy is then at `https://sarthak-2401-max.github.io/Game-App/privacy.html`.
+1. **Host the privacy policy.** GitHub Pages is not available for private repos on the free plan. Create a public repo named `sarthak-2401-max.github.io` and copy `site/` into it. The policy is then at `https://sarthak-2401-max.github.io/privacy.html`, and the same repo hosts `app-ads.txt` at the domain root. (If Game-App is ever made public or you have GitHub Pro, the included Pages workflow can publish `site/` instead.)
 2. Fill in `[DEVELOPER NAME]`, `[CONTACT EMAIL]` and `[DATE]` in `site/privacy.html` and `site/index.html`.
 3. Set `privacyPolicyUrl` and `supportEmail` in `src/config/app.ts`.
 4. **Settings → Secrets and variables → Actions → New secret `EXPO_TOKEN`** (expo.dev → Account settings → Access tokens).
