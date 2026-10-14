@@ -6,11 +6,15 @@
 // (read by the SDK from the IAB TCF string) and, on iOS, ATT authorisation.
 import { Platform } from 'react-native';
 import { log } from '../../utils/log';
+import { isExpoGo } from '../../utils/runtime';
 import type { ConsentOutcome } from './consentTypes';
 
 type Lib = typeof import('react-native-google-mobile-ads');
 
 function lib(): Lib | null {
+  // Expo Go has no AdMob native module, and requiring the library there raises a red-box error
+  // even when caught, so skip it entirely.
+  if (isExpoGo) return null;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require('react-native-google-mobile-ads') as Lib;
@@ -35,6 +39,8 @@ async function requestAtt(): Promise<ConsentOutcome['attStatus']> {
 }
 
 export async function gatherConsent(): Promise<ConsentOutcome> {
+  // Expo Go: no UMP/ATT to run; let the development ad simulator initialise.
+  if (isExpoGo) return { canRequestAds: true, nonPersonalized: true, attStatus: 'unavailable', privacyOptionsRequired: false };
   const l = lib();
   if (!l) return { canRequestAds: false, nonPersonalized: true, attStatus: 'unavailable', privacyOptionsRequired: false };
   const { AdsConsent, AdsConsentPrivacyOptionsRequirementStatus } = l;

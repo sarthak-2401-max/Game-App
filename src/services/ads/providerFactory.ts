@@ -7,6 +7,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import type { AdUnitIds } from '../../config/ads';
 import { log } from '../../utils/log';
+import { isExpoGo } from '../../utils/runtime';
 import { createAdMobProvider } from './admobProvider';
 import { mockProvider } from './mockProvider';
 import type { AdProvider } from './types';
@@ -36,7 +37,6 @@ export function createAdProvider(): AdProvider | null {
   const mode = extra.mode ?? 'admob';
   if (mode === 'off') return null;
   if (mode === 'mock') return __DEV__ ? mockProvider : null;
-  const isExpoGo = Constants.executionEnvironment === 'storeClient';
   const units = unitIds(extra);
   if (!__DEV__ && !units && !extra.allowTestUnits) {
     // A release build without real unit IDs shows no ads rather than Google test ads.

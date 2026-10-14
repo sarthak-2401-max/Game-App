@@ -3,11 +3,13 @@
 import { Platform } from 'react-native';
 import type { AdUnitIds } from '../../config/ads';
 import { log } from '../../utils/log';
+import { isExpoGo } from '../../utils/runtime';
 import type { AdProvider, PresentationHandlers } from './types';
 
 type Lib = typeof import('react-native-google-mobile-ads');
 
 function loadLib(): Lib | null {
+  if (isExpoGo) return null;
   try {
     // Required lazily so a missing native module (Expo Go) degrades to "no ads" instead of crashing.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
