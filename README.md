@@ -73,6 +73,7 @@ Navigation is a small stack in the zustand app store (`src/state/useApp.ts`) rat
 
 - **[PUBLISHING.md](docs/PUBLISHING.md): step-by-step path to the App Store and Google Play**
 - [STORE_LISTING.md](docs/STORE_LISTING.md): store copy, screenshot sizes, questionnaire answers (assets in `store-assets/`)
+- [GETTING_STARTED.md](docs/GETTING_STARTED.md): beginner setup, from installing Node to running on your phone
 - [BUILD.md](docs/BUILD.md): environments, EAS profiles, environment variables, identifiers
 - [ADS.md](docs/ADS.md): AdMob setup, placements, reward integrity, frequency rules
 - [PRIVACY.md](docs/PRIVACY.md): consent flow, data inventory, privacy policy template, store privacy forms
