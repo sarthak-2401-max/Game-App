@@ -5,11 +5,14 @@
 A portrait, turn-based escape-room puzzle game for iOS and Android, built with Expo + TypeScript. Each room is a hand-made grid with one way out: keys and locks, switches and plates, spikes, lasers, drones, moving platforms, teleporters, crumbling floors, push-blocks, move limits and real-time countdowns.
 
 - **100 campaign rooms** in 10 chapters, plus 12 rotating daily challenges and 3 bonus-vault rooms. Every room is proven solvable by a solver that drives the real game engine.
+- **Story:** you are Pip, a maintenance robot waking up inside the sealed Meridian Vault. Every chapter opens with a story card, every escaped room recovers one story beat, and the Journal keeps them all (`src/game/story.ts`).
+- **Power-ups:** Pathfinder (next 5 steps), Shield (survive one hit), Overclock (+5 moves or +20 s) and Freeze (clock stops for 3 actions). They unlock after rooms 5, 20, 30 and 50, and are earned from chapter milestones, an optional ad, or bought with coins (`src/config/powerups.ts`). Real-money purchases are not implemented yet.
+- **Look:** a 3D-style board (raised walls with front faces and cast shadows, crates, contact shadows, hovering pickups), Pip as a robot character, and a colour palette per chapter (`src/theme/chapters.ts`).
 - **Progression:** Escape Coins, 22 cosmetics, 14 achievements, a daily streak with a one-day grace period.
-- **Monetisation:** optional rewarded ads (revive, hint, double reward, free coins, bonus rooms) and conservative interstitials, through Google AdMob with UMP consent and iOS App Tracking Transparency.
+- **Monetisation:** optional rewarded ads (revive, hint, double reward, free coins, bonus rooms, power-ups) and conservative interstitials, through Google AdMob with UMP consent and iOS App Tracking Transparency.
 - **Offline-first:** no account, no server. Progress is a versioned local save with migrations, a backup and corruption recovery.
 
-> Status: feature-complete and verified in automated tests and a browser build. It has **not** yet been built natively, run on a phone, or connected to a real AdMob account. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [docs/STORE_CHECKLIST.md](docs/STORE_CHECKLIST.md).
+> Status: verified in automated tests and a browser build, and played in Expo Go on an iPhone (before the story and power-up update). It has **not** yet been built natively or connected to a real AdMob account. Store screenshots in `store-assets/` predate the new look and need regenerating. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [docs/STORE_CHECKLIST.md](docs/STORE_CHECKLIST.md).
 
 ## Quick start
 

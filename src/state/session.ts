@@ -1,6 +1,7 @@
 // In-room session: the engine state plus undo history, checkpoint, revives and the real-time
 // countdown. Pure functions; the zustand store in useSession.ts just holds the current value.
 import { ECONOMY } from '../config/economy';
+import { POWERUP_TUNING, type PowerUpId } from '../config/powerups';
 import { initialState, step } from '../game/engine';
 import type { Action, GameState, Room, StepEvent } from '../game/types';
 
@@ -31,6 +32,10 @@ export interface Session {
   /** Events from the latest action, with a sequence number so the UI reacts once per action. */
   events: StepEvent[];
   seq: number;
+  /** Shield power-up armed: the next fatal action is cancelled instead. */
+  shieldArmed: boolean;
+  /** Power-ups spent in this room visit (kept across restarts, for analytics). */
+  powerupsUsed: PowerUpId[];
 }
 
 const MAX_HISTORY = 500;
@@ -52,6 +57,8 @@ export function newSession(room: Room, kind: SessionKind, day?: string): Session
     timedOut: false,
     events: [],
     seq: 0,
+    shieldArmed: false,
+    powerupsUsed: [],
   };
 }
 
@@ -61,6 +68,15 @@ export function act(s: Session, a: Action): Session {
   if (!isPlaying(s)) return s;
   const r = step(s.room, s.state, a);
   if (!r.valid) return { ...s, events: r.events, seq: s.seq + 1 };
+  // Shield: a fatal action (other than running out of moves) is cancelled and the shield is spent.
+  if (r.state.status === 'dead' && s.shieldArmed && r.state.death !== 'moves') {
+    return {
+      ...s,
+      shieldArmed: false,
+      events: [{ type: 'shielded', at: s.state.player, cause: r.state.death ?? 'spikes' }],
+      seq: s.seq + 1,
+    };
+  }
   let next: Session = {
     ...s,
     state: r.state,
@@ -99,6 +115,7 @@ export function restart(s: Session): Session {
     usedUndo: s.usedUndo,
     undoCount: s.undoCount,
     hintsUsed: s.hintsUsed,
+    powerupsUsed: s.powerupsUsed,
     seq: s.seq + 1,
   };
 }
@@ -162,5 +179,48 @@ export function describeRevive(kind: ReviveKind): string {
       return `Get ${ECONOMY.ads.reviveExtraMoves} extra moves and keep going.`;
     case 'extraTime':
       return `Add ${ECONOMY.ads.reviveExtraSeconds} seconds to the clock and keep going.`;
+  }
+}
+
+// ---- Power-ups ----------------------------------------------------------------------------
+
+export const roomHasClock = (room: Room) =>
+  room.drones.length + room.platforms.length > 0 || room.tags.some((t) => t.startsWith('timed'));
+
+export type PowerUpBlock = 'not_playing' | 'already_active' | 'no_effect';
+
+/** Why a power-up can't be used right now, or null if it can. */
+export function powerUpBlocked(s: Session, id: PowerUpId): PowerUpBlock | null {
+  if (!isPlaying(s)) return 'not_playing';
+  switch (id) {
+    case 'pathfinder':
+      return (s.state.frozen ?? 0) > 0 ? 'already_active' : null;
+    case 'shield':
+      return s.shieldArmed ? 'already_active' : null;
+    case 'overclock':
+      return s.room.moveLimit === undefined && s.timeLeftMs === undefined ? 'no_effect' : null;
+    case 'freeze':
+      if (!roomHasClock(s.room)) return 'no_effect';
+      return (s.state.frozen ?? 0) > 0 ? 'already_active' : null;
+  }
+}
+
+/** Applies the in-room effect. Pathfinder has no state effect; the UI shows the route. */
+export function applyPowerUp(s: Session, id: PowerUpId): Session {
+  if (powerUpBlocked(s, id)) return s;
+  const base = { ...s, powerupsUsed: [...s.powerupsUsed, id], seq: s.seq + 1, events: [] };
+  switch (id) {
+    case 'pathfinder':
+      return base;
+    case 'shield':
+      return { ...base, shieldArmed: true };
+    case 'overclock':
+      return {
+        ...base,
+        state: s.room.moveLimit !== undefined ? { ...s.state, bonusMoves: s.state.bonusMoves + POWERUP_TUNING.overclockMoves } : s.state,
+        timeLeftMs: s.timeLeftMs !== undefined ? s.timeLeftMs + POWERUP_TUNING.overclockSeconds * 1000 : undefined,
+      };
+    case 'freeze':
+      return { ...base, state: { ...s.state, frozen: POWERUP_TUNING.freezeTurns } };
   }
 }

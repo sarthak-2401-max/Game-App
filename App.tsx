@@ -8,6 +8,7 @@ import { MockAdHost } from './src/components/ads/MockAdHost';
 import { Toast } from './src/components/Toast';
 import { GameScreen } from './src/screens/GameScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
+import { JournalScreen } from './src/screens/JournalScreen';
 import { LevelSelectScreen } from './src/screens/LevelSelectScreen';
 import { PrivacyScreen } from './src/screens/PrivacyScreen';
 import { RewardsScreen } from './src/screens/RewardsScreen';
@@ -30,6 +31,8 @@ function Router() {
       return <SettingsScreen />;
     case 'privacy':
       return <PrivacyScreen />;
+    case 'journal':
+      return <JournalScreen />;
     default:
       return <HomeScreen />;
   }

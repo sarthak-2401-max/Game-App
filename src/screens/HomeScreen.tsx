@@ -3,7 +3,9 @@ import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } fr
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '../components/Icon';
+import { Ambient } from '../components/Ambient';
 import { RoomPreview } from '../components/RoomPreview';
+import { chapterPalette } from '../theme/chapters';
 import { Button, CoinBadge, IconButton, Panel, ProgressBar, Pulse } from '../components/ui';
 import { APP } from '../config/app';
 import { ECONOMY } from '../config/economy';
@@ -47,7 +49,9 @@ export function HomeScreen() {
   const previewWidth = Math.min(width - 64, 300);
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={[styles.content, { paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl }]}>
+    <View style={styles.root}>
+    <Ambient color={nextChapter ? chapterPalette(nextChapter.number).glow : colors.cyan} cy={0.32} strength={0.2} />
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.content, { paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl }]}>
       <View style={styles.topRow}>
         <CoinBadge coins={save.coins} />
         <View style={{ flexDirection: 'row', gap: space.sm }}>
@@ -119,14 +123,16 @@ export function HomeScreen() {
         <View style={styles.navRow}>
           <NavTile icon="grid" label="Rooms" onPress={() => navigate({ name: 'levels' })} />
           <NavTile icon="gift" label="Shop" onPress={() => navigate({ name: 'rewards', tab: 'shop' })} />
+          <NavTile icon="book" label="Journal" onPress={() => navigate({ name: 'journal' })} />
           <NavTile icon="trophy" label="Awards" onPress={() => navigate({ name: 'rewards', tab: 'achievements' })} />
         </View>
       </Animated.View>
     </ScrollView>
+    </View>
   );
 }
 
-function NavTile({ icon, label, onPress }: { icon: 'grid' | 'gift' | 'trophy'; label: string; onPress: () => void }) {
+function NavTile({ icon, label, onPress }: { icon: 'grid' | 'gift' | 'trophy' | 'book'; label: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => [styles.navTile, pressed && { opacity: 0.75 }]}>
       <Icon name={icon} size={24} color={colors.cyan} />
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
   label: { color: colors.text, ...type.h2 },
   value: { color: colors.textDim, fontWeight: '800', fontVariant: ['tabular-nums'] },
   dim: { color: colors.textDim, ...type.small },
-  navRow: { flexDirection: 'row', gap: space.md },
+  navRow: { flexDirection: 'row', gap: space.sm },
   navTile: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: space.md, backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radius.lg, minHeight: 72, justifyContent: 'center' },
   navLabel: { color: colors.text, fontWeight: '700' },
 });

@@ -1,6 +1,6 @@
 // Shared UI primitives: buttons, panels, badges, toggles and the modal sheet.
 import React, { useEffect, useRef } from 'react';
-import { BackHandler, Pressable, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { BackHandler, Pressable, ScrollView, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { sound } from '../services/audio/sound';
 import { colors, radius, space, TOUCH, type } from '../theme/theme';
@@ -169,12 +169,14 @@ export function Sheet({ visible, onRequestClose, children, title }: { visible: b
     <Animated.View entering={FadeIn.duration(150)} style={styles.overlay}>
       <View style={styles.backdrop}>
         <View style={styles.sheet} accessibilityViewIsModal>
-          {title ? (
-            <Text style={styles.sheetTitle} accessibilityRole="header">
-              {title}
-            </Text>
-          ) : null}
-          {children}
+          <ScrollView bounces={false} contentContainerStyle={styles.sheetContent} showsVerticalScrollIndicator={false}>
+            {title ? (
+              <Text style={styles.sheetTitle} accessibilityRole="header">
+                {title}
+              </Text>
+            ) : null}
+            {children}
+          </ScrollView>
         </View>
       </View>
     </Animated.View>
@@ -223,6 +225,7 @@ const styles = StyleSheet.create({
   section: { color: colors.textDim, ...type.tiny, textTransform: 'uppercase', marginTop: space.lg, marginBottom: space.sm },
   overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100, elevation: 100 },
   backdrop: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'center', padding: space.lg },
-  sheet: { backgroundColor: colors.surface, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: space.xl, maxWidth: 480, width: '100%', alignSelf: 'center', gap: space.md },
+  sheet: { backgroundColor: colors.surface, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, maxWidth: 480, width: '100%', maxHeight: '92%', alignSelf: 'center', overflow: 'hidden' },
+  sheetContent: { padding: space.xl, gap: space.md },
   sheetTitle: { color: colors.text, ...type.h1, textAlign: 'center' },
 });

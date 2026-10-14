@@ -9,6 +9,7 @@ export type AdPlacement =
   | 'double_reward'
   | 'bonus_coins'
   | 'bonus_room'
+  | 'powerup'
   | 'interstitial_transition';
 
 export type RewardedPlacement = Exclude<AdPlacement, 'interstitial_transition'>;

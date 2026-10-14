@@ -3,14 +3,19 @@ import { AppState, BackHandler, Platform, StyleSheet, Text, useWindowDimensions,
 import Animated, { FadeIn, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRewardedOffer } from '../components/ads/RewardedOffer';
-import { Board } from '../components/board/Board';
+import { Board, themeLook } from '../components/board/Board';
+import { Ambient } from '../components/Ambient';
+import { PowerUpBar } from '../components/game/PowerUpBar';
 import { Icon } from '../components/Icon';
+import { BeatView, StoryCard } from '../components/StoryCard';
 import { Button, CoinBadge, IconButton, Sheet, ToggleRow } from '../components/ui';
 import { ACHIEVEMENTS } from '../config/achievements';
+import { getPowerUp, POWERUP_TUNING, type PowerUpId } from '../config/powerups';
 import { movesAllowed, remainingCores } from '../game/engine';
 import { neighbor } from '../game/grid';
 import { nextMovesHint } from '../game/hints';
-import { CAMPAIGN_SIZE, chapterOf, getRoom } from '../game/levels';
+import { CAMPAIGN_SIZE, CHAPTERS, chapterOf, getRoom } from '../game/levels';
+import { CHAPTER_STORY, EPILOGUE, ROOM_STORY, type StoryBeat } from '../game/story';
 import SOLUTIONS from '../game/levels/solutions.generated.json';
 import type { Action, DeathCause } from '../game/types';
 import { adService } from '../services/ads/adService';
@@ -26,7 +31,9 @@ import {
   shouldShowInterstitial,
   type RewardLine,
 } from '../state/progression';
+import { buyPowerUp, powerUpCount, type PowerUpGrant } from '../state/powerups';
 import { describeRevive, reviveOffer } from '../state/session';
+import { chapterIntroSeen, markChapterIntroSeen, markEpilogueSeen } from '../state/story';
 import { useApp } from '../state/useApp';
 import { useSession } from '../state/useSession';
 import { useToast } from '../state/useToast';
@@ -49,6 +56,14 @@ interface Result {
   doubleAmount: number;
   chapterCompleted?: number;
   dailyStatus?: 'claimed' | 'already' | 'blocked';
+  powerups: PowerUpGrant[];
+}
+
+interface StoryOverlay {
+  kicker: string;
+  title: string;
+  beats: readonly StoryBeat[];
+  onDone: () => void;
 }
 
 export function GameScreen() {
@@ -64,6 +79,8 @@ export function GameScreen() {
   const [hintCells, setHintCells] = useState<number[] | undefined>();
   const [introVisible, setIntroVisible] = useState(true);
   const [doubled, setDoubled] = useState(false);
+  const [story, setStory] = useState<StoryOverlay | null>(null);
+  const [getMore, setGetMore] = useState<PowerUpId | null>(null);
   const handledWin = useRef<number>(-1);
   const settings = app.save.settings;
   const reduced = settings.reducedMotion;
@@ -72,7 +89,7 @@ export function GameScreen() {
   const state = session?.state;
   const failed = !!session && (session.state.status === 'dead' || session.timedOut);
   const won = session?.state.status === 'won';
-  const inputEnabled = !!session && !paused && !failed && !won && !showHint;
+  const inputEnabled = !!session && !paused && !failed && !won && !showHint && !story;
 
   // ---- Layout ----------------------------------------------------------------------------
   // Size cells from the space the board area actually gets, so the board never grows over the
@@ -86,6 +103,27 @@ export function GameScreen() {
     const availH = (area?.h ?? fallbackH) - frame;
     return Math.max(16, Math.floor(Math.min(availW / room.width, availH / room.height, 64)));
   }, [room, area, dims, insets, settings.showDpad]);
+
+  // ---- Chapter opening story ----------------------------------------------------------------
+  useEffect(() => {
+    if (!session || session.kind !== 'campaign') return;
+    const ch = CHAPTERS[session.room.chapter - 1];
+    if (!ch || session.room.index !== ch.firstRoom || chapterIntroSeen(useApp.getState().save, ch.number)) return;
+    const st = CHAPTER_STORY[ch.number - 1];
+    if (!st) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- opens once when a chapter's first room starts
+    setStory({
+      kicker: `Chapter ${ch.number} · ${st.location}`,
+      title: ch.title,
+      beats: st.opening,
+      onDone: () => {
+        useApp.getState().update((sv) => markChapterIntroSeen(sv, ch.number));
+        analytics.track('story_viewed', { kind: 'chapter', chapter: ch.number });
+        setStory(null);
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.room.id]);
 
   // ---- Feedback for each action ------------------------------------------------------------
   useEffect(() => {
@@ -134,6 +172,11 @@ export function GameScreen() {
           sound.play('win');
           haptics.success();
           break;
+        case 'shielded':
+          sound.play('unlock');
+          haptics.success();
+          toast('Shield absorbed the hit. Try another way.', 'success');
+          break;
       }
     }
     // Hints are consumed as the player follows them.
@@ -160,6 +203,7 @@ export function GameScreen() {
         achievements: r.ok ? r.achievements : [],
         firstClear: r.ok,
         doubleAmount: 0,
+        powerups: [],
         dailyStatus: r.ok ? 'claimed' : r.reason === 'already_claimed' ? 'already' : 'blocked',
       });
       analytics.track('daily_challenge_completed', { room_id: session.room.id, claimed: r.ok, moves: session.state.moves });
@@ -174,7 +218,20 @@ export function GameScreen() {
         parMoves: par,
       }, now);
       appState.update(() => (session.kind === 'campaign' ? noteRoomForInterstitial(r.save) : r.save));
-      setResult({ rewards: r.rewards, achievements: r.achievements, firstClear: r.firstClear, doubleAmount: r.doubleEligibleAmount, chapterCompleted: r.chapterCompleted });
+      setResult({ rewards: r.rewards, achievements: r.achievements, firstClear: r.firstClear, doubleAmount: r.doubleEligibleAmount, chapterCompleted: r.chapterCompleted, powerups: r.powerups });
+      r.powerups.filter((g) => g.reason === 'unlocked').forEach((g) => analytics.track('powerup_unlocked', { powerup: g.id }));
+      if (session.kind === 'campaign' && session.room.index === CAMPAIGN_SIZE && !r.save.story.epilogueSeen) {
+        setStory({
+          kicker: 'Epilogue',
+          title: 'Outside',
+          beats: EPILOGUE,
+          onDone: () => {
+            useApp.getState().update(markEpilogueSeen);
+            analytics.track('story_viewed', { kind: 'epilogue' });
+            setStory(null);
+          },
+        });
+      }
       r.achievements.forEach((id) => analytics.track('achievement_unlocked', { id }));
       analytics.track('level_completed', {
         room_id: session.room.id,
@@ -194,6 +251,10 @@ export function GameScreen() {
 
   // ---- Real-time countdown (pauses when paused, backgrounded or a sheet is open) --------------
   const appActive = useRef(true);
+  const storyOpen = useRef(false);
+  useEffect(() => {
+    storyOpen.current = !!story;
+  }, [story]);
   useEffect(() => {
     if (!room?.timeLimit) return;
     let last = Date.now();
@@ -202,7 +263,7 @@ export function GameScreen() {
       const dt = now - last;
       last = now;
       const st = useSession.getState();
-      if (!appActive.current || st.paused || showHint || !st.session || st.session.state.status !== 'playing') return;
+      if (!appActive.current || st.paused || showHint || storyOpen.current || !st.session || st.session.state.status !== 'playing') return;
       st.tick(Math.min(dt, 1000));
     }, 200);
     return () => clearInterval(t);
@@ -310,6 +371,28 @@ export function GameScreen() {
     setShowHint(true);
   };
 
+  /** Lights up the next `count` steps of a working route. Returns false if none could be shown. */
+  const showRoute = (count: number, source: 'ad' | 'pathfinder'): boolean => {
+    const st = useSession.getState().session;
+    if (!st) return false;
+    const h = nextMovesHint(st.room, st.state, (SOLUTIONS as Record<string, string>)[st.room.id], count);
+    analytics.track('hint_used', { room_id: st.room.id, kind: source, result: h.kind });
+    if (h.kind === 'moves') {
+      const cells: number[] = [];
+      let c = st.state.player;
+      for (const m of h.moves) {
+        if (m !== 'wait') c = neighbor(st.room.width, st.room.height, c, m);
+        cells.push(c);
+      }
+      setHintCells(cells);
+      const waits = h.moves.filter((m) => m === 'wait').length;
+      toast(waits ? `Follow the numbered tiles (includes ${waits} wait${waits > 1 ? 's' : ''}).` : 'Follow the numbered tiles.', 'success');
+      return true;
+    }
+    toast(h.kind === 'stuck' ? "There's no way out from here. Undo a few moves or restart." : 'This position is too complex to map. Try undoing a few moves.', 'warn');
+    return false;
+  };
+
   const revealMoves = () => {
     setShowHint(false);
     offer({
@@ -317,28 +400,85 @@ export function GameScreen() {
       title: 'Reveal the next moves',
       benefit: 'Shows the next 3 steps of a working solution from where you stand.',
       onGranted: () => {
-        const st = useSession.getState().session;
-        if (!st) return;
-        const h = nextMovesHint(st.room, st.state, (SOLUTIONS as Record<string, string>)[st.room.id]);
         S().noteHint();
-        analytics.track('hint_used', { room_id: st.room.id, kind: 'moves', result: h.kind });
-        if (h.kind === 'moves') {
-          const cells: number[] = [];
-          let c = st.state.player;
-          for (const m of h.moves) {
-            if (m !== 'wait') c = neighbor(st.room.width, st.room.height, c, m);
-            cells.push(c);
-          }
-          setHintCells(cells);
-          const waits = h.moves.filter((m) => m === 'wait').length;
-          toast(waits ? `Follow the numbered tiles (includes ${waits} wait${waits > 1 ? 's' : ''}).` : 'Follow the numbered tiles.', 'success');
-        } else if (h.kind === 'stuck') {
-          toast("There's no way out from here. Undo a few moves or restart.", 'warn');
-        } else {
-          toast('This position is too complex to hint. Try undoing a few moves.', 'warn');
-        }
+        showRoute(3, 'ad');
       },
     });
+  };
+
+  const BLOCK_TEXT = {
+    not_playing: 'Power-ups work only while you are playing.',
+    already_active: 'That power-up is already active.',
+    no_effect: 'That power-up has nothing to affect in this room.',
+    none_left: '',
+  } as const;
+
+  const onPowerUp = (id: PowerUpId) => {
+    if (powerUpCount(app.save, id) <= 0) {
+      setGetMore(id);
+      return;
+    }
+    if (id === 'pathfinder') {
+      // Check a route exists before spending the power-up.
+      const st = useSession.getState().session;
+      if (!st) return;
+      const h = nextMovesHint(st.room, st.state, (SOLUTIONS as Record<string, string>)[st.room.id], POWERUP_TUNING.pathfinderSteps);
+      if (h.kind !== 'moves') {
+        toast(h.kind === 'stuck' ? "There's no way out from here. Undo a few moves or restart." : 'This position is too complex to map. Try undoing a few moves.', 'warn');
+        return;
+      }
+    }
+    const blocked = S().spendPowerUp(id);
+    if (blocked) {
+      if (blocked !== 'none_left') toast(BLOCK_TEXT[blocked], 'info');
+      return;
+    }
+    sound.play('unlock');
+    haptics.light();
+    const def = getPowerUp(id);
+    if (id === 'pathfinder') showRoute(POWERUP_TUNING.pathfinderSteps, 'pathfinder');
+    else toast(`${def.name} activated.`, 'success');
+  };
+
+  const getMoreSheet = (id: PowerUpId) => {
+    const def = getPowerUp(id);
+    const adsLeft = rewardedUsesLeft(app.save, 'powerup', dayKey());
+    return (
+      <Sheet visible title={def.name} onRequestClose={() => setGetMore(null)}>
+        <View style={{ alignItems: 'center' }}>
+          <Icon name={def.icon} size={44} color={def.color} />
+        </View>
+        <Text style={styles.center}>{def.description}</Text>
+        <Text style={styles.centerDim}>You have none left. Get one now:</Text>
+        <Button
+          label={`Buy for ${def.coinPrice}`}
+          icon="coin"
+          variant="reward"
+          disabled={app.save.coins < def.coinPrice}
+          sublabel={app.save.coins < def.coinPrice ? `You have ${app.save.coins} coins` : undefined}
+          onPress={() => {
+            const r = buyPowerUp(useApp.getState().save, id);
+            if (r.ok) {
+              app.update(() => r.save);
+              analytics.track('powerup_purchased', { powerup: id, currency: 'coins' });
+              toast(`${def.name} added.`, 'success');
+              setGetMore(null);
+            }
+          }}
+        />
+        {adService.hasProvider && adsLeft > 0 && (
+          <Button
+            label="Watch an ad for 1"
+            icon="video"
+            onPress={() => {
+              setGetMore(null);
+              offer({ placement: 'powerup', title: `Free ${def.name}`, benefit: `Get 1 ${def.name} for your inventory.`, grantOpts: { powerUpId: id }, onGranted: () => undefined });
+            }}
+          />
+        )}
+        <Button label="Not now" variant="ghost" onPress={() => setGetMore(null)} />
+      </Sheet>
+    );
   };
 
   const revive = reviveOffer(session);
@@ -347,10 +487,12 @@ export function GameScreen() {
   const nextRoomExists = session.kind === 'campaign' && room.index < CAMPAIGN_SIZE;
   const freeHint = room.hint ?? room.intro ?? mechanicTip(room.tags);
   // Rewarded offers stay out of the onboarding rooms and are hidden when no ad source exists.
+  const palette = themeLook(app.save.cosmetics.selected.theme, room.chapter);
   const adsOn = adService.hasProvider && !(session.kind === 'campaign' && room.index <= 3);
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 4, paddingBottom: insets.bottom + 8 }]}>
+    <View style={[styles.root, { backgroundColor: palette.bg, paddingTop: insets.top + 4, paddingBottom: insets.bottom + 8 }]}>
+      <Ambient color={palette.glow} cy={0.48} strength={0.16} />
       {/* HUD */}
       <View style={styles.hudRow}>
         <IconButton icon="pause" label="Pause" onPress={() => S().setPaused(true)} />
@@ -372,6 +514,8 @@ export function GameScreen() {
           <Stat label="Keys" value={[state.keys.gold ? `${state.keys.gold} gold` : '', state.keys.blue ? `${state.keys.blue} blue` : ''].filter(Boolean).join(' · ')} />
         )}
         {hasClock && <Stat label="Turn" value={String(state.tick)} />}
+        {(state.frozen ?? 0) > 0 && <Stat label="Frozen" value={`${state.frozen} left`} accent={getPowerUp('freeze').color} />}
+        {session.shieldArmed && <Stat label="Shield" value="Ready" accent={getPowerUp('shield').color} />}
       </View>
 
       {/* Board */}
@@ -388,7 +532,7 @@ export function GameScreen() {
             <Text style={styles.introText}>{room.intro}</Text>
           </Animated.View>
         )}
-        <View style={styles.boardFrame}>
+        <View style={[styles.boardFrame, { shadowColor: palette.glow, borderColor: `${palette.glow}40` }]}>
           <Board
             room={room}
             state={state}
@@ -401,12 +545,20 @@ export function GameScreen() {
             checkpointCell={session.checkpoint?.state.player}
             onAction={onAction}
             inputEnabled={inputEnabled}
+            frozen={(state.frozen ?? 0) > 0}
+            shielded={session.shieldArmed}
           />
         </View>
       </View>
 
       {/* Controls */}
       <View style={styles.controls}>
+        <PowerUpBar
+          save={app.save}
+          disabled={!inputEnabled}
+          active={{ shield: session.shieldArmed, freeze: (state.frozen ?? 0) > 0, pathfinder: !!hintCells?.length }}
+          onPress={onPowerUp}
+        />
         <View style={styles.toolRow}>
           <IconButton icon="undo" label="Undo last move" onPress={() => S().undo()} disabled={!session.history.length || failed || won} />
           <IconButton icon="restart" label="Restart room" onPress={() => { setHintCells(undefined); S().restart(); }} />
@@ -498,6 +650,24 @@ export function GameScreen() {
                 <Text style={styles.rewardAmt}>+{r.amount}</Text>
               </Animated.View>
             ))}
+            {result.powerups.map((g, i) => {
+              const def = getPowerUp(g.id);
+              return (
+                <View key={`pu${i}`} style={[styles.rewardRow, { backgroundColor: `${def.color}1A` }]}>
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                    <Icon name={def.icon} size={18} color={def.color} />
+                    <Text style={styles.rewardLabel}>{g.reason === 'unlocked' ? `New power-up: ${def.name}` : def.name}</Text>
+                  </View>
+                  <Text style={[styles.rewardAmt, { color: def.color }]}>×{g.count}</Text>
+                </View>
+              );
+            })}
+            {session.kind === 'campaign' && ROOM_STORY[room.index - 1] && (
+              <Animated.View entering={FadeInUp.delay(200).duration(300)} style={styles.storyBox}>
+                <Text style={styles.storyKicker}>Story unlocked</Text>
+                <BeatView beat={ROOM_STORY[room.index - 1]} compact />
+              </Animated.View>
+            )}
             {result.achievements.map((id) => (
               <View key={id} style={styles.achRow}>
                 <Icon name="trophy" size={18} color={colors.gold} />
@@ -527,15 +697,17 @@ export function GameScreen() {
           </Animated.View>
         )}
       </Sheet>
+      {getMore && getMoreSheet(getMore)}
       {offerSheet}
+      {story && <StoryCard kicker={story.kicker} title={story.title} beats={story.beats} onDone={story.onDone} />}
     </View>
   );
 }
 
-function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
+function Stat({ label, value, warn, accent }: { label: string; value: string; warn?: boolean; accent?: string }) {
   return (
-    <View style={[styles.stat, warn && { borderColor: colors.danger }]} accessible accessibilityLabel={`${label}: ${value}`}>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={[styles.stat, warn && { borderColor: colors.danger }, accent ? { borderColor: accent } : null]} accessible accessibilityLabel={`${label}: ${value}`}>
+      <Text style={[styles.statLabel, accent ? { color: accent } : null]}>{label}</Text>
       <Text style={[styles.statValue, warn && { color: colors.danger }]}>{value}</Text>
     </View>
   );
@@ -572,7 +744,7 @@ const styles = StyleSheet.create({
   statLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
   statValue: { color: colors.text, fontWeight: '800', fontSize: 14, fontVariant: ['tabular-nums'] },
   boardWrap: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', marginVertical: space.sm, overflow: 'hidden' },
-  boardFrame: { padding: 4, borderRadius: radius.md, backgroundColor: '#05070C', borderWidth: 1, borderColor: '#1C2538', shadowColor: colors.cyan, shadowOpacity: 0.15, shadowRadius: 18 },
+  boardFrame: { padding: 4, borderRadius: radius.md, backgroundColor: '#05070C', borderWidth: 1, borderColor: '#1C2538', shadowColor: colors.cyan, shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 8 }, elevation: 12 },
   intro: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', gap: 8, alignItems: 'center', backgroundColor: '#0B1A24EE', borderColor: colors.cyanDim, borderWidth: 1, borderRadius: radius.md, padding: 10 },
   introText: { color: colors.text, flex: 1, fontWeight: '600', fontSize: 14 },
   controls: { gap: space.sm, alignItems: 'center' },
@@ -586,4 +758,6 @@ const styles = StyleSheet.create({
   rewardAmt: { color: colors.amber, fontWeight: '900' },
   achRow: { flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
   achText: { color: colors.gold, fontWeight: '800' },
+  storyBox: { backgroundColor: '#0B1220', borderRadius: radius.md, padding: space.md, gap: 6, borderWidth: 1, borderColor: colors.border },
+  storyKicker: { color: colors.textMuted, fontSize: 10, fontWeight: '900', letterSpacing: 1.2, textTransform: 'uppercase' },
 });

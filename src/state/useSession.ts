@@ -5,6 +5,8 @@ import type { Action, Room } from '../game/types';
 import { analytics } from '../services/analytics/analytics';
 import { useApp } from './useApp';
 import { recordAttempt, recordFailure } from './progression';
+import { consumePowerUp } from './powerups';
+import type { PowerUpId } from '../config/powerups';
 import * as S from './session';
 
 interface SessionState {
@@ -19,6 +21,8 @@ interface SessionState {
   revive(): void;
   setPaused(p: boolean): void;
   noteHint(): void;
+  /** Spends one power-up from the inventory and applies it. */
+  spendPowerUp(id: PowerUpId): S.PowerUpBlock | 'none_left' | null;
   clear(): void;
 }
 
@@ -111,6 +115,20 @@ export const useSession = create<SessionState>((set, get) => ({
     if (!s) return;
     set({ session: { ...s, hintsUsed: s.hintsUsed + 1 } });
     useApp.getState().update((sv) => ({ ...sv, stats: { ...sv.stats, hintsUsed: sv.stats.hintsUsed + 1 } }));
+  },
+
+  spendPowerUp(id) {
+    const s = get().session;
+    if (!s) return 'not_playing';
+    const blocked = S.powerUpBlocked(s, id);
+    if (blocked) return blocked;
+    const app = useApp.getState();
+    const spent = consumePowerUp(app.save, id);
+    if (!spent) return 'none_left';
+    app.update(() => spent);
+    set({ session: S.applyPowerUp(s, id) });
+    analytics.track('powerup_used', { ...props(s), powerup: id });
+    return null;
   },
 
   clear() {

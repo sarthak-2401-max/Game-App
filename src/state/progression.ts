@@ -9,6 +9,8 @@ import { INTERSTITIAL_POLICY, type RewardedPlacement } from '../config/ads';
 import { CAMPAIGN_SIZE, ROOMS_PER_CHAPTER, roomId } from '../game/levels';
 import type { Room } from '../game/types';
 import type { RoomRecord, SaveData } from '../services/storage/saveSchema';
+import { POWERUP_TUNING, type PowerUpId } from '../config/powerups';
+import { addPowerUp, grantChapterPowerUps, syncPowerUpUnlocks, type PowerUpGrant } from './powerups';
 import { dayKey, daysBetween } from '../utils/dates';
 
 export interface RewardLine {
@@ -25,6 +27,8 @@ export interface CompletionResult {
   firstClear: boolean;
   /** Base reward that an optional "double reward" ad would add again (0 = not eligible). */
   doubleEligibleAmount: number;
+  /** Power-ups unlocked or earned by this completion. */
+  powerups: PowerUpGrant[];
 }
 
 export interface RunStats {
@@ -200,7 +204,16 @@ export function completeRoom(save: SaveData, room: Room, run: RunStats, now = ne
   );
   s = ach.save;
   rewards.push(...ach.rewards);
-  return { save: s, rewards, achievements: ach.unlocked, chapterCompleted, firstClear, doubleEligibleAmount: base };
+
+  const unlocks = syncPowerUpUnlocks(s);
+  s = unlocks.save;
+  const powerups = [...unlocks.grants];
+  if (chapterCompleted !== undefined) {
+    const milestone = grantChapterPowerUps(s, chapterCompleted);
+    s = milestone.save;
+    powerups.push(...milestone.grants);
+  }
+  return { save: s, rewards, achievements: ach.unlocked, chapterCompleted, firstClear, doubleEligibleAmount: base, powerups };
 }
 
 // ---- Daily challenge --------------------------------------------------------------------
@@ -291,6 +304,7 @@ const LIMITS: Record<RewardedPlacement, number> = {
   double_reward: ECONOMY.ads.doubleRewardDailyLimit,
   bonus_coins: ECONOMY.ads.bonusCoinsDailyLimit,
   bonus_room: ECONOMY.ads.bonusRoomUnlockDailyLimit,
+  powerup: POWERUP_TUNING.adDailyLimit,
 };
 
 export function rollAdDay(save: SaveData, today: string): SaveData {
@@ -315,7 +329,7 @@ export function grantRewardedAd(
   placement: RewardedPlacement,
   token: string,
   now = new Date(),
-  opts: { doubleAmount?: number; bonusRoomId?: string } = {},
+  opts: { doubleAmount?: number; bonusRoomId?: string; powerUpId?: PowerUpId } = {},
 ): GrantResult {
   if (save.ads.grantedTokens.includes(token)) return { granted: false, save, reason: 'duplicate' };
   const today = dayKey(now);
@@ -335,6 +349,7 @@ export function grantRewardedAd(
   if (placement === 'bonus_room' && opts.bonusRoomId && !s.bonusRoomsUnlocked.includes(opts.bonusRoomId)) {
     s = { ...s, bonusRoomsUnlocked: [...s.bonusRoomsUnlocked, opts.bonusRoomId] };
   }
+  if (placement === 'powerup' && opts.powerUpId) s = addPowerUp(s, opts.powerUpId, 1);
   return { granted: true, save: s };
 }
 

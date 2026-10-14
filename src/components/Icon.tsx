@@ -5,7 +5,8 @@ import Svg, { Circle, G, Line, Path, Polygon, Rect } from 'react-native-svg';
 export type IconName =
   | 'pause' | 'undo' | 'restart' | 'hint' | 'wait' | 'up' | 'down' | 'left' | 'right' | 'gear' | 'back'
   | 'lock' | 'check' | 'star' | 'gift' | 'calendar' | 'trophy' | 'play' | 'grid' | 'video' | 'close'
-  | 'coin' | 'shield' | 'flame' | 'sound' | 'music' | 'vibrate' | 'motion' | 'info';
+  | 'coin' | 'shield' | 'flame' | 'sound' | 'music' | 'vibrate' | 'motion' | 'info'
+  | 'compass' | 'bolt' | 'snow' | 'book' | 'cart';
 
 // Icons are decorative: the surrounding control carries the accessible label.
 // react-native-svg passes props straight to the DOM on web, so use the web attribute there.
@@ -134,6 +135,37 @@ export function Icon({ name, size = 22, color = '#E8EEF9' }: { name: IconName; s
         );
       case 'shield':
         return <Path d={`M ${s / 2} ${s * 0.16} L ${s * 0.78} ${s * 0.28} V ${s * 0.5} C ${s * 0.78} ${s * 0.68} ${s * 0.64} ${s * 0.78} ${s / 2} ${s * 0.86} C ${s * 0.36} ${s * 0.78} ${s * 0.22} ${s * 0.68} ${s * 0.22} ${s * 0.5} V ${s * 0.28} Z`} {...p} />;
+      case 'compass':
+        return (
+          <G>
+            <Circle cx={s / 2} cy={s / 2} r={s * 0.34} {...p} />
+            <Polygon points={`${s * 0.62},${s * 0.38} ${s * 0.44},${s * 0.44} ${s * 0.38},${s * 0.62} ${s * 0.56},${s * 0.56}`} fill={color} />
+          </G>
+        );
+      case 'bolt':
+        return <Polygon points={`${s * 0.56},${s * 0.12} ${s * 0.26},${s * 0.56} ${s * 0.48},${s * 0.56} ${s * 0.42},${s * 0.88} ${s * 0.74},${s * 0.42} ${s * 0.52},${s * 0.42}`} fill={color} />;
+      case 'snow':
+        return (
+          <G>
+            {[0, 60, 120].map((r) => (
+              <G key={r} rotation={r} origin={`${s / 2}, ${s / 2}`}>
+                <Line x1={s / 2} y1={s * 0.14} x2={s / 2} y2={s * 0.86} {...p} />
+                <Line x1={s * 0.4} y1={s * 0.22} x2={s / 2} y2={s * 0.3} {...p} />
+                <Line x1={s * 0.6} y1={s * 0.22} x2={s / 2} y2={s * 0.3} {...p} />
+              </G>
+            ))}
+          </G>
+        );
+      case 'book':
+        return <Path d={`M ${s / 2} ${s * 0.28} C ${s * 0.4} ${s * 0.2} ${s * 0.26} ${s * 0.2} ${s * 0.16} ${s * 0.24} V ${s * 0.78} C ${s * 0.26} ${s * 0.74} ${s * 0.4} ${s * 0.74} ${s / 2} ${s * 0.82} C ${s * 0.6} ${s * 0.74} ${s * 0.74} ${s * 0.74} ${s * 0.84} ${s * 0.78} V ${s * 0.24} C ${s * 0.74} ${s * 0.2} ${s * 0.6} ${s * 0.2} ${s / 2} ${s * 0.28} Z M ${s / 2} ${s * 0.28} V ${s * 0.82}`} {...p} />;
+      case 'cart':
+        return (
+          <G>
+            <Path d={`M ${s * 0.12} ${s * 0.2} H ${s * 0.24} L ${s * 0.34} ${s * 0.64} H ${s * 0.78} L ${s * 0.86} ${s * 0.32} H ${s * 0.28}`} {...p} />
+            <Circle cx={s * 0.4} cy={s * 0.8} r={s * 0.06} fill={color} />
+            <Circle cx={s * 0.72} cy={s * 0.8} r={s * 0.06} fill={color} />
+          </G>
+        );
       case 'flame':
         return <Path d={`M ${s / 2} ${s * 0.14} C ${s * 0.7} ${s * 0.36} ${s * 0.78} ${s * 0.5} ${s * 0.72} ${s * 0.66} A ${s * 0.24} ${s * 0.24} 0 0 1 ${s * 0.28} ${s * 0.66} C ${s * 0.24} ${s * 0.52} ${s * 0.34} ${s * 0.44} ${s * 0.4} ${s * 0.38} C ${s * 0.42} ${s * 0.5} ${s * 0.5} ${s * 0.52} ${s * 0.52} ${s * 0.46} C ${s * 0.56} ${s * 0.36} ${s * 0.5} ${s * 0.24} ${s / 2} ${s * 0.14} Z`} fill={color} />;
       case 'sound':

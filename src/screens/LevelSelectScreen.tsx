@@ -14,6 +14,8 @@ import { chapterProgress, completedCount, continueRoom, isRoomUnlocked, unlockBo
 import { useApp } from '../state/useApp';
 import { useSession } from '../state/useSession';
 import { useToast } from '../state/useToast';
+import { CHAPTER_STORY } from '../game/story';
+import { chapterPalette } from '../theme/chapters';
 import { colors, radius, space, type } from '../theme/theme';
 
 /** Completed campaign rooms needed before the Bonus Vault opens. */
@@ -50,11 +52,15 @@ export function LevelSelectScreen() {
         {chapters.map(({ info, rooms }) => {
           const progress = chapterProgress(save, info.number);
           const locked = !isRoomUnlocked(save, info.firstRoom);
+          const pal = chapterPalette(info.number);
           return (
-            <Panel key={info.number} style={[{ gap: space.md }, locked && { opacity: 0.55 }]}>
+            <Panel key={info.number} style={[{ gap: space.md, borderColor: locked ? colors.border : `${pal.glow}55`, backgroundColor: locked ? colors.surface : pal.bg }, locked && { opacity: 0.55 }]}>
               <View style={styles.chapterHead}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.chapterNum}>Chapter {info.number}</Text>
+                  <Text style={[styles.chapterNum, { color: pal.glow }]}>
+                    Chapter {info.number}
+                    {!locked && CHAPTER_STORY[info.number - 1] ? ` · ${CHAPTER_STORY[info.number - 1].location}` : ''}
+                  </Text>
                   <Text style={styles.chapterTitle} accessibilityRole="header">
                     {info.title}
                   </Text>

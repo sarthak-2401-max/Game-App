@@ -20,7 +20,8 @@ export type Route =
   | { name: 'levels' }
   | { name: 'rewards'; tab?: RewardsTab }
   | { name: 'settings' }
-  | { name: 'privacy' };
+  | { name: 'privacy' }
+  | { name: 'journal' };
 
 export type RewardsTab = 'shop' | 'achievements' | 'daily' | 'coins';
 

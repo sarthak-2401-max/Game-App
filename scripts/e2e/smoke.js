@@ -9,7 +9,8 @@ const OUT = process.argv[2];
   const step = async (name, fn) => { try { await fn(); await page.waitForTimeout(700); await page.screenshot({ path: `${OUT}/${name}.png` }); console.log('ok', name); } catch (e) { console.log('FAIL', name, e.message.split('\n')[0]); } };
   await page.goto('http://localhost:8099/');
   await step('01-home-new', () => page.getByText('Play', { exact: true }).waitFor({ timeout: 15000 }));
-  await step('02-room1', async () => { await page.getByText('Play', { exact: true }).click({ force: true }); await page.waitForTimeout(800); });
+  await step('02-story', async () => { await page.getByText('Play', { exact: true }).click({ force: true }); await page.getByText('Skip', { exact: true }).waitFor({ timeout: 5000 }); });
+  await step('02-room1', async () => { await page.getByText('Skip', { exact: true }).click({ force: true }); await page.waitForTimeout(800); });
   await step('03-room1-won', async () => { await page.keyboard.press('ArrowRight'); await page.waitForTimeout(300); await page.keyboard.press('ArrowRight'); await page.getByText('Escaped!').waitFor({ timeout: 5000 }); });
   await step('04-room2', async () => { await page.getByText('Next room').click({ force: true }); });
   await step('05-room2-fail', async () => {
@@ -35,6 +36,8 @@ const OUT = process.argv[2];
   await step('16-after-reset', async () => { await page.getByText('Erase everything').click(); await page.getByText('Play', { exact: true }).waitFor({ timeout: 5000 }); });
   await page.goto('http://localhost:8099/');
   await step('17-privacy', async () => { await page.getByLabel('Settings').click(); await page.getByText('Privacy information').click(); });
+  await page.goto('http://localhost:8099/');
+  await step('18-journal', async () => { await page.getByText('Journal', { exact: true }).waitFor({ timeout: 15000 }); await page.waitForTimeout(600); await page.getByText('Journal', { exact: true }).click({ force: true }); await page.getByText(/entries recovered/).waitFor({ timeout: 5000 }); });
   console.log('ERRORS', JSON.stringify(errors, null, 1));
   await browser.close();
 })();

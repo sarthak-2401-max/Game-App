@@ -1,15 +1,15 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
-import { getCosmetic } from '../../config/cosmetics';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { DEFAULT_COSMETICS, getCosmetic } from '../../config/cosmetics';
+import { chapterPalette, type Palette } from '../../theme/chapters';
 import { colOf, dirBetween, rowOf } from '../../game/grid';
 import type { Action, Dir, GameState, Room, StepEvent } from '../../game/types';
 import { colors } from '../../theme/theme';
 import { Burst, type BurstSpec } from './Particles';
 import { deriveModel, type TileView } from './derive';
 import {
-  BlockGlyph as BlockGlyphRaw,
   CheckpointGlyph,
   CoinGlyph as CoinGlyphRaw,
   CoreGlyph as CoreGlyphRaw,
@@ -30,7 +30,6 @@ import {
 
 // Glyphs are SVG and take only primitive props, so memoising them stops every sprite from
 // re-drawing on each move (the main per-move cost on device).
-const BlockGlyph = memo(BlockGlyphRaw);
 const CoinGlyph = memo(CoinGlyphRaw);
 const CoreGlyph = memo(CoreGlyphRaw);
 const DroneGlyph = memo(DroneGlyphRaw);
@@ -60,53 +59,104 @@ interface Props {
   onAction?: (a: Action) => void;
   /** Disable input (paused, modal open, ended). */
   inputEnabled: boolean;
+  /** Chapter environment for the default theme (0 or undefined = cosmetic palette). */
+  chapter?: number;
+  /** Freeze power-up active: tint the room. */
+  frozen?: boolean;
+  /** Shield power-up armed: show a bubble around the player. */
+  shielded?: boolean;
 }
 
 const MOVE_MS = 110;
 
-function themeLook(id: string) {
+export type BoardTheme = Palette;
+
+/** Darkens a #RRGGBB colour by a factor (0..1). */
+function shade(hex: string, f: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const c = (v: number) => Math.max(0, Math.min(255, Math.round(v * f)));
+  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => c(v).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** The default room theme follows the chapter's environment; other themes are cosmetic picks. */
+export function themeLook(id: string, chapter?: number): BoardTheme {
+  if ((id === DEFAULT_COSMETICS.theme || !getCosmetic(id)) && chapter) return chapterPalette(chapter);
   const l = getCosmetic(id)?.look ?? {};
+  const wall = String(l.wall ?? '#262F45');
   return {
+    bg: String(l.bg ?? '#07090F'),
     floor: String(l.floor ?? '#121826'),
     floorAlt: String(l.floorAlt ?? '#151C2C'),
-    wall: String(l.wall ?? '#262F45'),
+    wall,
     wallEdge: String(l.wallEdge ?? '#3A4766'),
+    wallSide: shade(wall, 0.55),
+    glow: colors.cyan,
   };
 }
+
+/** Height of a wall's front face, as a fraction of a cell: the "3D" depth of the room. */
+export const WALL_DEPTH = 0.26;
 
 // ---- Static terrain ----------------------------------------------------------------------
 
 const TerrainTile = memo(function TerrainTile({
-  v,
+  k,
   size,
   x,
   y,
   t,
   pattern,
   alt,
+  wallAbove,
+  wallLeft,
 }: {
-  v: TileView;
+  k: TileView['tile']['k'];
   size: number;
   x: number;
   y: number;
-  t: ReturnType<typeof themeLook>;
+  t: BoardTheme;
   pattern: string;
   alt: boolean;
+  wallAbove: boolean;
+  wallLeft: boolean;
 }) {
-  const k = v.tile.k;
   const base = { position: 'absolute' as const, left: x, top: y, width: size, height: size };
+  const depth = Math.round(size * WALL_DEPTH);
   if (k === 'wall') {
-    return <View style={[base, { backgroundColor: t.wall, borderTopWidth: 3, borderTopColor: t.wallEdge, borderRadius: 2 }]} />;
+    // A raised block seen from the front: lit top face, darker front face, soft edge light.
+    return (
+      <View style={base}>
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: size - depth, backgroundColor: t.wall, borderTopWidth: 2, borderTopColor: t.wallEdge, borderTopLeftRadius: 3, borderTopRightRadius: 3 }} />
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth, backgroundColor: t.wallSide, borderTopWidth: 1, borderTopColor: '#00000040' }} />
+      </View>
+    );
   }
   if (k === 'pit') {
+    // A shaft: the far wall is visible inside the top of the hole.
     return (
-      <View style={[base, { backgroundColor: '#020306' }]}>
-        <View style={{ position: 'absolute', left: 3, right: 3, top: 3, bottom: 3, borderRadius: 4, borderWidth: 1, borderColor: '#10141F' }} />
+      <View style={[base, { backgroundColor: '#010205' }]}>
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: size * 0.34, backgroundColor: shade(t.wallSide, 0.7) }} />
+        <View style={{ position: 'absolute', left: 0, right: 0, top: size * 0.34, height: size * 0.12, backgroundColor: '#00000080' }} />
       </View>
     );
   }
   return (
-    <View style={[base, { backgroundColor: alt ? t.floorAlt : t.floor, borderWidth: StyleSheet.hairlineWidth, borderColor: '#0A0E17' }]}>
+    <View
+      style={[
+        base,
+        {
+          backgroundColor: alt ? t.floorAlt : t.floor,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderTopColor: '#FFFFFF0F',
+          borderLeftColor: '#FFFFFF0A',
+          borderBottomWidth: 1,
+          borderRightWidth: 1,
+          borderBottomColor: '#00000059',
+          borderRightColor: '#00000040',
+        },
+      ]}
+    >
       {pattern === 'grid' && <View style={{ position: 'absolute', left: size * 0.2, right: size * 0.2, top: size * 0.2, bottom: size * 0.2, borderWidth: 1, borderColor: '#ffffff0d', borderRadius: 3 }} />}
       {pattern === 'dots' &&
         [0.2, 0.8].flatMap((a) =>
@@ -114,10 +164,50 @@ const TerrainTile = memo(function TerrainTile({
             <View key={`${a}${b}`} style={{ position: 'absolute', left: size * a - 1.5, top: size * b - 1.5, width: 3, height: 3, borderRadius: 2, backgroundColor: '#ffffff14' }} />
           )),
         )}
+      {/* Shadows cast by the raised wall behind / beside this tile. */}
+      {wallAbove && <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: size * 0.2, backgroundColor: '#00000052' }} />}
+      {wallLeft && <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: size * 0.1, backgroundColor: '#00000033' }} />}
       {k === 'crumble' && <CrackGlyph s={size} />}
     </View>
   );
 });
+
+/** Soft contact shadow under anything standing on the floor. */
+const Shadow = memo(function Shadow({ size, scale = 1 }: { size: number; scale?: number }) {
+  const w = size * 0.62 * scale;
+  return <View pointerEvents="none" style={{ position: 'absolute', left: (size - w) / 2, top: size * 0.74, width: w, height: size * 0.16, borderRadius: size, backgroundColor: '#00000066' }} />;
+});
+
+/** Pushable crate drawn as a raised block, like a small wall. */
+const Crate = memo(function Crate({ size }: { size: number }) {
+  const inset = size * 0.08;
+  const depth = Math.round(size * WALL_DEPTH * 0.9);
+  const w = size - inset * 2;
+  return (
+    <View style={{ position: 'absolute', left: inset, top: inset, width: w, height: size - inset * 1.4 }}>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: -inset * 0.4, height: depth, backgroundColor: '#00000055', borderRadius: 4 }} />
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: depth, backgroundColor: '#B7853F', borderRadius: 4, borderWidth: 2, borderColor: '#E3B26A' }}>
+        <View style={{ position: 'absolute', left: '18%', right: '18%', top: '46%', height: 2, backgroundColor: '#7A5426' }} />
+        <View style={{ position: 'absolute', top: '18%', bottom: '18%', left: '48%', width: 2, backgroundColor: '#7A5426' }} />
+      </View>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth, backgroundColor: '#7A5426', borderBottomLeftRadius: 4, borderBottomRightRadius: 4 }} />
+    </View>
+  );
+});
+
+/** Gentle hover for actors and pickups so the room feels alive. */
+function Bob({ enabled, amount, period, children }: { enabled: boolean; amount: number; period: number; children: React.ReactNode }) {
+  const v = useSharedValue(0);
+  useEffect(() => {
+    if (!enabled) {
+      v.value = 0;
+      return;
+    }
+    v.value = withRepeat(withSequence(withTiming(-amount, { duration: period / 2, easing: Easing.inOut(Easing.sin) }), withTiming(0, { duration: period / 2, easing: Easing.inOut(Easing.sin) })), -1);
+  }, [enabled, amount, period, v]);
+  const st = useAnimatedStyle(() => ({ transform: [{ translateY: v.value }] }));
+  return <Animated.View style={st}>{children}</Animated.View>;
+}
 
 // ---- Dynamic features ----------------------------------------------------------------------
 
@@ -286,10 +376,10 @@ function TrailGhost({ cell, w, size, color, seq }: { cell: number; w: number; si
   );
 }
 
-export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled }: Props) {
+export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded }: Props) {
   const w = room.width;
   const model = useMemo(() => deriveModel(room, state), [room, state]);
-  const theme = useMemo(() => themeLook(look.theme), [look.theme]);
+  const theme = useMemo(() => themeLook(look.theme, chapter ?? room.chapter), [look.theme, chapter, room.chapter]);
   const pattern = String(getCosmetic(look.tile)?.look.pattern ?? 'plain');
   const exitStyle = String(getCosmetic(look.exit)?.look.style ?? 'portal');
   const skin = getCosmetic(look.skin)?.look ?? { color: colors.cyan, shape: 'circle' };
@@ -302,7 +392,9 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
       model.tiles.map((v) => (
         <TerrainTile
           key={v.cell}
-          v={v}
+          k={v.tile.k}
+          wallAbove={v.cell >= w && model.tiles[v.cell - w]?.tile.k === 'wall'}
+          wallLeft={v.cell % w > 0 && model.tiles[v.cell - 1]?.tile.k === 'wall'}
           size={size}
           x={colOf(w, v.cell) * size}
           y={rowOf(w, v.cell) * size}
@@ -396,8 +488,11 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           </Mover>
         ))}
         {model.items.map(({ index, item }) => (
-          <View key={`i${index}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, item.cell) * size, top: rowOf(w, item.cell) * size, zIndex: 2 }]}>
-            {item.kind === 'core' ? <CoreGlyph s={size} /> : item.kind === 'coin' ? <CoinGlyph s={size} /> : <KeyGlyph s={size} color={item.color ?? 'gold'} />}
+          <View key={`i${index}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, item.cell) * size, top: rowOf(w, item.cell) * size, width: size, height: size, zIndex: 2 }]}>
+            <Shadow size={size} scale={0.6} />
+            <Bob enabled={!reducedMotion} amount={size * 0.06} period={1600 + index * 170}>
+              {item.kind === 'core' ? <CoreGlyph s={size} /> : item.kind === 'coin' ? <CoinGlyph s={size} /> : <KeyGlyph s={size} color={item.color ?? 'gold'} />}
+            </Bob>
           </View>
         ))}
         {model.beams.map((b) => (
@@ -405,7 +500,7 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         ))}
         {blocks.map((b) => (
           <Mover key={`blk${b.id}`} cell={b.cell} w={w} size={size} reduced={reducedMotion} z={5}>
-            <BlockGlyph s={size} />
+            <Crate size={size} />
           </Mover>
         ))}
         {hintCells?.map((c, i) => (
@@ -426,18 +521,26 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           )}
         {moveFrom && trailColor !== 'transparent' && !reducedMotion && <TrailGhost cell={moveFrom.from} w={w} size={size} color={trailColor} seq={seq} />}
         <Mover cell={state.player} w={w} size={size} reduced={reducedMotion} z={8}>
+          <Shadow size={size} scale={0.8} />
           <View style={{ opacity: dead ? 0.35 : 1 }}>
-            <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} />
+            <Bob enabled={!reducedMotion && !dead} amount={size * 0.05} period={1400}>
+              <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} />
+            </Bob>
           </View>
+          {shielded && <View pointerEvents="none" style={{ position: 'absolute', left: size * 0.04, top: size * 0.02, width: size * 0.92, height: size * 0.92, borderRadius: size, borderWidth: 2, borderColor: '#5CC8FF', backgroundColor: '#5CC8FF22' }} />}
         </Mover>
         {model.drones.map((d) => (
           <Mover key={`d${d.index}`} cell={d.cell} w={w} size={size} reduced={reducedMotion} z={9}>
-            <DroneGlyph s={size} />
+            <Shadow size={size} scale={0.55} />
+            <Bob enabled={!reducedMotion && !frozen} amount={size * 0.08} period={900}>
+              <DroneGlyph s={size} />
+            </Bob>
           </Mover>
         ))}
         {bursts.map((b) => (
           <Burst key={b.id} spec={b} w={w} size={size} />
         ))}
+        {frozen && <View pointerEvents="none" style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, backgroundColor: '#B8A6FF1F', borderWidth: 2, borderColor: '#B8A6FF88', zIndex: 20 }]} />}
       </Animated.View>
     </GestureDetector>
   );

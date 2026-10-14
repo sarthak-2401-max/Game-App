@@ -250,20 +250,32 @@ export function BlockGlyph({ s }: P) {
   );
 }
 
+/** Pip, the maintenance robot. `shape` (from the character cosmetic) changes the head. */
 export function PlayerGlyph({ s, color, shape }: P & { color: string; shape: string }) {
-  const r = s * 0.3;
+  const cx = s / 2;
+  const headW = s * 0.56;
+  const headH = s * 0.4;
+  const headY = s * 0.2;
+  const bodyY = headY + headH - s * 0.02;
   return (
     <Svg width={s} height={s}>
-      <Circle cx={s / 2} cy={s / 2} r={s * 0.44} fill={color} fillOpacity={0.16} />
+      <Circle cx={cx} cy={s * 0.5} r={s * 0.46} fill={color} fillOpacity={0.12} />
+      {/* antenna */}
+      <Line x1={cx} y1={headY} x2={cx} y2={s * 0.08} stroke={color} strokeWidth={Math.max(1.5, s * 0.035)} strokeLinecap="round" />
+      <Circle cx={cx} cy={s * 0.07} r={s * 0.045} fill="#FFFFFF" />
+      {/* body */}
+      <Rect x={cx - s * 0.2} y={bodyY} width={s * 0.4} height={s * 0.26} rx={s * 0.08} fill={color} opacity={0.85} />
+      <Rect x={cx - s * 0.08} y={bodyY + s * 0.07} width={s * 0.16} height={s * 0.05} rx={s * 0.02} fill="#07090F" opacity={0.6} />
+      {/* head */}
       {shape === 'diamond' ? (
-        <Polygon points={`${s / 2},${s / 2 - r * 1.15} ${s / 2 + r * 1.15},${s / 2} ${s / 2},${s / 2 + r * 1.15} ${s / 2 - r * 1.15},${s / 2}`} fill={color} />
-      ) : shape === 'square' ? (
-        <Rect x={s / 2 - r} y={s / 2 - r} width={r * 2} height={r * 2} rx={r * 0.35} fill={color} />
+        <Polygon points={`${cx},${headY - s * 0.04} ${cx + headW / 2},${headY + headH / 2} ${cx},${headY + headH + s * 0.04} ${cx - headW / 2},${headY + headH / 2}`} fill={color} />
       ) : (
-        <Circle cx={s / 2} cy={s / 2} r={r} fill={color} />
+        <Rect x={cx - headW / 2} y={headY} width={headW} height={headH} rx={shape === 'square' ? s * 0.05 : headH / 2} fill={color} />
       )}
-      <Circle cx={s / 2 - r * 0.32} cy={s / 2 - r * 0.15} r={r * 0.16} fill="#07090F" />
-      <Circle cx={s / 2 + r * 0.32} cy={s / 2 - r * 0.15} r={r * 0.16} fill="#07090F" />
+      {/* visor */}
+      <Rect x={cx - headW * 0.36} y={headY + headH * 0.26} width={headW * 0.72} height={headH * 0.46} rx={headH * 0.23} fill="#07131A" />
+      <Circle cx={cx - headW * 0.15} cy={headY + headH * 0.49} r={s * 0.045} fill="#9CF5FF" />
+      <Circle cx={cx + headW * 0.15} cy={headY + headH * 0.49} r={s * 0.045} fill="#9CF5FF" />
     </Svg>
   );
 }

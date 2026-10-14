@@ -99,6 +99,8 @@ export interface GameState {
   death?: DeathCause;
   /** Extra moves granted by a revive. Part of state so undo stays consistent. */
   bonusMoves: number;
+  /** Freeze power-up: actions left during which the clock (drones, platforms, timed traps) stands still. */
+  frozen?: number;
 }
 
 export type StepEvent =
@@ -115,7 +117,9 @@ export type StepEvent =
   | { type: 'death'; cause: DeathCause }
   | { type: 'win' }
   | { type: 'checkpoint'; at: number }
-  | { type: 'exitSealed'; at: number };
+  | { type: 'exitSealed'; at: number }
+  /** Session-level: the Shield power-up absorbed a fatal action. */
+  | { type: 'shielded'; at: number; cause: DeathCause };
 
 export interface StepResult {
   state: GameState;

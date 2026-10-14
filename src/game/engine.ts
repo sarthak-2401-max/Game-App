@@ -189,8 +189,9 @@ export function step(room: Room, prev: GameState, action: Action, opts: EngineOp
     }
   }
 
-  // 3. Advance the clock.
-  const tick = prev.tick + 1;
+  // 3. Advance the clock (it stands still while a Freeze is active).
+  const frozen = prev.frozen ?? 0;
+  const tick = frozen > 0 ? prev.tick : prev.tick + 1;
   const moved = player;
   const onPit = effectiveTile(room, { ...prev, mods }, player).k === 'pit';
   for (const p of room.platforms) {
@@ -213,6 +214,7 @@ export function step(room: Room, prev: GameState, action: Action, opts: EngineOp
     mods,
     status: 'playing',
     bonusMoves: prev.bonusMoves,
+    ...(frozen > 0 ? { frozen: frozen - 1 } : {}),
   };
 
   // 4. Hazards at the new turn.

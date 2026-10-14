@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import type { RewardedPlacement } from '../../config/ads';
+import type { PowerUpId } from '../../config/powerups';
 import { adService } from '../../services/ads/adService';
 import { analytics } from '../../services/analytics/analytics';
 import { grantRewardedAd, rewardedUsesLeft } from '../../state/progression';
@@ -17,7 +18,7 @@ export interface OfferRequest {
   title: string;
   benefit: string;
   onGranted: () => void;
-  grantOpts?: { doubleAmount?: number; bonusRoomId?: string };
+  grantOpts?: { doubleAmount?: number; bonusRoomId?: string; powerUpId?: PowerUpId };
 }
 
 export function useAdReady() {

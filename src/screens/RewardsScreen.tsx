@@ -8,6 +8,8 @@ import { Button, Panel, ProgressBar, SectionTitle } from '../components/ui';
 import { ACHIEVEMENTS, getAchievement } from '../config/achievements';
 import { COSMETICS, type Cosmetic, type CosmeticSlot } from '../config/cosmetics';
 import { ECONOMY } from '../config/economy';
+import { POWERUPS } from '../config/powerups';
+import { buyPowerUp, powerUpCount } from '../state/powerups';
 import { dailyRoomFor } from '../game/daily/daily';
 import { adService } from '../services/ads/adService';
 import { analytics } from '../services/analytics/analytics';
@@ -37,6 +39,8 @@ const SLOT_NAMES: Record<CosmeticSlot, string> = {
 export function RewardsScreen({ tab }: { tab: RewardsTab }) {
   const replace = useApp((s) => s.replace);
   const insets = useSafeAreaInsets();
+  // Offer sheets are overlays, so they render at the screen root, not inside the scroll view.
+  const { offer, sheet } = useRewardedOffer();
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <View style={styles.pad}>
@@ -56,16 +60,74 @@ export function RewardsScreen({ tab }: { tab: RewardsTab }) {
         </View>
       </View>
       <ScrollView contentContainerStyle={[styles.pad, { paddingBottom: insets.bottom + space.xl, gap: space.md }]}>
-        {tab === 'shop' && <Shop />}
+        {tab === 'shop' && <Shop offer={offer} />}
         {tab === 'achievements' && <Achievements />}
         {tab === 'daily' && <Daily />}
-        {tab === 'coins' && <Coins />}
+        {tab === 'coins' && <Coins offer={offer} />}
       </ScrollView>
+      {sheet}
     </View>
   );
 }
 
-function Shop() {
+function PowerUpShop({ offer }: { offer: Offer }) {
+  const save = useApp((s) => s.save);
+  const update = useApp((s) => s.update);
+  const toast = useToast((s) => s.show);
+  const adsLeft = rewardedUsesLeft(save, 'powerup', dayKey());
+  return (
+    <View>
+      <SectionTitle>Power-ups</SectionTitle>
+      <View style={{ gap: space.sm }}>
+        {POWERUPS.map((p) => {
+          const unlocked = save.powerups.unlocked.includes(p.id);
+          const n = powerUpCount(save, p.id);
+          return (
+            <View key={p.id} style={[styles.item, !unlocked && { opacity: 0.6 }]}>
+              <View style={[styles.puIcon, { borderColor: p.color }]}>
+                <Icon name={unlocked ? p.icon : 'lock'} size={24} color={unlocked ? p.color : colors.textMuted} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.itemName}>
+                  {p.name}
+                  {unlocked ? <Text style={{ color: p.color }}>{`  ×${n}`}</Text> : null}
+                </Text>
+                <Text style={styles.dim}>{unlocked ? p.description : `Unlocks after room ${p.unlockAfterRoom}.`}</Text>
+              </View>
+              {unlocked && (
+                <View style={{ gap: 6 }}>
+                  <Button
+                    label={`${p.coinPrice}`}
+                    icon="coin"
+                    variant="reward"
+                    disabled={save.coins < p.coinPrice}
+                    onPress={() => {
+                      const r = buyPowerUp(useApp.getState().save, p.id);
+                      if (r.ok) {
+                        update(() => r.save);
+                        analytics.track('powerup_purchased', { powerup: p.id, currency: 'coins' });
+                        toast(`${p.name} added.`, 'success');
+                      }
+                    }}
+                  />
+                  {adService.hasProvider && adsLeft > 0 && (
+                    <Button
+                      label="Free"
+                      icon="video"
+                      onPress={() => offer({ placement: 'powerup', title: `Free ${p.name}`, benefit: `Get 1 ${p.name} for your inventory.`, grantOpts: { powerUpId: p.id }, onGranted: () => undefined })}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+function Shop({ offer }: { offer: Offer }) {
   const save = useApp((s) => s.save);
   const update = useApp((s) => s.update);
   const toast = useToast((s) => s.show);
@@ -88,6 +150,7 @@ function Shop() {
 
   return (
     <>
+      <PowerUpShop offer={offer} />
       <Text style={styles.dim}>Cosmetics only change how things look. Hazards always keep their colours and shapes.</Text>
       {slots.map((slot) => (
         <View key={slot}>
@@ -227,9 +290,10 @@ function Daily() {
   );
 }
 
-function Coins() {
+type Offer = ReturnType<typeof useRewardedOffer>['offer'];
+
+function Coins({ offer }: { offer: Offer }) {
   const save = useApp((s) => s.save);
-  const { offer, sheet } = useRewardedOffer();
   const left = rewardedUsesLeft(save, 'bonus_coins', dayKey());
   return (
     <>
@@ -252,12 +316,12 @@ function Coins() {
         />
       </Panel>
       )}
-      {sheet}
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  puIcon: { width: 48, height: 48, borderRadius: radius.md, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceHi },
   root: { flex: 1, backgroundColor: colors.bg },
   pad: { paddingHorizontal: space.lg, maxWidth: 560, width: '100%', alignSelf: 'center' },
   tabs: { flexDirection: 'row', backgroundColor: colors.surface, borderRadius: radius.lg, padding: 4, borderWidth: 1, borderColor: colors.border, marginBottom: space.md },

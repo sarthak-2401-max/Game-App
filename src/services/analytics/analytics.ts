@@ -25,7 +25,11 @@ export type AnalyticsEvent =
   | 'daily_challenge_started'
   | 'daily_challenge_completed'
   | 'save_recovered'
-  | 'progress_reset';
+  | 'progress_reset'
+  | 'powerup_used'
+  | 'powerup_purchased'
+  | 'powerup_unlocked'
+  | 'story_viewed';
 
 export type EventProps = Record<string, string | number | boolean | undefined>;
 

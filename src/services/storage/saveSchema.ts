@@ -3,6 +3,7 @@
 
 import type { RewardedPlacement } from '../../config/ads';
 import { DEFAULT_COSMETICS, type CosmeticSlot } from '../../config/cosmetics';
+import { isPowerUpId, type PowerUpId } from '../../config/powerups';
 
 export const SAVE_VERSION = 2;
 
@@ -80,6 +81,17 @@ export interface SaveData {
   consent: ConsentState;
   /** Room the player was in when the app closed, restored as "Continue". */
   lastRoom?: number;
+  powerups: {
+    inventory: Partial<Record<PowerUpId, number>>;
+    /** Power-ups whose unlock (and starter stock) has been granted. */
+    unlocked: PowerUpId[];
+    used: number;
+  };
+  story: {
+    /** Chapters whose opening story card has been shown. */
+    chaptersSeen: number[];
+    epilogueSeen: boolean;
+  };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -127,6 +139,8 @@ export function defaultSave(now = new Date()): SaveData {
     tutorialCompleted: false,
     settings: { ...DEFAULT_SETTINGS },
     consent: { personalizedAds: false },
+    powerups: { inventory: {}, unlocked: [], used: 0 },
+    story: { chaptersSeen: [], epilogueSeen: false },
   };
 }
 
@@ -257,5 +271,20 @@ export function sanitize(input: AnySave): SaveData {
     })(),
     consent: { ...d.consent, ...consent },
     lastRoom: typeof s.lastRoom === 'number' ? s.lastRoom : undefined,
+    powerups: (() => {
+      const p = obj<Record<string, unknown>>(s.powerups, {});
+      const inventory: Partial<Record<PowerUpId, number>> = {};
+      for (const [k, v] of Object.entries(obj<Record<string, unknown>>(p.inventory, {}))) {
+        if (isPowerUpId(k)) inventory[k] = Math.floor(num(v, 0));
+      }
+      return { inventory, unlocked: strArr(p.unlocked).filter(isPowerUpId), used: Math.floor(num(p.used, 0)) };
+    })(),
+    story: (() => {
+      const st = obj<Record<string, unknown>>(s.story, {});
+      return {
+        chaptersSeen: (Array.isArray(st.chaptersSeen) ? st.chaptersSeen : []).filter((n): n is number => typeof n === 'number'),
+        epilogueSeen: bool(st.epilogueSeen, false),
+      };
+    })(),
   };
 }
