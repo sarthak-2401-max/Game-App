@@ -35,6 +35,8 @@ export interface Settings {
   reducedMotion: boolean;
   /** Show on-screen arrow pad in addition to swipe/tap. */
   showDpad: boolean;
+  /** Characters read the story aloud (device text-to-speech). Subtitles always show. */
+  voiceover: boolean;
 }
 
 export interface ConsentState {
@@ -119,6 +121,7 @@ export const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   reducedMotion: false,
   showDpad: true,
+  voiceover: true,
 };
 
 export function defaultSave(now = new Date()): SaveData {

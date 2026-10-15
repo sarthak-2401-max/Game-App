@@ -5,6 +5,7 @@ import { gatherConsent } from '../services/ads/consent';
 import { createAdProvider } from '../services/ads/providerFactory';
 import { analytics } from '../services/analytics/analytics';
 import { sound } from '../services/audio/sound';
+import { voice } from '../services/audio/voice';
 import { setHapticsEnabled } from '../services/haptics/haptics';
 import { asyncStore } from '../services/storage/asyncStore';
 import type { KeyValueStore } from '../services/storage/kv';
@@ -146,6 +147,7 @@ export const useApp = create<AppState>((set, get) => ({
 
 function applySettings(s: Settings) {
   sound.configure({ sound: s.sound, music: s.music });
+  voice.configure({ voiceover: s.voiceover });
   setHapticsEnabled(s.haptics);
 }
 

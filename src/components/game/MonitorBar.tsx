@@ -1,16 +1,18 @@
 // The monitor strip above the board. It shows the room's instruction, and anything WITNESS (or
 // HALE) says, typed out like a terminal. It never blocks input: lines queue up and play one
-// at a time, and a tap finishes or skips the current one.
+// at a time, and a tap finishes or skips the current one. With voiceover on, each line is also
+// read aloud and stays up until the voice finishes.
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { voice } from '../../services/audio/voice';
 import { colors, radius } from '../../theme/theme';
 import { Icon } from '../Icon';
 
 export interface FeedItem {
   /** Unique per item (used to consume it). */
   key: string;
-  speaker: 'WITNESS' | 'HALE' | 'CLUE';
+  speaker: 'WITNESS' | 'HALE' | 'PIP' | 'CLUE';
   /** Small caption above the text, e.g. "Recording · Priya Shah". */
   label?: string;
   text: string;
@@ -24,6 +26,7 @@ export const MONITOR_HEIGHT = 74;
 const LOOK = {
   WITNESS: { color: colors.witness, border: '#3A4152', name: 'WITNESS' },
   HALE: { color: colors.cyan, border: colors.cyanDim, name: 'HALE' },
+  PIP: { color: colors.amber, border: '#5A4220', name: 'PIP' },
   CLUE: { color: '#C9A6FF', border: '#4B3B6E', name: 'FOUND' },
 } as const;
 
@@ -56,6 +59,10 @@ export function MonitorBar({
   onOpenClue?: (id: string) => void;
 }) {
   const [shown, setShown] = useState(0);
+  // The voice has finished this line (or there is no voice for it).
+  const [voiced, setVoiced] = useState(true);
+  const usedVoice = useRef(false);
+  const currentKey = useRef('');
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const text = item?.text ?? '';
   const typing = !!item && shown < text.length;
@@ -66,27 +73,47 @@ export function MonitorBar({
     onShow?.(item);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- restart the typewriter for each new line
     setShown(reducedMotion ? item.text.length : 0);
+    usedVoice.current = item.speaker !== 'CLUE' && voice.isEnabled;
+    currentKey.current = item.key;
+    if (item.speaker === 'CLUE') setVoiced(true);
+    else {
+      setVoiced(false);
+      const key = item.key;
+      // A cut-off earlier line reports back too: only this line's end counts.
+      voice.say(item.text, item.speaker, () => {
+        if (currentKey.current === key) setVoiced(true);
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item?.key]);
+
+  // Leaving the game (or the bar unmounting) silences the line.
+  useEffect(() => () => voice.stop(), []);
 
   useEffect(() => {
     if (!item) return;
     if (timer.current) clearTimeout(timer.current);
     if (shown < text.length) {
       timer.current = setTimeout(() => setShown((n) => Math.min(text.length, n + 2)), 22);
+    } else if (!voiced) {
+      // Wait for the voice, with a cap in case the speech engine never reports back.
+      timer.current = setTimeout(() => onDone(item.key), 20_000);
     } else {
-      const hold = Math.max(2600, Math.min(7000, text.length * 48)) + (item.clueId ? 1500 : 0);
-      timer.current = setTimeout(() => onDone(item.key), hold);
+      const hold = usedVoice.current ? 900 : Math.max(2600, Math.min(7000, text.length * 48));
+      timer.current = setTimeout(() => onDone(item.key), hold + (item.clueId ? 1500 : 0));
     }
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [item, shown, text.length, onDone]);
+  }, [item, shown, voiced, text.length, onDone]);
 
   const tap = () => {
     if (!item) return;
     if (typing) setShown(text.length);
-    else if (item.clueId && onOpenClue) {
+    else if (!voiced) {
+      voice.stop();
+      onDone(item.key);
+    } else if (item.clueId && onOpenClue) {
       onOpenClue(item.clueId);
       onDone(item.key);
     } else onDone(item.key);
@@ -123,7 +150,7 @@ export function MonitorBar({
           {item.speaker === 'WITNESS' && <RecDot on reduced={reducedMotion} />}
           {item.clueId && !typing && <Text style={styles.open}>Tap to read</Text>}
         </View>
-        <Text style={[styles.text, { color: item.speaker === 'HALE' ? colors.text : look.color }]} numberOfLines={3}>
+        <Text style={[styles.text, { color: item.speaker === 'HALE' || item.speaker === 'PIP' ? colors.text : look.color }]} numberOfLines={3}>
           {text.slice(0, shown)}
           {typing ? '▍' : ''}
         </Text>

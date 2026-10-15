@@ -15,6 +15,8 @@ import { RewardsScreen } from './src/screens/RewardsScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { analytics } from './src/services/analytics/analytics';
 import { sound } from './src/services/audio/sound';
+import { adService } from './src/services/ads/adService';
+import { voice } from './src/services/audio/voice';
 import { useApp } from './src/state/useApp';
 import { colors } from './src/theme/theme';
 
@@ -44,17 +46,24 @@ export default function App() {
   useEffect(() => {
     useApp.getState().init();
     sound.init();
+    void voice.loadVoices();
+    // Nothing talks over an ad.
+    const unAds = adService.subscribe(() => {
+      if (adService.isShowing) voice.stop();
+    });
     // Screens with their own back behaviour (gameplay) register later and take precedence.
     const back = BackHandler.addEventListener('hardwareBackPress', () => useApp.getState().back());
     const appState = AppState.addEventListener('change', (s) => {
       const active = s === 'active';
       sound.setAppActive(active);
+      voice.setAppActive(active);
       if (active) analytics.startSession();
       else analytics.endSession();
     });
     return () => {
       back.remove();
       appState.remove();
+      unAds();
     };
   }, []);
 

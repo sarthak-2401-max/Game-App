@@ -6,7 +6,7 @@ export type IconName =
   | 'pause' | 'undo' | 'restart' | 'hint' | 'wait' | 'up' | 'down' | 'left' | 'right' | 'gear' | 'back'
   | 'lock' | 'check' | 'star' | 'gift' | 'calendar' | 'trophy' | 'play' | 'grid' | 'video' | 'close'
   | 'coin' | 'shield' | 'flame' | 'sound' | 'music' | 'vibrate' | 'motion' | 'info'
-  | 'compass' | 'bolt' | 'snow' | 'book' | 'cart';
+  | 'compass' | 'bolt' | 'snow' | 'book' | 'cart' | 'voice';
 
 // Icons are decorative: the surrounding control carries the accessible label.
 // react-native-svg passes props straight to the DOM on web, so use the web attribute there.
@@ -173,6 +173,16 @@ export function Icon({ name, size = 22, color = '#E8EEF9' }: { name: IconName; s
           <G>
             <Polygon points={`${s * 0.18},${s * 0.4} ${s * 0.34},${s * 0.4} ${s * 0.52},${s * 0.24} ${s * 0.52},${s * 0.76} ${s * 0.34},${s * 0.6} ${s * 0.18},${s * 0.6}`} fill={color} />
             <Path d={`M ${s * 0.64} ${s * 0.36} A ${s * 0.18} ${s * 0.18} 0 0 1 ${s * 0.64} ${s * 0.64}`} {...p} />
+          </G>
+        );
+      case 'voice':
+        // A speech bubble with two sound bars.
+        return (
+          <G>
+            <Path d={`M ${s * 0.2} ${s * 0.26} H ${s * 0.8} V ${s * 0.66} H ${s * 0.44} L ${s * 0.28} ${s * 0.8} V ${s * 0.66} H ${s * 0.2} Z`} {...p} />
+            <Line x1={s * 0.4} y1={s * 0.4} x2={s * 0.4} y2={s * 0.52} {...p} />
+            <Line x1={s * 0.5} y1={s * 0.36} x2={s * 0.5} y2={s * 0.56} {...p} />
+            <Line x1={s * 0.6} y1={s * 0.4} x2={s * 0.6} y2={s * 0.52} {...p} />
           </G>
         );
       case 'music':
