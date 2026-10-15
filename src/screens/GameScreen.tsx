@@ -34,6 +34,7 @@ import type { Action, DeathCause } from '../game/types';
 import { adService } from '../services/ads/adService';
 import { analytics } from '../services/analytics/analytics';
 import { sound } from '../services/audio/sound';
+import { voice } from '../services/audio/voice';
 import { haptics } from '../services/haptics/haptics';
 import {
   claimDaily,
@@ -107,6 +108,13 @@ export function GameScreen() {
   const handledWin = useRef<number>(-1);
   const resultTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const witness = useWitness(session, !!story);
+  // The room instruction waits for the story line and WITNESS, then stays for three moves.
+  const [introFrom, setIntroFrom] = useState(0);
+  const feedBusy = witness.feed.length > 0;
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- start counting when the monitor frees up
+    if (!feedBusy) setIntroFrom(useSession.getState().session?.state.moves ?? 0);
+  }, [feedBusy]);
   const settings = app.save.settings;
   const reduced = settings.reducedMotion;
 
@@ -219,7 +227,7 @@ export function GameScreen() {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reacts once per engine step (keyed by seq)
       setHintCells((h) => (h && h[0] === session.state.player ? (h.length > 1 ? h.slice(1) : undefined) : undefined));
     }
-    if (session.events.length && introVisible && session.state.moves >= 3) setIntroVisible(false);
+    if (session.events.length && introVisible && !witness.feed.length && session.state.moves - introFrom >= 3) setIntroVisible(false);
     if (session.state.moves === 0 && session.room.echoTrack?.length && session.attempt > 1) sound.play('echo');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.seq]);
@@ -322,6 +330,17 @@ export function GameScreen() {
   useEffect(() => () => {
     if (resultTimer.current) clearTimeout(resultTimer.current);
   }, []);
+
+  // The escape's story beat is read aloud when the result card comes up.
+  const resultBeat = result && session?.kind === 'campaign' ? ROOM_STORY[session.room.index - 1] : undefined;
+  useEffect(() => {
+    if (!resultBeat) return;
+    const t = setTimeout(() => voice.say(resultBeat.text, resultBeat.speaker), reduced ? 0 : 450);
+    return () => {
+      clearTimeout(t);
+      voice.stop();
+    };
+  }, [resultBeat, reduced]);
 
   // ---- Real-time countdown (pauses when paused, backgrounded or a sheet is open) --------------
   const appActive = useRef(true);
@@ -452,6 +471,7 @@ export function GameScreen() {
     }
     setHintCells(undefined);
     setIntroVisible(true);
+    setIntroFrom(0);
     if (stop?.kind === 'interlude' && stop.id) {
       const inter = getInterlude(stop.id);
       if (inter) return S().start(inter.room, 'interlude');
@@ -467,6 +487,7 @@ export function GameScreen() {
     S().setPaused(false);
     setHintCells(undefined);
     setIntroVisible(true);
+    setIntroFrom(0);
     const n = interlude && interlude.after > 0 ? interlude.after + 1 : undefined;
     const next = n && n <= CAMPAIGN_SIZE ? getRoom(n) : undefined;
     if (next) S().start(next, 'campaign');
@@ -645,7 +666,7 @@ export function GameScreen() {
       <View style={styles.monitor}>
         <MonitorBar
           item={witness.feed[0]}
-          intro={introVisible && state.moves < 3 ? room.intro : undefined}
+          intro={introVisible && state.moves - introFrom < 3 ? room.intro : undefined}
           reducedMotion={reduced}
           watched={witness.watched}
           onDone={witness.consume}

@@ -95,6 +95,15 @@ class SoundSystem {
     this.syncMusic();
   }
 
+  /** Lowers the music while a voice line plays. */
+  duck(on: boolean) {
+    try {
+      if (this.music) this.music.volume = on ? 0.12 : 0.35;
+    } catch (e) {
+      log.debug('audio', 'duck failed', e);
+    }
+  }
+
   play(cue: SoundCue) {
     if (!this.sfxOn || !this.appActive || !this.unlocked) return;
     try {

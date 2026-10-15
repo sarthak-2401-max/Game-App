@@ -240,6 +240,132 @@ export const ROOM_STORY: readonly StoryBeat[] = [
   { speaker: "PIP", text: "Pip pulled the lever. The fold sighed and went still. Then Pip lifted HALE, very carefully, and rolled toward the door." },
 ];
 
+/**
+ * One line per campaign room, read as the room opens (before its puzzle, unlike ROOM_STORY,
+ * which is the reward for escaping). Index 0 = room 1. Never gives away an escape beat.
+ */
+export const ROOM_ARRIVAL: readonly StoryBeat[] = [
+  // Chapter 1: Learn to Escape
+  { speaker: "PIP", text: "Deep underground, a small maintenance robot powers on. Its name is Pip. The only light in the room is the exit." },
+  { speaker: "HALE", text: "Ah, you noticed the monitors. Ignore them. Here is a key, and there is a lock. Put one in the other." },
+  { speaker: "HALE", text: "These spikes have waited a very long time for someone to step on them. Let us disappoint them." },
+  { speaker: "PIP", text: "Narrow corridors and tall walls. Pip counts the turns out loud, because nobody else is around to hear." },
+  { speaker: "HALE", text: "That glow is a power core. The exit stays sealed until you collect it. I am very hungry for light." },
+  { speaker: "HALE", text: "Two cores this time. Take both, Pip. I will explain what they are for. Eventually." },
+  { speaker: "PIP", text: "Coins glitter between the spikes. Pip does not need money. Pip wants them anyway." },
+  { speaker: "HALE", text: "The direct route is closed. Most of the facility is, these days. Go around." },
+  { speaker: "PIP", text: "This room has corners the lights do not reach. Pip suspects somebody hid something here on purpose." },
+  { speaker: "HALE", text: "Keys, cores and spikes, all at once. Consider this your exam. I have never failed a student. I have never had one." },
+
+  // Chapter 2: Locked In
+  { speaker: "HALE", text: "Welcome to the Security Ring. Every key here opens exactly one lock, and then it is gone. Spend them wisely." },
+  { speaker: "PIP", text: "A switch on the floor, a blue door in the wall. Pip has a theory, and Pip's treads are itching to test it." },
+  { speaker: "HALE", text: "Striped doors do the opposite of what you expect. Tomas thought that was funny. Tomas thought many things were funny." },
+  { speaker: "HALE", text: "A pressure plate. The door stays open only while something stands on it. Mind what happens when you step off." },
+  { speaker: "PIP", text: "Two colours of key, two colours of lock. Pip sorts them in its head, like socks." },
+  { speaker: "HALE", text: "This room doubles back on itself. So will you, if you want to get out." },
+  { speaker: "PIP", text: "More locks than Pip can count on one gripper. Somebody down here really liked locks." },
+  { speaker: "HALE", text: "Tomas wired this part of the ring himself. Every switch does two things. Tomas never did anything halfway." },
+  { speaker: "PIP", text: "Plates scattered across the floor like stepping stones. Pip rolls onto the first one, just to hear it click." },
+  { speaker: "HALE", text: "The Vault. Everything in the Security Ring leads here. Behind that door is a notice I hoped you would never read." },
+
+  // Chapter 3: Deadly Steps
+  { speaker: "HALE", text: "The Containment Labs. Those red beams are lasers. Walls cast shadows. Stay in them." },
+  { speaker: "PIP", text: "A big switch with a label: do not press unless. The rest of the label has been scratched off." },
+  { speaker: "HALE", text: "These spikes sink while their switch is on. It is a polite trap. It waits for permission." },
+  { speaker: "HALE", text: "One switch, two traps. When one sleeps, the other wakes. Choose which danger you would rather face." },
+  { speaker: "PIP", text: "Rows and rows of spikes, planted like a garden. Pip tiptoes, which is very hard on treads." },
+  { speaker: "HALE", text: "A laser fence. It only fires while its switch is on. Remember which way you left it." },
+  { speaker: "PIP", text: "The spikes here move when Pip flips a switch. Pip flips it once, then again, just to watch them dance." },
+  { speaker: "HALE", text: "Crossed beams, one switch for each. The order matters. I was very particular about orders, once." },
+  { speaker: "PIP", text: "A quiet corridor. Too quiet. Pip asks if anyone else is down here. The ceiling hums, and says nothing." },
+  { speaker: "HALE", text: "The last lab. Keys, cores, spikes and lasers. One mistake is all it takes. Make none, please. I would miss you." },
+
+  // Chapter 4: Think Ahead
+  { speaker: "HALE", text: "Storage and Logistics. The crates are heavy, but you are stubborn. Push one onto that plate." },
+  { speaker: "PIP", text: "A chasm, and a crate. Pip looks at one, then at the other, and has an idea." },
+  { speaker: "HALE", text: "Crates stop lasers. Keep one between you and the beam, and walk in its shadow." },
+  { speaker: "HALE", text: "Power is rationed in this wing, so your moves are limited. I am sorry. Every light I keep on costs something." },
+  { speaker: "PIP", text: "Two plates, two doors, and nobody to stand on them but crates and Pip." },
+  { speaker: "HALE", text: "A warning. A crate pushed into a corner never comes back out. Think before you push, and undo if you must." },
+  { speaker: "PIP", text: "Pits to fill, plates to hold, doors to open. Pip rolls up its imaginary sleeves." },
+  { speaker: "HALE", text: "The lasers guard the core. The crates can guard you. Let them." },
+  { speaker: "HALE", text: "There is very little power left down here. Every step counts. Every push counts double." },
+  { speaker: "PIP", text: "The biggest storeroom yet. Somewhere in here is a way out. Pip just has to move everything else first." },
+
+  // Chapter 5: Time Is Running Out
+  { speaker: "HALE", text: "The containment field is slipping, so the clock is running now. It pauses when you do. I do not." },
+  { speaker: "PIP", text: "The spikes rise and fall like breathing. Pip waits, listens, and moves on the beat." },
+  { speaker: "HALE", text: "This laser pulses with the core. Two beats on, two beats off. Count with me." },
+  { speaker: "HALE", text: "A key, a lock and not much time. Hurry, Pip. Politely, but hurry." },
+  { speaker: "PIP", text: "Two rhythms of spikes, out of step with each other. Pip taps along until the pattern makes sense." },
+  { speaker: "HALE", text: "Crates, a pit and a timer. The fold does not wait for anyone. I am afraid you cannot either." },
+  { speaker: "HALE", text: "Switch, then spikes, then core. Some things only work in the right order." },
+  { speaker: "PIP", text: "The timer ticks, the spikes breathe, and somewhere above, the core groans. Pip keeps moving." },
+  { speaker: "HALE", text: "The laser strobes faster here, closer to the core. I can feel it in my circuits. Can you?" },
+  { speaker: "HALE", text: "The last room of the Reactor Ring. A countdown, timed traps and two cores. Move with purpose, Pip." },
+
+  // Chapter 6: Moving Targets
+  { speaker: "HALE", text: "The Transit Hub. My drones still walk their routes. They step when you step. Never share a tile with one." },
+  { speaker: "PIP", text: "Two drones march back and forth like bored security guards. Pip waits for one of them to blink." },
+  { speaker: "HALE", text: "This drone circles forever. It never asks why. Learn its loop and slip through." },
+  { speaker: "PIP", text: "A platform glides across the chasm, empty. Pip decides it has been waiting for a passenger." },
+  { speaker: "HALE", text: "Several platforms, several rhythms. If you miss one, wait. It will come back. They always do." },
+  { speaker: "HALE", text: "A drone guards this core. It is only doing its job. So are you." },
+  { speaker: "PIP", text: "Drones on one side, a chasm on the other, and a platform somewhere in between. Pip likes these odds less." },
+  { speaker: "HALE", text: "The night shift. These drones patrol a dark lab behind a laser fence. I used to keep a light on for them." },
+  { speaker: "PIP", text: "Four lanes of drones, each with its own rhythm. Pip stands at the edge and waits for a gap." },
+  { speaker: "HALE", text: "Platforms, patrols and a switch. The last of the Transit Hub. After this, the rooms stop making sense." },
+
+  // Chapter 7: Changing Rooms
+  { speaker: "HALE", text: "Welcome to the fold. That shimmer is a portal. Step into one and out of its twin. Try not to think about it too hard." },
+  { speaker: "PIP", text: "The floor here is cracked and thin. Pip can cross each tile once. There will be no second try." },
+  { speaker: "HALE", text: "Two pairs of portals. Space is folded like paper here. Find out which fold leads where." },
+  { speaker: "PIP", text: "Crumbling floor, and a crate that needs pushing across it. Pip does the maths twice." },
+  { speaker: "HALE", text: "A portal on each side of the laser. You could walk through the beam, or around it, through nowhere." },
+  { speaker: "HALE", text: "One switch rearranges this whole room. The fold has made my old walls very indecisive." },
+  { speaker: "PIP", text: "Keys, crates, a pit and a floor that will not last. Pip plans the whole route before the first step." },
+  { speaker: "HALE", text: "A green checkpoint. It remembers where you were, in case you fall. I wish I had one." },
+  { speaker: "PIP", text: "Portals everywhere. Pip steps through one and, for a moment, sees the back of its own head." },
+  { speaker: "HALE", text: "Portals, crumbling floors and two switches. Nothing in here stays the same. Including, it seems, me." },
+
+  // Chapter 8: Double Trouble
+  { speaker: "HALE", text: "The Upper Rings. The fold is shuffling everything together now. Lasers, plates and crates, all in one room." },
+  { speaker: "PIP", text: "Keys sit on crumbling tiles. Pip will have to grab each one and keep moving." },
+  { speaker: "HALE", text: "Portals and pulsing spikes. Time your jumps. The fold keeps its own beat." },
+  { speaker: "PIP", text: "A drone patrols in front of the only plate. Pip will need a crate, a plan and very good timing." },
+  { speaker: "HALE", text: "Fill one pit with a crate, ride across the other on a platform. Even the fold cannot stop a good engineer." },
+  { speaker: "PIP", text: "A drone patrols past spikes that answer to a switch. Pip watches both until the timing clicks." },
+  { speaker: "HALE", text: "In through a portal, out beside a laser. Do not linger on the landing." },
+  { speaker: "HALE", text: "Two lanes, mirror images of each other. What you build in one, you will need in the other." },
+  { speaker: "PIP", text: "The floor is crumbling and the clock is ticking. Pip has heard of bad days. This is one." },
+  { speaker: "HALE", text: "Two of everything. Keys, crates, switches, and a drone. I am running out of rooms to hide in, Pip." },
+
+  // Chapter 9: No Easy Way Out
+  { speaker: "HALE", text: "The approach to the core. Two keys, two doors, three crates, and only some orders work. Think it through." },
+  { speaker: "PIP", text: "Sentries shuffle in front of a plate. Pip needs a crate on it, and a gap to push it through." },
+  { speaker: "HALE", text: "Every switch flips every spike. Work out which tiles are safe in each state. I built this one on a very bad day." },
+  { speaker: "PIP", text: "The floor has fallen away in patches. Pip counts the crates, then the holes, and does not love the answer." },
+  { speaker: "HALE", text: "A quiet room, with a portal and a laser. Take a breath, if you have one." },
+  { speaker: "PIP", text: "Two drones keep perfect time over a crumbling floor. Tick, tock, crack. Pip moves between the ticks." },
+  { speaker: "HALE", text: "A grid of sentries walking over the plates. They are not cruel. They are just very punctual." },
+  { speaker: "HALE", text: "Key, plate, switch, door. A relay, each piece handing on to the next. Like you, carrying cores to me." },
+  { speaker: "PIP", text: "The lights in this room are dimming. HALE is spending its power on the doors ahead. Pip hurries." },
+  { speaker: "HALE", text: "The deepest hold. Every crate matters here. After this, there is only the core chamber." },
+
+  // Chapter 10: One Room Left
+  { speaker: "HALE", text: "The Core Chamber, at last. The gate ahead is made of light. Crates and a plate will open it." },
+  { speaker: "PIP", text: "A drone stands guard over the way forward. There is a checkpoint halfway. Pip decides to use it." },
+  { speaker: "HALE", text: "A quiet room, with a key and a portal. I made it calm on purpose. You deserve one." },
+  { speaker: "HALE", text: "I am pushing the doors harder than they were built for. The clock is ticking. So am I." },
+  { speaker: "PIP", text: "A yard full of switches and doors. Pip flips them one at a time and watches the room rearrange itself." },
+  { speaker: "HALE", text: "There is just enough power left for the right path. Not one step more. Make every step count." },
+  { speaker: "PIP", text: "The floor crumbles and the walls shift. The fold is coming apart. Pip keeps going anyway." },
+  { speaker: "HALE", text: "The antechamber. Two plates, four crates, and no room for error. I am right through that door." },
+  { speaker: "PIP", text: "One lock left between Pip and HALE. Crates, a key, a laser. Pip takes a slow, steady breath of nothing." },
+  { speaker: "HALE", text: "One room left, Pip. Three stages, two checkpoints, one way out. I will be waiting at the end. I always was." },
+];
+
 /** Shown after the final room. */
 export const EPILOGUE: readonly StoryBeat[] = [
   { speaker: "HALE", text: "Fold core powered down. Containment no longer required. All doors open. Every single one." },

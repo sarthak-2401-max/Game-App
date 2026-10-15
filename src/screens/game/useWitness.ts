@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FeedItem } from '../../components/game/MonitorBar';
 import type { BoardClue } from '../../components/board/Board';
 import { getClue, type Clue } from '../../game/observer/clues';
+import { ROOM_ARRIVAL } from '../../game/story';
 import { clueCell, cluesFound, fillTemplate, roomClues, transmissionsFor } from '../../game/observer/observer';
 import type { Transmission, Trigger } from '../../game/observer/script';
 import { analytics } from '../../services/analytics/analytics';
@@ -15,6 +16,9 @@ import { useApp } from '../../state/useApp';
 import { colOf, rowOf } from '../../game/grid';
 
 const KIND_LABEL: Record<Clue['kind'], string> = { wall: 'Writing', recording: 'Recording', object: 'Object', sigil: 'Mark' };
+
+/** Rooms whose arrival line has played since the app started: replays stay quiet. */
+const arrivalPlayed = new Set<string>();
 
 export function clueLabel(c: Clue) {
   return c.source ? `${KIND_LABEL[c.kind]} · ${c.source}` : KIND_LABEL[c.kind];
@@ -96,6 +100,14 @@ export function useWitness(session: Session | null, storyOpen: boolean): Witness
   useEffect(() => {
     if (!session || storyOpen || started.current === session.visit) return;
     started.current = session.visit;
+    // The room's story line opens the visit, ahead of anything WITNESS says.
+    const arrival = session.kind === 'campaign' ? ROOM_ARRIVAL[session.room.index - 1] : undefined;
+    if (arrival && (arrival.speaker === 'HALE' || arrival.speaker === 'PIP') && !arrivalPlayed.has(session.room.id)) {
+      arrivalPlayed.add(session.room.id);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- queued once per visit, like the WITNESS lines below
+      setFeed((f) => [...f, { key: `a${++keySeq}`, speaker: arrival.speaker as 'HALE' | 'PIP', text: arrival.text }]);
+      analytics.track('story_viewed', { kind: 'arrival', room_id: session.room.id });
+    }
     fire(session.room.id, { on: 'start' });
   }, [session, storyOpen, fire]);
 

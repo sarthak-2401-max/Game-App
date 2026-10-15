@@ -12,7 +12,7 @@ import { evaluate, sigilCount } from '../game/observer/conditions';
 import { fillTemplate } from '../game/observer/observer';
 import { getInterlude, INTERLUDES, SECRET_ROOM_ID } from '../game/observer/rooms';
 import { seenFlag, TRANSMISSIONS } from '../game/observer/script';
-import { CHAPTER_STORY, EPILOGUE, ROOM_STORY } from '../game/story';
+import { CHAPTER_STORY, EPILOGUE, ROOM_ARRIVAL, ROOM_STORY } from '../game/story';
 import { memoryView } from '../state/memory';
 import { useApp } from '../state/useApp';
 import { useSession } from '../state/useSession';
@@ -93,8 +93,9 @@ function StoryTab() {
             {save.story.chaptersSeen.includes(ch.number) && st?.opening.map((b, i) => <BeatView key={`o${i}`} beat={b} compact />)}
             {Array.from({ length: ROOMS_PER_CHAPTER }, (_, k) => ch.firstRoom + k).map((n) =>
               done(n) ? (
-                <View key={n} style={{ gap: 2 }}>
+                <View key={n} style={{ gap: 6 }}>
                   <Text style={styles.roomLabel}>Room {n}</Text>
+                  {ROOM_ARRIVAL[n - 1] && <BeatView beat={ROOM_ARRIVAL[n - 1]} compact />}
                   <BeatView beat={ROOM_STORY[n - 1]} compact />
                 </View>
               ) : (

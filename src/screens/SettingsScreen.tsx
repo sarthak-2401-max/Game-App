@@ -48,6 +48,7 @@ export function SettingsScreen() {
         <Panel>
           <ToggleRow icon="sound" label="Sound effects" value={st.sound} onChange={(v) => setSettings({ sound: v })} />
           <ToggleRow icon="music" label="Music" value={st.music} onChange={(v) => setSettings({ music: v })} />
+          <ToggleRow icon="voice" label="Voiceover" description="Characters read the story aloud. Subtitles always show." value={st.voiceover} onChange={(v) => setSettings({ voiceover: v })} />
           {Platform.OS !== 'web' && <ToggleRow icon="vibrate" label="Haptics" value={st.haptics} onChange={(v) => setSettings({ haptics: v })} />}
         </Panel>
 
