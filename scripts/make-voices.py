@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
-"""Records every story and WITNESS line with the Kokoro-82M voice model (Apache-2.0).
+"""Records every story and WITNESS line.
+
+Two engines:
+  gemini (default): Google's Gemini text-to-speech, which acts each line from its persona and
+      direction (src/game/voiceDirection.ts). Needs GEMINI_API_KEY in the environment. Never
+      commit the key. Optional GEMINI_TTS_MODEL (default gemini-2.5-pro-preview-tts).
+  kokoro: the offline Kokoro-82M model (Apache-2.0). Natural but flat; no acting.
+      python3 -m pip install kokoro-onnx soundfile, and KOKORO_DIR holding kokoro-v1.0.onnx and
+      voices-v1.0.bin from https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0
 
 Usage:
-    python3 -m pip install kokoro-onnx soundfile
-    KOKORO_DIR=/path/with/model python3 scripts/make-voices.py [--only KEY ...] [--force]
+    python3 scripts/make-voices.py [--engine gemini|kokoro] [--only ID_OR_KEY ...] [--force]
 
-KOKORO_DIR must hold kokoro-v1.0.onnx and voices-v1.0.bin from
-https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0 (not committed: 350 MB).
-ffmpeg is required for the effects and MP3 encoding.
+ffmpeg is required for the effects and MP3 encoding. Progress is saved after every clip, so an
+interrupted run (or a hit rate limit) picks up where it stopped.
 
 Output: assets/voice/<key>.mp3, assets/voice/manifest.json (what each file was made from, so only
 changed lines are re-recorded) and src/services/audio/voiceClips.generated.ts.
 """
 import argparse
+import base64
 import json
+import time
+import urllib.error
+import urllib.request
 import os
 import re
 import subprocess
@@ -46,14 +56,73 @@ def speakable(text: str) -> str:
     return text
 
 
+SCENE = "An abandoned underground research facility, sealed for over a year. Quiet, echoing rooms. A small maintenance robot named Pip is finding its way through."
+
+
+def gemini_prompt(l):
+    notes = l.get("direction") or "in the character's usual manner"
+    return (
+        f"# AUDIO PROFILE\n{l['persona']}\n\n## THE SCENE\n{SCENE}\n\n"
+        f"### DIRECTOR'S NOTES\nPerformance: {notes}. Natural human delivery with real feeling, varied pacing and pauses where they help.\n\n"
+        f"#### TRANSCRIPT\n{speakable(l['spoken'])}"
+    )
+
+
+def gemini_pcm(l):
+    """Returns 24 kHz mono 16-bit PCM for one line, waiting out rate limits."""
+    key = os.environ["GEMINI_API_KEY"]
+    model = os.environ.get("GEMINI_TTS_MODEL", "gemini-2.5-pro-preview-tts")
+    body = {
+        "contents": [{"parts": [{"text": gemini_prompt(l)}]}],
+        "generationConfig": {
+            "responseModalities": ["AUDIO"],
+            "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": l["cast"]["gemini"]}}},
+        },
+    }
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    for attempt in range(8):
+        req = urllib.request.Request(url, data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "x-goog-api-key": key})
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                data = json.load(r)
+            part = data["candidates"][0]["content"]["parts"][0]["inlineData"]
+            return base64.b64decode(part["data"])
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode(errors="replace")
+            if e.code in (429, 500, 503) and attempt < 7:
+                wait = 20 * (attempt + 1)
+                m = re.search(r'"retryDelay":\s*"(\d+)s"', msg)
+                if m:
+                    wait = int(m.group(1)) + 2
+                if e.code == 429 and "PerDay" in msg:
+                    sys.exit(f"Daily quota reached; run again later to continue.\n{msg[:500]}")
+                print(f"  {e.code}, retrying in {wait}s", flush=True)
+                time.sleep(wait)
+                continue
+            sys.exit(f"Gemini error {e.code}: {msg[:800]}")
+        except (KeyError, IndexError):
+            if attempt < 7:
+                time.sleep(5)
+                continue
+            sys.exit(f"Unexpected Gemini response: {json.dumps(data)[:800]}")
+    sys.exit("Gemini kept failing")
+
+
 def lines():
     out = subprocess.run(["npx", "tsx", "scripts/voice-lines.ts"], cwd=ROOT, check=True, capture_output=True, text=True).stdout
     return json.loads(out)
 
 
+def save_manifest(manifest):
+    with open(MANIFEST, "w") as fh:
+        json.dump(manifest, fh, indent=1, sort_keys=True)
+        fh.write("\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", nargs="*", help="record just these keys")
+    ap.add_argument("--engine", choices=["gemini", "kokoro"], default="gemini")
+    ap.add_argument("--only", nargs="*", help="record just these line ids or keys")
     ap.add_argument("--force", action="store_true", help="re-record even unchanged lines")
     args = ap.parse_args()
 
@@ -62,31 +131,47 @@ def main():
     todo = lines()
     wanted = {l["key"] for l in todo}
 
-    import soundfile as sf
-    from kokoro_onnx import Kokoro
+    kokoro = None
+    if args.engine == "kokoro":
+        from kokoro_onnx import Kokoro
 
-    kdir = os.environ.get("KOKORO_DIR", ".")
-    kokoro = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
+        kdir = os.environ.get("KOKORO_DIR", ".")
+        kokoro = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
+    elif not os.environ.get("GEMINI_API_KEY"):
+        sys.exit("Set GEMINI_API_KEY (or use --engine kokoro).")
 
     made = 0
     for i, l in enumerate(todo):
-        spec = {"spoken": l["spoken"], **l["cast"]}
+        cast = l["cast"]
+        if args.engine == "gemini":
+            spec = {"engine": "gemini", "spoken": l["spoken"], "voice": cast["gemini"], "fx": cast["fx"], "persona": l["persona"], "direction": l.get("direction")}
+        else:
+            spec = {"engine": "kokoro", "spoken": l["spoken"], "voice": cast["voice"], "speed": cast["speed"], "fx": cast["fx"]}
         path = os.path.join(OUT, f"{l['key']}.mp3")
-        if args.only and l["key"] not in args.only:
+        if args.only and l["key"] not in args.only and l["id"] not in args.only:
             continue
         if not args.force and manifest.get(l["key"]) == spec and os.path.exists(path):
             continue
-        voice = spec["voice"]
-        audio, sr = kokoro.create(speakable(spec["spoken"]), voice=voice, speed=spec["speed"], lang="en-gb" if voice.startswith("b") else "en-us")
         with tempfile.NamedTemporaryFile(suffix=".wav") as wav:
-            sf.write(wav.name, audio, sr)
+            if args.engine == "gemini":
+                raw = ["-f", "s16le", "-ar", "24000", "-ac", "1"]
+                with open(wav.name, "wb") as fh:
+                    fh.write(gemini_pcm(l))
+            else:
+                import soundfile as sf
+
+                voice = spec["voice"]
+                audio, sr = kokoro.create(speakable(spec["spoken"]), voice=voice, speed=spec["speed"], lang="en-gb" if voice.startswith("b") else "en-us")
+                sf.write(wav.name, audio, sr)
+                raw = []
             subprocess.run(
-                ["ffmpeg", "-y", "-loglevel", "error", "-i", wav.name, "-af", FX[spec["fx"]], "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", path],
+                ["ffmpeg", "-y", "-loglevel", "error", *raw, "-i", wav.name, "-af", FX[spec["fx"]], "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", path],
                 check=True,
             )
         manifest[l["key"]] = spec
         made += 1
-        print(f"[{i + 1}/{len(todo)}] {l['key']} {voice}: {spec['spoken'][:60]}", flush=True)
+        save_manifest(manifest)
+        print(f"[{i + 1}/{len(todo)}] {l['id']} {spec['voice']}: {spec['spoken'][:60]}", flush=True)
 
     # Drop recordings of lines that no longer exist.
     for f in os.listdir(OUT):
@@ -95,9 +180,7 @@ def main():
             os.remove(os.path.join(OUT, f))
             manifest.pop(key, None)
     manifest = {k: manifest[k] for k in sorted(manifest) if k in wanted}
-    with open(MANIFEST, "w") as fh:
-        json.dump(manifest, fh, indent=1, sort_keys=True)
-        fh.write("\n")
+    save_manifest(manifest)
 
     keys = sorted(k for k in wanted if os.path.exists(os.path.join(OUT, f"{k}.mp3")))
     with open(TS_OUT, "w") as fh:
