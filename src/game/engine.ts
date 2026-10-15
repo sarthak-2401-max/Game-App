@@ -9,6 +9,7 @@
 //   3. Advance the clock one turn: platforms carry the player, drones move.
 //   4. Resolve hazards at the new turn: drones, spikes, lasers, falling.
 //   5. Check the win condition (exit + all cores), then the move limit.
+// In echo rooms the echo takes its recorded step between 2 and 3, after the player.
 
 import { activeChannels } from './entities/channels';
 import { hasPlatformAt, spikesRaised } from './entities/hazards';
@@ -35,6 +36,7 @@ export function initialState(room: Room): GameState {
     mods: {},
     status: 'playing',
     bonusMoves: 0,
+    ...(room.echo && room.echoTrack?.length ? { echo: room.start } : {}),
   };
 }
 
@@ -105,6 +107,24 @@ function blockCanEnter(room: Room, s: GameState, cell: number, channels: number)
       return !hasPlatformAt(room, s.tick, cell);
     default:
       return false; // walls, emitters, locks, exits, switches, teleporters
+  }
+}
+
+/** Can the echo walk into this cell? It collides like the player but ignores hazards and items. */
+function echoCanEnter(room: Room, s: GameState, cell: number, channels: number): boolean {
+  if (s.blocks.includes(cell)) return false;
+  const t = effectiveTile(room, s, cell);
+  switch (t.k) {
+    case 'wall':
+    case 'emitter':
+    case 'lock':
+      return false;
+    case 'door':
+      return !isDoorClosed(room, s, cell, channels);
+    case 'pit':
+      return false;
+    default:
+      return true;
   }
 }
 
@@ -189,6 +209,30 @@ export function step(room: Room, prev: GameState, action: Action, opts: EngineOp
     }
   }
 
+  // 2b. The echo replays its recorded action for this turn.
+  let echo = prev.echo;
+  const track = room.echoTrack;
+  if (track && room.echo && echo !== undefined && echo >= 0) {
+    const a = track[prev.moves];
+    if (a && a !== 'wait') {
+      const to = neighbor(room.width, room.height, echo, a);
+      const world = { ...prev, mods, blocks };
+      if (to !== -1 && echoCanEnter(room, world, to, channelsBefore)) {
+        let dest = to;
+        if (effectiveTile(room, world, to).k === 'tele') {
+          const p = partnerTeleporter(room, to);
+          if (p !== -1 && !blocks.includes(p)) dest = p;
+        }
+        events.push({ type: 'echo', from: echo, to: dest });
+        echo = dest;
+      }
+    }
+    if (prev.moves + 1 >= track.length + room.echo.linger) {
+      events.push({ type: 'echoFaded', at: echo });
+      echo = -1;
+    }
+  }
+
   // 3. Advance the clock (it stands still while a Freeze is active).
   const frozen = prev.frozen ?? 0;
   const tick = frozen > 0 ? prev.tick : prev.tick + 1;
@@ -215,6 +259,7 @@ export function step(room: Room, prev: GameState, action: Action, opts: EngineOp
     status: 'playing',
     bonusMoves: prev.bonusMoves,
     ...(frozen > 0 ? { frozen: frozen - 1 } : {}),
+    ...(echo !== undefined ? { echo } : {}),
   };
 
   // 4. Hazards at the new turn.
@@ -262,5 +307,7 @@ export function stateKey(s: GameState, tickPeriod: number): string {
     .sort((a, b) => a - b)
     .map((k) => `${k}${s.mods[k] === 'pit' ? 'p' : 'f'}`)
     .join(',');
-  return `${s.player}|${s.blocks.join(',')}|${s.itemsTaken}|${s.keys.gold}.${s.keys.blue}|${s.switches}|${mods}|${tickPeriod > 1 ? s.tick % tickPeriod : 0}`;
+  // While an echo is still replaying, its future depends on how far through the track it is.
+  const echo = s.echo === undefined ? '' : s.echo < 0 ? '|e-' : `|e${s.echo}@${s.moves}`;
+  return `${s.player}|${s.blocks.join(',')}|${s.itemsTaken}|${s.keys.gold}.${s.keys.blue}|${s.switches}|${mods}|${tickPeriod > 1 ? s.tick % tickPeriod : 0}${echo}`;
 }

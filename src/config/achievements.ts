@@ -22,6 +22,11 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   { id: 'streak_3', name: 'Habit Forming', description: 'Reach a 3-day daily streak.', reward: 30, target: 3 },
   { id: 'streak_7', name: 'Dedicated', description: 'Reach a 7-day daily streak.', reward: 70, target: 7 },
   { id: 'collector', name: 'Collector', description: 'Own 5 cosmetics you bought or earned.', reward: 30, target: 5 },
+  { id: 'sigils_5', name: 'Seen', description: "Find five of WITNESS's marks.", reward: 40, target: 5 },
+  { id: 'sigils_10', name: 'Witnessed', description: "Find all ten of WITNESS's marks.", reward: 100, target: 10 },
+  { id: 'stars_100', name: 'Rising Star', description: 'Earn 100 mastery stars.', reward: 50, target: 100 },
+  { id: 'stars_250', name: 'Constellation', description: 'Earn 250 mastery stars.', reward: 150, target: 250 },
+  { id: 'daily_master', name: 'Daily Master', description: 'Earn all three stars on a daily challenge.', reward: 30, target: 1 },
   { id: 'flawless_chapter', name: 'Untouchable', description: 'Clear a whole chapter without failing a single attempt.', reward: 60, target: 1, hidden: true },
 ];
 

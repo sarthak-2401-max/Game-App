@@ -1,14 +1,15 @@
 # Roadmap
 
-Suggested next steps, roughly in order.
+Suggested next steps, in priority order. See [UPGRADE_REPORT.md](UPGRADE_REPORT.md) for what the Observer update already shipped.
 
-1. **Device pass.** Development builds on one iPhone and one mid-range Android; work through STORE_CHECKLIST.md "Device QA".
-2. **Playtest the curve.** Five to ten players through chapters 1–4; use `level_failed` causes and attempts to rebalance rooms that spike.
-3. **Crash reporting** (e.g. Sentry) gated on consent, with the privacy docs updated.
-4. **Remote config** for `ECONOMY` and `INTERSTITIAL_POLICY` so ad frequency and rewards can be tuned without a release.
-5. **More daily rooms.** Grow the pool from 12 with the forge workflow, or generate seeded variations validated by the solver at build time.
-6. **Server time for dailies** to close the forward-clock loophole; optional cloud save (the `KeyValueStore` interface is the seam).
-7. **Localisation** (string extraction; layouts already wrap).
-8. **Composed music and richer SFX**, with a separate music volume slider.
-9. **Level editor** in a dev build, saving ASCII specs that run straight through the validator.
-10. **AdMob SSV** if rewards ever carry real value; mediation once traffic justifies it.
+1. **Device pass.** Expo Go on the iPhone now (feel, sound, the darkness effect, monitor readability); a development build on a mid-range Android once the Play account is verified. Work through STORE_CHECKLIST.md "Device QA".
+2. **Playtest the first 15 minutes** with five to ten people. Do they notice WITNESS, find the Room 2 writing, try both o01 exits? Use `first_interaction`, `first_completion`, `clue_found` and `level_failed` to tune.
+3. **Echo rooms inside the campaign** (chapters 6–9), now that the rule is solver-proven.
+4. **More memory variants:** rooms that soften after many deaths, or change after an `.alt` route.
+5. **Store screenshots** regenerated with the monitor, stars and an Echo room.
+6. **AdMob production ids**, then a real-device ad test.
+7. **Crash reporting** gated on consent, with the privacy docs updated.
+8. **Remote config** for `ECONOMY` and `INTERSTITIAL_POLICY`.
+9. **Server time for dailies** and optional cloud save (the `KeyValueStore` interface is the seam).
+10. **Localisation:** the WITNESS script and clues are already data files.
+11. **Composed music** and a WITNESS ambience layer.

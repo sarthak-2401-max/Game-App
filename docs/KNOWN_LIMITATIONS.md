@@ -4,7 +4,7 @@
 
 - **No native build has been made.** Everything was built and tested in a Linux container: TypeScript, lint, Jest, a static web export and a headless-browser run. No iOS or Android binary has been compiled or installed.
 - **AdMob, UMP consent and ATT have not run.** The integration compiles against `react-native-google-mobile-ads` 17.2 and follows its documented API, but no real ad has been requested, shown or rewarded. No AdMob account, app ids or ad units exist yet.
-- **Audio and haptics** were not heard or felt on a phone. On the web build, audio waits for the first tap or key press (browser autoplay rules).
+- **Audio and haptics** (including the new WITNESS, clue, echo, door and star cues) were not heard or felt on a phone. The lights-out gradient has not been profiled on low-end Android. On the web build, audio waits for the first tap or key press (browser autoplay rules).
 - **Touch input:** swipe and tap-to-move were not automated; the browser runs used the keyboard. Gesture handling needs a pass on real phones, including small screens and notched devices.
 - **Screen readers:** accessibility labels and roles are set on controls and board, but VoiceOver and TalkBack were not tested.
 - **Performance** on low-end Android devices is unmeasured. The largest rooms render about 100 SVG tiles plus animated layers.
@@ -22,6 +22,11 @@
 - **Local saves only.** No cloud sync; uninstalling deletes progress.
 - **Difficulty** is tuned with solver metrics (shortest path, dead-end states, critical turns), not with human playtests. Expect to rebalance a few rooms after real players try them.
 - **Music** is a simple synthesised loop meant as a placeholder for a composed track.
+
+- **WITNESS lines** stay on the monitor for about 3–7 seconds; every line is kept in the Journal's WITNESS Files.
+- **Hints in echo rooms** follow the solution recorded with the reference echo. With a different echo they fall back to the bounded search.
+- **The o01 choice** is recorded from the first completion only; replaying the interlude does not change it.
+- **Not 3D.** The board is React Native views and SVG with a 3D-style look. No 3D engine is used.
 
 ## Placeholders you must replace
 

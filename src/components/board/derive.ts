@@ -42,7 +42,7 @@ export function deriveModel(room: Room, s: GameState): RenderModel {
       v.warning = !v.raised && tile.mode.kind === 'timed' && spikesRaised(tile, s.tick + 1, channels);
     } else if (tile.k === 'door') v.active = isDoorClosed(room, s, i, channels);
     else if (tile.k === 'switch') v.active = isChannelOn(s.switches, tile.ch);
-    else if (tile.k === 'plate') v.active = s.player === i || s.blocks.includes(i);
+    else if (tile.k === 'plate') v.active = s.player === i || s.blocks.includes(i) || (!!room.echo?.presses && s.echo === i);
     else if (tile.k === 'emitter') {
       v.active = emitterActive(tile, s.tick, channels);
       v.warning = !v.active && !!tile.timing && emitterActive(tile, s.tick + 1, channels);

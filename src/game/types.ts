@@ -38,7 +38,8 @@ export type Tile =
   | { k: 'spikes'; mode: SpikeMode }
   | { k: 'plate'; ch: number }
   | { k: 'switch'; ch: number }
-  | { k: 'door'; ch: number; invert?: boolean }
+  /** `look: 'wall'` draws the door as a wall section that slides into the floor when it opens. */
+  | { k: 'door'; ch: number; invert?: boolean; look?: 'wall' }
   | { k: 'lock'; color: KeyColor }
   | { k: 'tele'; pair: number }
   /** With a channel, an emitter is off while it is active (or only fires while active if `invert`). */
@@ -63,6 +64,21 @@ export interface Route {
   offset: number;
 }
 
+/**
+ * Echo rooms replay the player's previous attempt as a translucent echo. The echo re-walks the
+ * recorded actions one per turn, with collision (walls, closed doors, locks, crates and pits
+ * stop it for that turn), is intangible to hazards and to the player, and holds pressure
+ * plates down only when `presses` is set. It lingers `linger` turns after its track ends.
+ */
+export interface EchoConfig {
+  linger: number;
+  /** Longest recording kept, in actions. */
+  maxRecord: number;
+  presses: boolean;
+  /** A reference first attempt (encoded actions) used to prove the room solvable. */
+  reference: string;
+}
+
 export interface Room {
   id: string;
   chapter: number; // 1-based; 0 for daily/bonus content
@@ -81,6 +97,11 @@ export interface Room {
   intro?: string; // short contextual instruction shown when the room opens
   hint?: string; // free textual hint
   tags: string[]; // mechanics used, for teaching order checks and analytics
+  echo?: EchoConfig;
+  /** The recorded attempt the echo replays (set per session; absent on the first attempt). */
+  echoTrack?: Action[];
+  /** Id of the room-memory variant this room was built from, if any. */
+  variant?: string;
 }
 
 export type DeathCause = 'spikes' | 'laser' | 'drone' | 'fall' | 'moves' | 'timeout';
@@ -101,6 +122,8 @@ export interface GameState {
   bonusMoves: number;
   /** Freeze power-up: actions left during which the clock (drones, platforms, timed traps) stands still. */
   frozen?: number;
+  /** Echo position (-1 once it has faded). Only present in echo rooms with a recording. */
+  echo?: number;
 }
 
 export type StepEvent =
@@ -118,6 +141,10 @@ export type StepEvent =
   | { type: 'win' }
   | { type: 'checkpoint'; at: number }
   | { type: 'exitSealed'; at: number }
+  | { type: 'echo'; from: number; to: number }
+  | { type: 'echoFaded'; at: number }
+  /** A door changed state this turn (opened or closed by a switch, plate or echo). */
+  | { type: 'doors'; opened: number[]; closed: number[] }
   /** Session-level: the Shield power-up absorbed a fatal action. */
   | { type: 'shielded'; at: number; cause: DeathCause };
 

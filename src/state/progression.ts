@@ -12,6 +12,10 @@ import type { RoomRecord, SaveData } from '../services/storage/saveSchema';
 import { POWERUP_TUNING, type PowerUpId } from '../config/powerups';
 import { addPowerUp, grantChapterPowerUps, syncPowerUpUnlocks, type PowerUpGrant } from './powerups';
 import { dayKey, daysBetween } from '../utils/dates';
+import { sigilCount } from '../game/observer/conditions';
+import { markClueFound, memoryView, noteCompletionMemory, type MemoryRun } from './memory';
+import { clueFlag } from '../game/observer/clues';
+import { starCount, totalStars } from './mastery';
 
 export interface RewardLine {
   label: string;
@@ -29,6 +33,9 @@ export interface CompletionResult {
   doubleEligibleAmount: number;
   /** Power-ups unlocked or earned by this completion. */
   powerups: PowerUpGrant[];
+  /** Stars this run earned, and the room's best (union) after it. */
+  stars: number;
+  bestStars: number;
 }
 
 export interface RunStats {
@@ -40,6 +47,10 @@ export interface RunStats {
   failedAttempts: number;
   /** Shortest known solution (from the solver), for the efficiency achievement. */
   parMoves?: number;
+  /** Mastery stars earned by this run (see mastery.ts). */
+  stars?: number;
+  /** Room-memory facts about this run. */
+  memory?: MemoryRun;
 }
 
 const emptyRecord = (): RoomRecord => ({ completed: false, completions: 0, coinsFound: 0, attempts: 0, rewarded: false });
@@ -96,6 +107,11 @@ export function evaluateAchievements(
     streak_7: s.daily.streak.best,
     collector: cosmeticsOwnedBeyondDefault(s),
     daily_first: Object.keys(s.daily.claims).length > 0 ? 1 : 0,
+    sigils_5: sigilCount(memoryView(s)),
+    sigils_10: sigilCount(memoryView(s)),
+    stars_100: totalStars(s),
+    stars_250: totalStars(s),
+    daily_master: Object.values(s.daily.claims).some((c) => starCount(c.stars) === 3) ? 1 : 0,
   };
   for (const def of ACHIEVEMENTS) {
     const cur = s.achievements[def.id] ?? { progress: 0 };
@@ -168,6 +184,7 @@ export function completeRoom(save: SaveData, room: Room, run: RunStats, now = ne
     coinsFound,
     firstClearAt: rec.firstClearAt ?? now.toISOString(),
     rewarded: true,
+    stars: (rec.stars ?? 0) | (run.stars ?? 1),
   };
   s = addCoins(
     {
@@ -178,6 +195,8 @@ export function completeRoom(save: SaveData, room: Room, run: RunStats, now = ne
     },
     base + coinReward,
   );
+
+  if (run.memory) s = noteCompletionMemory(s, room, run.memory);
 
   let chapterCompleted: number | undefined;
   if (room.chapter > 0) {
@@ -213,7 +232,36 @@ export function completeRoom(save: SaveData, room: Room, run: RunStats, now = ne
     s = milestone.save;
     powerups.push(...milestone.grants);
   }
-  return { save: s, rewards, achievements: ach.unlocked, chapterCompleted, firstClear, doubleEligibleAmount: base, powerups };
+  return {
+    save: s,
+    rewards,
+    achievements: ach.unlocked,
+    chapterCompleted,
+    firstClear,
+    doubleEligibleAmount: base,
+    powerups,
+    stars: run.stars ?? 1,
+    bestStars: newRec.stars ?? 1,
+  };
+}
+
+// ---- Clues and WITNESS's marks --------------------------------------------------------------
+
+export interface ClueResult {
+  save: SaveData;
+  /** False if the clue was already found (nothing changes). */
+  isNew: boolean;
+  sigils: number;
+  achievements: string[];
+  rewards: RewardLine[];
+}
+
+/** Records a found clue and pays out any collection achievement it completes (once). */
+export function discoverClue(save: SaveData, id: string, now = new Date()): ClueResult {
+  if ((save.memory.flags[clueFlag(id)] ?? 0) > 0) return { save, isNew: false, sigils: sigilCount(memoryView(save)), achievements: [], rewards: [] };
+  const marked = markClueFound(save, id);
+  const ach = evaluateAchievements(marked, {}, now);
+  return { save: ach.save, isNew: true, sigils: sigilCount(memoryView(ach.save)), achievements: ach.unlocked, rewards: ach.rewards };
 }
 
 // ---- Daily challenge --------------------------------------------------------------------
@@ -258,6 +306,20 @@ export function claimDaily(save: SaveData, challengeDay: string, now = new Date(
   s = addCoins(s, ECONOMY.dailyReward + streakBonus);
   const ach = evaluateAchievements(s, {}, now);
   return { ok: true, save: ach.save, rewards: [...rewards, ...ach.rewards], achievements: ach.unlocked };
+}
+
+/**
+ * Records the mastery result of a daily run. Only the day's existing claim is updated (best
+ * stars and moves), so replays can improve the score but never pay coins again.
+ */
+export function recordDailyResult(save: SaveData, day: string, stars: number, moves: number, now = new Date()): { save: SaveData; achievements: string[]; rewards: RewardLine[] } {
+  const claim = save.daily.claims[day];
+  if (!claim) return { save, achievements: [], rewards: [] };
+  const next = { ...claim, stars: (claim.stars ?? 0) | stars, bestMoves: claim.bestMoves === undefined ? moves : Math.min(claim.bestMoves, moves) };
+  if (next.stars === claim.stars && next.bestMoves === claim.bestMoves) return { save, achievements: [], rewards: [] };
+  const s = { ...save, daily: { ...save.daily, claims: { ...save.daily.claims, [day]: next } } };
+  const ach = evaluateAchievements(s, {}, now);
+  return { save: ach.save, achievements: ach.unlocked, rewards: ach.rewards };
 }
 
 /** Streak shown on the home screen: a streak is "alive" until the grace period lapses. */

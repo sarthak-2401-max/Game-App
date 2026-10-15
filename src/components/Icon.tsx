@@ -19,7 +19,7 @@ export function Icon({ name, size = 22, color = '#E8EEF9' }: { name: IconName; s
   const sw = Math.max(1.8, s / 11);
   const p = { stroke: color, strokeWidth: sw, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
   const arrow = (rot: number) => (
-    <G rotation={rot} origin={`${s / 2}, ${s / 2}`}>
+    <G transform={`rotate(${rot} ${s / 2} ${s / 2})`}>
       <Polygon points={`${s / 2},${s * 0.2} ${s * 0.82},${s * 0.62} ${s * 0.18},${s * 0.62}`} fill={color} />
     </G>
   );
@@ -148,7 +148,7 @@ export function Icon({ name, size = 22, color = '#E8EEF9' }: { name: IconName; s
         return (
           <G>
             {[0, 60, 120].map((r) => (
-              <G key={r} rotation={r} origin={`${s / 2}, ${s / 2}`}>
+              <G key={r} transform={`rotate(${r} ${s / 2} ${s / 2})`}>
                 <Line x1={s / 2} y1={s * 0.14} x2={s / 2} y2={s * 0.86} {...p} />
                 <Line x1={s * 0.4} y1={s * 0.22} x2={s / 2} y2={s * 0.3} {...p} />
                 <Line x1={s * 0.6} y1={s * 0.22} x2={s / 2} y2={s * 0.3} {...p} />
