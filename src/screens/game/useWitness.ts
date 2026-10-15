@@ -24,6 +24,12 @@ export function clueLabel(c: Clue) {
   return c.source ? `${KIND_LABEL[c.kind]} · ${c.source}` : KIND_LABEL[c.kind];
 }
 
+/** A WITNESS line as shown (numbers filled in) and as written (to find its recording). */
+export interface SpokenLine {
+  text: string;
+  voiceKey: string;
+}
+
 export interface Witness {
   feed: FeedItem[];
   consume: (key: string) => void;
@@ -33,9 +39,9 @@ export interface Witness {
   /** Clue ids found during this visit. */
   foundThisVisit: string[];
   /** Line for the failure sheet, if WITNESS has one. */
-  failLine?: string;
+  failLine?: SpokenLine;
   /** Computes (and records as heard) the lines for the win screen. */
-  winLines: (run: { moves: number; deaths: number }) => string[];
+  winLines: (run: { moves: number; deaths: number }) => SpokenLine[];
   /** Achievements unlocked by clues during this visit (to show on the result screen). */
   achievements: string[];
 }
@@ -47,7 +53,7 @@ export function useWitness(session: Session | null, storyOpen: boolean): Witness
   const [darkTurns, setDarkTurns] = useState(0);
   const [watched, setWatched] = useState(false);
   const [found, setFound] = useState<string[]>([]);
-  const [failLine, setFailLine] = useState<string | undefined>();
+  const [failLine, setFailLine] = useState<SpokenLine | undefined>();
   const [achievements, setAchievements] = useState<string[]>([]);
   const started = useRef<number>(-1);
   const echoAnnounced = useRef<string>('');
@@ -63,7 +69,7 @@ export function useWitness(session: Session | null, storyOpen: boolean): Witness
       if (!lines.length) return;
       const app = useApp.getState();
       const mem = memoryView(app.save);
-      const items: FeedItem[] = lines.map((t) => ({ key: `t${++keySeq}`, speaker: t.speaker, text: fillTemplate(t.text, mem, run) }));
+      const items: FeedItem[] = lines.map((t) => ({ key: `t${++keySeq}`, speaker: t.speaker, text: fillTemplate(t.text, mem, run), voiceKey: t.text }));
       app.update((sv) => lines.reduce((acc, t) => markHeard(acc, t.id), sv));
       lines.forEach((t) => analytics.track('witness_heard', { id: t.id, room_id: t.room }));
       const lights = lines.find((t) => t.lights)?.lights;
@@ -146,7 +152,7 @@ export function useWitness(session: Session | null, storyOpen: boolean): Witness
           const text = fillTemplate(lines[0].text, memoryView(useApp.getState().save), { deaths: session.failedAttempts });
           useApp.getState().update((sv) => markHeard(sv, lines[0].id));
           // eslint-disable-next-line react-hooks/set-state-in-effect -- shown on the failure sheet
-          setFailLine(text);
+          setFailLine({ text, voiceKey: lines[0].text });
         }
       }
       return;
@@ -200,7 +206,7 @@ export function useWitness(session: Session | null, storyOpen: boolean): Witness
       if (!lines.length) return [];
       const mem = memoryView(useApp.getState().save);
       useApp.getState().update((sv) => lines.reduce((acc, t) => markHeard(acc, t.id), sv));
-      return lines.map((t) => fillTemplate(t.text, mem, run));
+      return lines.map((t) => ({ text: fillTemplate(t.text, mem, run), voiceKey: t.text }));
     },
     [session],
   );

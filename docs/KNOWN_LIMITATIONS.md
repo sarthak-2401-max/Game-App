@@ -27,8 +27,8 @@
 - **Hints in echo rooms** follow the solution recorded with the reference echo. With a different echo they fall back to the bounded search.
 - **The o01 choice** is recorded from the first completion only; replaying the interlude does not change it.
 - **Not 3D.** The board is React Native views and SVG with a 3D-style look. No 3D engine is used.
-- **Voiceover uses the phone's built-in text-to-speech** (`expo-speech`), not recorded actors. It works offline and in Expo Go, but how natural it sounds depends on the voices installed on the device. On iOS, HALE, Pip, the staff logs and WITNESS each pick a different system voice when one is installed (Daniel, Samantha, Moira, Fred and fallbacks); otherwise they are told apart by pitch and speed only. Downloading an "Enhanced" English voice in iOS Settings > Accessibility > Spoken Content > Voices improves it. To use recorded or AI-generated audio instead, `src/services/audio/voice.ts` is the one place to swap.
-- **Voiceover has not been heard on a real phone yet.** Browser tests confirm which lines are sent to the speech engine and with which voice settings, not how they sound.
+- **Voices are generated, not acted.** Every line is pre-recorded with the open-source Kokoro-82M voice model (Apache-2.0) and shipped as MP3 (about 300 clips). They sound human, but a voice actor would give more emotion and better timing. Re-record with `npm run assets:voices` after editing any story text; lines without a recording fall back to the phone's text-to-speech, and a test fails until they are recorded.
+- **Numbers are not spoken.** Five WITNESS lines show a live number in the subtitle ("Exit reached in 12 moves"); their recordings use a wording without it (`SPOKEN_TEMPLATES` in `src/game/voiceLines.ts`).
 
 ## Placeholders you must replace
 

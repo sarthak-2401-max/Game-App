@@ -25,8 +25,8 @@ const URL = process.argv[3] ?? 'http://localhost:8099/';
   await shot('fs-02-room1');
   await key('ArrowRight');
   results.firstInteractionMs = Date.now() - t0;
-  // WITNESS speaks on the first move, so it never covers the room's instruction before it.
-  results.witnessOnFirstMove = await page.getByText(/Subject 7 is awake/).waitFor({ timeout: 4000 }).then(() => true, () => false);
+  // WITNESS speaks on the first move, after the room's opening story line has been read.
+  results.witnessOnFirstMove = await page.getByText(/Subject 7 is awake/).waitFor({ timeout: 15000 }).then(() => true, () => false);
   await page.waitForTimeout(900);
   await shot('fs-02b-room1-witness');
   await key('ArrowRight');

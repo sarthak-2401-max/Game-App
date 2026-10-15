@@ -1,12 +1,16 @@
-// Voiceover: the story read aloud with the device's own text-to-speech (expo-speech), so it
-// works offline, in Expo Go and on the web with no audio files to ship. Each character gets its
-// own voice settings. One line plays at a time; a new line cuts off the old one. Subtitles are
-// always on screen, so nothing is lost when voiceover is off or the phone is muted.
+// Voiceover: every story and WITNESS line has a recording in assets/voice (made by
+// scripts/make-voices.py), played with expo-audio. A line without a recording (one edited
+// since the last recording run) falls back to the device's text-to-speech. One line plays at a
+// time; a new line cuts off the old one. Subtitles are always on screen, so nothing is lost
+// when voiceover is off or the phone is muted.
 import * as Speech from 'expo-speech';
+import { voiceKey, type VoiceSpeaker } from '../../game/voiceLines';
 import { log } from '../../utils/log';
 import { sound } from './sound';
+import { expoClipPlayer, type ClipPlayer } from './voiceClipPlayer';
+import { VOICE_CLIPS } from './voiceClips.generated';
 
-export type Speaker = 'HALE' | 'PIP' | 'LOG' | 'WITNESS';
+export type Speaker = VoiceSpeaker;
 
 interface Profile {
   /** Preferred system voices by name, best first. The first one installed wins. */
@@ -15,8 +19,8 @@ interface Profile {
   rate: number;
 }
 
-// iOS ships these voices by name; Android and the web fall back to the default English voice
-// and tell the characters apart by pitch and speed.
+// Fallback only. iOS ships these voices by name; Android and the web fall back to the default
+// English voice and tell the characters apart by pitch and speed.
 export const PROFILES: Record<Speaker, Profile> = {
   // The facility AI: calm, low, measured.
   HALE: { prefer: ['Daniel', 'Arthur', 'Aaron', 'Oliver', 'Gordon'], pitch: 0.88, rate: 0.94 },
@@ -47,11 +51,23 @@ export class VoiceOver {
   private token = 0;
   private speaking = false;
   /** The playing line's onEnd, run if the line is cut off. */
-  private pending: (() => void) | null = null;
+  private pending: ((finished: boolean) => void) | null = null;
+  /** Stops the playing recording (null while text-to-speech or nothing plays). */
+  private release: (() => void) | null = null;
+  private safety: ReturnType<typeof setTimeout> | null = null;
   private voices: Partial<Record<Speaker, string>> = {};
   private voicesLoaded: Promise<void> | null = null;
 
-  constructor(private engine: Engine = Speech) {}
+  constructor(
+    private engine: Engine = Speech,
+    private clips: Record<string, number> = VOICE_CLIPS,
+    private player: ClipPlayer = expoClipPlayer,
+  ) {}
+
+  /** Whether this line has a recording. `key` is the line as written, before templates are filled. */
+  hasRecording(text: string, who: Speaker) {
+    return voiceKey(who, text) in this.clips;
+  }
 
   configure(opts: { voiceover: boolean }) {
     this.enabled = opts.voiceover;
@@ -94,14 +110,16 @@ export class VoiceOver {
   }
 
   /**
-   * Reads a line in a character's voice. `onEnd` runs when it finishes, is cut off, or cannot
+   * Plays a line in a character's voice. `onEnd` runs when it finishes, is cut off, or cannot
    * play at all (voiceover off, app in the background), so callers can always rely on it.
+   * `key` is the line as written when `text` has numbers filled in ("{moves} moves").
+   * `finished` is false when the line was cut off or could not play.
    */
-  say(text: string, who: Speaker, onEnd?: () => void): void {
+  say(text: string, who: Speaker, onEnd?: (finished: boolean) => void, key?: string): void {
     this.stop();
     const line = speakable(text);
     if (!this.enabled || !this.appActive || !line) {
-      onEnd?.();
+      onEnd?.(false);
       return;
     }
     const id = ++this.token;
@@ -110,14 +128,27 @@ export class VoiceOver {
       this.token++;
       this.speaking = false;
       this.pending = null;
+      this.clearPlayback();
       sound.duck(false);
-      onEnd?.();
+      onEnd?.(true);
     };
+    this.speaking = true;
+    this.pending = onEnd ?? null;
+    sound.duck(true);
+    const clip = this.clips[voiceKey(who, key ?? text)];
+    if (clip !== undefined) {
+      try {
+        this.release = this.player.play(clip, end);
+        // If the player never reports the end (a lost event), move on anyway.
+        this.safety = setTimeout(end, Math.max(4000, line.length * 120));
+      } catch (e) {
+        log.debug('voice', 'clip failed', e);
+        end();
+      }
+      return;
+    }
     const p = PROFILES[who];
     try {
-      this.speaking = true;
-      this.pending = onEnd ?? null;
-      sound.duck(true);
       this.engine.speak(line, {
         language: 'en-US',
         voice: this.voices[who],
@@ -133,21 +164,44 @@ export class VoiceOver {
     }
   }
 
+  private clearPlayback() {
+    if (this.safety) clearTimeout(this.safety);
+    this.safety = null;
+    const release = this.release;
+    this.release = null;
+    try {
+      release?.();
+    } catch (e) {
+      log.debug('voice', 'release failed', e);
+    }
+  }
+
   stop() {
     const wasSpeaking = this.speaking;
+    const wasClip = !!this.release;
     const pending = this.pending;
     // Invalidate the old line first so a late onStopped cannot end the next one.
     this.token++;
     this.speaking = false;
     this.pending = null;
     if (!wasSpeaking) return;
+    this.clearPlayback();
     sound.duck(false);
-    try {
-      void this.engine.stop();
-    } catch (e) {
-      log.debug('voice', 'stop failed', e);
+    if (!wasClip) {
+      try {
+        void this.engine.stop();
+      } catch (e) {
+        log.debug('voice', 'stop failed', e);
+      }
     }
-    pending?.();
+    pending?.(false);
+  }
+
+  /** Plays lines one after another; stopping (or a new line) ends the sequence. */
+  sayAll(lines: { text: string; who: Speaker; key?: string }[]) {
+    const [first, ...rest] = lines;
+    if (!first) return;
+    this.say(first.text, first.who, (finished) => finished && this.sayAll(rest), first.key);
   }
 }
 
