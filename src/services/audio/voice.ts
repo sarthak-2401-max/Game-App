@@ -143,11 +143,14 @@ export class VoiceOver {
       this.pending = null;
       this.clearPlayback();
       sound.duck(false);
+      sound.setWitness(false);
       onEnd?.(true);
     };
     this.setSpeaking(true);
     this.pending = onEnd ?? null;
     sound.duck(true);
+    // WITNESS speaks over its own drone.
+    sound.setWitness(who === 'WITNESS');
     const clip = this.clips[voiceKey(who, key ?? text)];
     if (clip !== undefined) {
       try {
@@ -206,6 +209,7 @@ export class VoiceOver {
     if (!wasSpeaking) return;
     this.clearPlayback();
     sound.duck(false);
+    sound.setWitness(false);
     if (!wasClip) {
       try {
         void this.engine.stop();

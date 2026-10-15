@@ -1,7 +1,7 @@
 import { CAMPAIGN_SIZE } from '../src/game/levels';
 import { CHAPTER_STORY, EPILOGUE, ROOM_ARRIVAL, ROOM_STORY } from '../src/game/story';
 
-jest.mock('../src/services/audio/sound', () => ({ sound: { duck: jest.fn() } }));
+jest.mock('../src/services/audio/sound', () => ({ sound: { duck: jest.fn(), setWitness: jest.fn() } }));
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), getAvailableVoicesAsync: jest.fn(async () => []) }));
 jest.mock('../src/services/audio/voiceClipPlayer', () => ({ expoClipPlayer: { play: jest.fn(() => () => undefined) } }));
 

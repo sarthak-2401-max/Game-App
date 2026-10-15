@@ -154,6 +154,14 @@ export function GameScreen() {
     return () => clearTimeout(t);
   }, [kind, roomIndex]);
 
+  // ---- Music --------------------------------------------------------------------------------
+  // Each chapter has its own bed; leaving the game goes back to the menu's.
+  const chapter = session?.room.chapter;
+  useEffect(() => {
+    if (chapter) sound.setBase(`ch${chapter}`);
+  }, [chapter]);
+  useEffect(() => () => sound.setBase('menu'), []);
+
   // ---- Chapter opening story ----------------------------------------------------------------
   useEffect(() => {
     if (!session || session.kind !== 'campaign') return;

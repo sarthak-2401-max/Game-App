@@ -1,4 +1,4 @@
-// Warms the assets a room is about to need. Voice lines and scene paintings are separate files,
+// Warms the assets a room is about to need. Voice lines, music beds and scene paintings are files,
 // and the first time one plays it has to be read (in Expo Go, fetched from the dev server), which
 // stalls the line and can leave a gap in the music. Fetching them a room ahead, while the player
 // is still solving, keeps the next room's opening instant.
@@ -10,6 +10,7 @@ import { CHAPTER_STORY, ROOM_ARRIVAL, ROOM_STORY, type StoryBeat } from '../../g
 import { voiceKey, type VoiceSpeaker } from '../../game/voiceLines';
 import { chapterScenes } from '../story/storyScenes';
 import { log } from '../../utils/log';
+import { MUSIC_BEDS } from './musicBeds.generated';
 import { VOICE_CLIPS } from './voiceClips.generated';
 
 /** Module ids already warmed (or being warmed), so nothing is fetched twice. */
@@ -34,8 +35,9 @@ function assetsForRoom(n: number): number[] {
   const ch = CHAPTERS.find((c) => c.firstRoom === n);
   const st = ch ? CHAPTER_STORY[ch.number - 1] : undefined;
   if (ch && st) {
+    out.push(MUSIC_BEDS[`ch${ch.number}`]);
     for (const b of st.opening) out.push(beatClip(b));
-    for (const s of chapterScenes(ch.number, st.opening.length)) out.push(s?.source);
+    for (const s of chapterScenes(ch.number, st.opening.length)) out.push(s?.source, MUSIC_BEDS[`story-${s?.mood ?? 'neutral'}`]);
   }
   return out.filter((m): m is number => m !== undefined);
 }

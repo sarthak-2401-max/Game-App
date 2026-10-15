@@ -77,4 +77,18 @@ save('clue', mix(tone(1568, 0.5, 'sine', r=0.45), 0.5*tone(2093, 0.5, 'sine', r=
 save('echo', mix(reverse(tone(220, 0.45, 'sine', sweep=880, r=0.4)), 0.3*reverse(noise(0.45, 0.04))), 0.4)
 save('reveal', mix(tone(98, 0.9, 'sine', sweep=147, a=0.4, r=0.4), 0.4*tone(196, 0.9, 'tri', sweep=294, a=0.4, r=0.4), 0.15*noise(0.9, 0.02, a=0.3)), 0.45)
 save('star', seq(tone(1319, 0.06, 'sine'), tone(1976, 0.18, 'sine', r=0.15)), 0.45)
+# Footsteps on the Vault's metal floor: four takes, so walking never sounds like one repeated
+# blip. Each is a soft heel thump, a scuff of grit and a faint ring of the grating.
+def step(seed, pitch, bright):
+    rs = np.random.RandomState(seed)
+    n = int(SR*0.16)
+    thump = tone(70*pitch, 0.09, 'sine', a=0.002, r=0.08)
+    grit = rs.uniform(-1, 1, int(SR*0.05)); acc = 0; g = np.zeros_like(grit)
+    for i, v in enumerate(grit): acc += bright*(v-acc); g[i] = v - acc  # high-passed scuff
+    g *= env(len(g), 0.001, 0.045)
+    ring = mix(0.12*tone(1900*pitch, 0.14, 'sine', a=0.001, r=0.13), 0.08*tone(2630*pitch, 0.12, 'sine', a=0.001, r=0.11))
+    y = np.zeros(n); y[:len(thump)] += thump; y[int(SR*0.004):int(SR*0.004)+len(g)] += 0.55*g; y[:len(ring)] += ring
+    return y
+for i, (pitch, bright) in enumerate([(1.0, 0.35), (0.92, 0.3), (1.07, 0.4), (0.97, 0.25)], 1):
+    save(f'step{i}', step(100+i, pitch, bright), 0.42)
 print('ok')
