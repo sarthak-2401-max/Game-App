@@ -3,17 +3,19 @@
 // the speaker's animated portrait. Tap anywhere to advance. Reduced motion keeps the pictures
 // still and shows each line whole.
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import type { StoryBeat } from '../../game/story';
 import { voice } from '../../services/audio/voice';
+import type { StoryScene } from '../../services/story/storyScenes';
 import { useApp } from '../../state/useApp';
 import { colors, space } from '../../theme/theme';
 import { Ambient } from '../Ambient';
 import { Button } from '../ui';
 import { Portrait } from './Portrait';
+import { SceneRig } from './SceneRig';
 import { useVoiceSpeaking } from './useVoiceSpeaking';
 
 const NAME: Record<StoryBeat['speaker'], { name: string; color: string }> = {
@@ -31,7 +33,15 @@ const MOVES = [
 ];
 const SHOT_MS = 14000;
 
-function Shot({ source, index, reduced }: { source: number; index: number; reduced: boolean }) {
+/** The paintings are 768x1344; they fill the screen like `cover`, cropping the overflow. */
+const ART_W = 768;
+const ART_H = 1344;
+
+function Shot({ scene, index, reduced, speaker, speaking }: { scene: StoryScene; index: number; reduced: boolean; speaker: string; speaking: boolean }) {
+  const win = useWindowDimensions();
+  const k = Math.max(win.width / ART_W, win.height / ART_H);
+  const w = ART_W * k;
+  const h = ART_H * k;
   const t = useSharedValue(0);
   useEffect(() => {
     if (!reduced) t.value = withTiming(1, { duration: SHOT_MS, easing: Easing.out(Easing.quad) });
@@ -50,7 +60,10 @@ function Shot({ source, index, reduced }: { source: number; index: number; reduc
   return (
     <Animated.View entering={FadeIn.duration(reduced ? 0 : 900)} exiting={FadeOut.duration(reduced ? 0 : 900)} style={StyleSheet.absoluteFill}>
       <Animated.View style={[StyleSheet.absoluteFill, style]}>
-        <Image source={source} style={styles.image} resizeMode="cover" />
+        <View style={{ position: 'absolute', width: w, height: h, left: (win.width - w) / 2, top: (win.height - h) / 2 }}>
+          <Image source={scene.source} style={styles.image} />
+          <SceneRig rig={scene.rig} w={w} h={h} mood={scene.mood} speaker={speaker} speaking={speaking} reduced={reduced} />
+        </View>
       </Animated.View>
     </Animated.View>
   );
@@ -87,7 +100,7 @@ function useTyped(text: string, on: boolean): string {
   return on ? text.slice(0, n) : text;
 }
 
-export function CinematicStory({ kicker, title, beats, scenes, onDone }: { kicker: string; title: string; beats: readonly StoryBeat[]; scenes: readonly (number | undefined)[]; onDone: () => void }) {
+export function CinematicStory({ kicker, title, beats, scenes, onDone }: { kicker: string; title: string; beats: readonly StoryBeat[]; scenes: readonly (StoryScene | undefined)[]; onDone: () => void }) {
   const insets = useSafeAreaInsets();
   const reduced = useApp((st) => st.save.settings.reducedMotion);
   const speaking = useVoiceSpeaking();
@@ -109,7 +122,7 @@ export function CinematicStory({ kicker, title, beats, scenes, onDone }: { kicke
   const scene = scenes[at];
   return (
     <Animated.View entering={FadeIn.duration(400)} style={styles.root}>
-      {scene !== undefined ? <Shot key={at} source={scene} index={at} reduced={reduced} /> : <Ambient color={sp.color} cy={0.35} strength={0.18} />}
+      {scene ? <Shot key={at} scene={scene} index={at} reduced={reduced} speaker={beat.speaker} speaking={speaking} /> : <Ambient color={sp.color} cy={0.35} strength={0.18} />}
       <Shade />
       <Pressable style={[styles.fill, { paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.md }]} onPress={advance} accessibilityRole="button" accessibilityLabel={last ? 'Begin' : 'Next'}>
         <Animated.View entering={FadeIn.delay(300).duration(700)}>

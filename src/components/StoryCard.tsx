@@ -11,6 +11,7 @@ import { useApp } from '../state/useApp';
 import { colors, radius, space } from '../theme/theme';
 import { Ambient } from './Ambient';
 import { Icon } from './Icon';
+import type { StoryScene } from '../services/story/storyScenes';
 import { CinematicStory } from './story/CinematicStory';
 import { Portrait } from './story/Portrait';
 import { useVoiceSpeaking } from './story/useVoiceSpeaking';
@@ -64,7 +65,7 @@ function useTyped(text: string, on: boolean): string {
 }
 
 /** With `scenes` (one illustration per beat) the card plays as a cinematic; otherwise it lists the beats. */
-export function StoryCard(props: { kicker: string; title: string; beats: readonly StoryBeat[]; scenes?: readonly (number | undefined)[]; onDone: () => void }) {
+export function StoryCard(props: { kicker: string; title: string; beats: readonly StoryBeat[]; scenes?: readonly (StoryScene | undefined)[]; onDone: () => void }) {
   if (props.scenes?.some((s) => s !== undefined)) return <CinematicStory {...props} scenes={props.scenes} />;
   return <BeatList {...props} />;
 }

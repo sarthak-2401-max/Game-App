@@ -12,8 +12,7 @@ import { MonitorBar, MONITOR_HEIGHT } from '../components/game/MonitorBar';
 import { StarChecklist } from '../components/game/Stars';
 import { Icon } from '../components/Icon';
 import { BeatView, StoryCard } from '../components/StoryCard';
-import { sceneKey } from '../game/scenes';
-import { SCENE_IMAGES } from '../services/story/sceneImages.generated';
+import { chapterScenes, epilogueScenes, type StoryScene } from '../services/story/storyScenes';
 import { Button, CoinBadge, IconButton, Sheet, ToggleRow } from '../components/ui';
 import { ACHIEVEMENTS } from '../config/achievements';
 import { DEFAULT_COSMETICS } from '../config/cosmetics';
@@ -88,7 +87,7 @@ interface StoryOverlay {
   kicker: string;
   title: string;
   beats: readonly StoryBeat[];
-  scenes?: readonly (number | undefined)[];
+  scenes?: readonly (StoryScene | undefined)[];
   onDone: () => void;
 }
 
@@ -154,7 +153,7 @@ export function GameScreen() {
       kicker: `Chapter ${ch.number} · ${st.location}`,
       title: ch.title,
       beats: st.opening,
-      scenes: st.opening.map((_, i) => SCENE_IMAGES[sceneKey('chapter', i, ch.number)]),
+      scenes: chapterScenes(ch.number, st.opening.length),
       onDone: () => {
         useApp.getState().update((sv) => markChapterIntroSeen(sv, ch.number));
         analytics.track('story_viewed', { kind: 'chapter', chapter: ch.number });
@@ -301,7 +300,7 @@ export function GameScreen() {
           kicker: 'Epilogue',
           title: 'Outside',
           beats: EPILOGUE,
-          scenes: EPILOGUE.map((_, i) => SCENE_IMAGES[sceneKey('epilogue', i)]),
+          scenes: epilogueScenes(EPILOGUE.length),
           onDone: () => {
             useApp.getState().update(markEpilogueSeen);
             analytics.track('story_viewed', { kind: 'epilogue' });
