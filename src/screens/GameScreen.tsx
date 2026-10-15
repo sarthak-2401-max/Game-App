@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, BackHandler, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { AppState, BackHandler, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRewardedOffer } from '../components/ads/RewardedOffer';
@@ -22,6 +22,8 @@ import { getClue } from '../game/observer/clues';
 import { fillTemplate, openedCells } from '../game/observer/observer';
 import { getInterlude, interludeAfter, isInterludeId } from '../game/observer/rooms';
 import { OBSERVATION_PALETTE } from '../theme/chapters';
+import { ENVIRONMENTS, roomDesign } from '../game/environments';
+import { BACKDROPS } from '../services/story/backdrops.generated';
 import { memoryView } from '../state/memory';
 import { parFor, starCriteria, starsForWin, type StarCriteria } from '../state/mastery';
 import { clueLabel, useWitness, type SpokenLine } from './game/useWitness';
@@ -664,18 +666,28 @@ export function GameScreen() {
   const freeHint = room.hint ?? room.intro ?? mechanicTip(room.tags);
   // Rewarded offers stay out of the onboarding rooms and are hidden when no ad source exists.
   const observation = isInterludeId(room.id) && app.save.cosmetics.selected.theme === DEFAULT_COSMETICS.theme;
-  const palette = observation ? OBSERVATION_PALETTE : themeLook(app.save.cosmetics.selected.theme, room.chapter);
+  // Campaign rooms each stand somewhere in the Vault; a cosmetic theme replaces the place's look.
+  const design = session.kind === 'campaign' && !isInterludeId(room.id) && app.save.cosmetics.selected.theme === DEFAULT_COSMETICS.theme ? roomDesign(room.index) : undefined;
+  const environment = design && ENVIRONMENTS[design.env];
+  const backdrop = environment && BACKDROPS[environment.id];
+  const palette = observation ? OBSERVATION_PALETTE : (environment?.palette ?? themeLook(app.save.cosmetics.selected.theme, room.chapter));
   const adsOn = adService.hasProvider && !(session.kind === 'campaign' && room.index <= 3);
 
   return (
     <View style={[styles.root, { backgroundColor: palette.bg, paddingTop: insets.top + 4, paddingBottom: insets.bottom + 8 }]}>
+      {backdrop !== undefined && (
+        <>
+          <Image source={backdrop} style={styles.backdrop} resizeMode="cover" accessibilityIgnoresInvertColors />
+          <View pointerEvents="none" style={[styles.backdrop, { backgroundColor: palette.bg, opacity: 0.62 }]} />
+        </>
+      )}
       <Ambient color={palette.glow} cy={0.48} strength={0.16} />
       {/* HUD */}
       <View style={styles.hudRow}>
         <IconButton icon="pause" label="Pause" onPress={() => S().setPaused(true)} />
         <View style={{ flex: 1, alignItems: 'center' }}>
           <Text style={styles.hudTitle} numberOfLines={1}>
-            {title}
+            {design ? `Room ${room.index} · ${design.place}` : title}
           </Text>
           <Text style={styles.hudSub} numberOfLines={1}>
             {room.name}
@@ -747,8 +759,10 @@ export function GameScreen() {
             dark={witness.dark}
             openingCells={session.attempt === 1 ? openedCells(room) : undefined}
             palette={observation ? OBSERVATION_PALETTE : undefined}
+            environment={environment}
+            landmark={design?.landmark}
           />
-          {!reduced && <RoomBanner show={`${room.id}:${session.visit}`} kicker={title} title={room.name} color={palette.glow} />}
+          {!reduced && <RoomBanner show={`${room.id}:${session.visit}`} kicker={design ? design.place : title} title={room.name} color={palette.glow} />}
           <View style={[styles.plinth, { height: Math.round(cell * PLINTH), backgroundColor: palette.wallSide, borderTopColor: `${palette.glow}66` }]}>
             <View style={[styles.plinthTrim, { backgroundColor: palette.glow }]} />
             <View style={styles.plinthShade} />
@@ -1012,6 +1026,7 @@ function mechanicTip(tags: string[]): string {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 12 },
+  backdrop: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, width: '100%', height: '100%' },
   hudRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   hudTitle: { color: colors.textDim, ...type.tiny, textTransform: 'uppercase' },
   hudSub: { color: colors.text, ...type.h2 },

@@ -135,29 +135,47 @@ export function Flash({ color, seq }: { color: string; seq: number }) {
   return <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: color, zIndex: 19 }, st]} />;
 }
 
-function Mote({ W, H, seed, color }: { W: number; H: number; seed: number; color: string }) {
+/** How each environment's air moves: colour (null = the room's glow), size, drift direction, shape. */
+export const MOTE_STYLES: Record<string, { color: string | null; size: number; dir: 1 | -1; square?: boolean; ring?: boolean; bright?: number }> = {
+  dust: { color: null, size: 1, dir: 1 },
+  steam: { color: '#E8FFF8', size: 3.2, dir: 1, bright: 0.5 },
+  spores: { color: '#B6F27A', size: 1.4, dir: 1 },
+  bubbles: { color: '#9FE8FF', size: 2.2, dir: 1, ring: true },
+  snow: { color: '#F2FBFF', size: 1.5, dir: -1 },
+  sparks: { color: '#FFC24D', size: 0.9, dir: 1, bright: 1.6 },
+  data: { color: null, size: 1.2, dir: 1, square: true },
+  fireflies: { color: '#FFE36E', size: 1.3, dir: 1, bright: 1.8 },
+  embers: { color: '#FF8A4C', size: 1.1, dir: 1, bright: 1.5 },
+  stars: { color: '#FFFFFF', size: 1, dir: 1, bright: 1.4 },
+};
+
+function Mote({ W, H, seed, color, kind }: { W: number; H: number; seed: number; color: string; kind: string }) {
   const r = (k: number) => (hashString(`${seed}:${k}`) % 1000) / 1000;
+  const m = MOTE_STYLES[kind] ?? MOTE_STYLES.dust;
   const x0 = r(1) * W;
   const y0 = r(2) * H;
-  const drift = 18 + r(3) * 30;
+  const drift = (18 + r(3) * 30) * m.dir;
   const dur = 5200 + r(4) * 5200;
-  const s = 1.5 + r(5) * 2;
+  const s = (1.5 + r(5) * 2) * m.size;
+  const peak = 0.38 * (m.bright ?? 1);
   const p = useSharedValue(0);
   useEffect(() => {
     p.value = withDelay(r(6) * 3000, withRepeat(withTiming(1, { duration: dur, easing: Easing.inOut(Easing.sin) }), -1, true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p]);
-  const st = useAnimatedStyle(() => ({ opacity: 0.12 + 0.38 * Math.sin(p.value * Math.PI), transform: [{ translateY: -drift * p.value }, { translateX: Math.sin(p.value * 6.28) * 6 }] }));
-  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: x0, top: y0, width: s, height: s, borderRadius: s, backgroundColor: color }, st]} />;
+  const st = useAnimatedStyle(() => ({ opacity: 0.12 + peak * Math.sin(p.value * Math.PI), transform: [{ translateY: -drift * p.value }, { translateX: Math.sin(p.value * 6.28) * 6 }] }));
+  const c = m.color ?? color;
+  const shape = m.ring ? { borderWidth: 1, borderColor: c } : { backgroundColor: c };
+  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: x0, top: y0, width: s, height: s, borderRadius: m.square ? 0 : s }, shape, st]} />;
 }
 
-/** Dust drifting through the light: makes a still room feel inhabited. */
-export function Motes({ W, H, color, count = 12, seed = 0 }: { W: number; H: number; color: string; count?: number; seed?: number }) {
+/** Dust drifting through the light: makes a still room feel inhabited. `kind` picks the room's air. */
+export function Motes({ W, H, color, count = 12, seed = 0, kind = 'dust' }: { W: number; H: number; color: string; count?: number; seed?: number; kind?: string }) {
   const list = useMemo(() => Array.from({ length: count }, (_, i) => seed * 100 + i), [count, seed]);
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, { zIndex: 13 }]}>
       {list.map((k) => (
-        <Mote key={k} W={W} H={H} seed={k} color={color} />
+        <Mote key={`${kind}${k}`} W={W} H={H} seed={k} color={color} kind={kind} />
       ))}
     </View>
   );

@@ -1,0 +1,114 @@
+{
+ "canteen": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A retro underground staff canteen with teal tiles, orange lamps, long tables, trays left behind and a blinking coffee machine.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "cargo-lift": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dark cargo lift hall with open shafts, hanging chains, yellow hazard railings and a broken lift cage.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "cell-block": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A row of holding cells with glass doors and teal light strips, numbered doors and a long empty corridor.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "checkpoint": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A security checkpoint with a body scanner arch, yellow and black hazard stripes, navy walls and a turnstile gate.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "clean-lab": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A bright clean optics laboratory with glass walls, white benches, lenses and thin cyan lights.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "cold-storage": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A frozen cold storage room with frosted freezer doors, icicles, pale blue light and one warm amber lamp.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "coolant": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A partly flooded maintenance tunnel with turquoise glowing water, big pipes, silver reflections and dripping leaks.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "daycare": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "An empty underground daycare with bright crayon drawings of a small robot on every wall, toy blocks, a play castle and dim warm lamps, slightly eerie.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "decon": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A white-tiled decontamination corridor with shower arches, drifting steam and mint green safety lights.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "generator": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dim generator hall with big humming machines, red emergency lights and gauges near empty.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "grow-lab": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "An overgrown underground greenhouse lab with vines covering machinery, grow lamps casting warm light and broken irrigation pipes.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "hangar": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A drone hangar with charging docks on the walls, hovering patrol drones with green lights and painted route lines on the floor.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "infirmary": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A quiet facility infirmary with white curtains, made beds, a coral red cross sign and soft mint walls.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "lockers": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A staff locker room with tall blue lockers, a few doors hanging open, warm amber ceiling lamps and a bench.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "monitor-room": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dark security monitor room with a wall of glowing CCTV screens, swivel chairs and cyan light on the walls.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "observation": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dark observation room behind one-way glass, swivel chairs facing the window, glowing magenta monitors recording.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "platform": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "An underground shuttle station platform with tiled walls, a big station clock, green signage and deep track pits.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "power-closet": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A cramped copper electrical room with fuse panels, thick cables, glowing amber power sockets and sparks.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "reactor": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A ring-shaped reactor chamber with a pulsing magenta energy core, heavy coils and violet light.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "reactor-control": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A reactor control room with amber consoles, a giant countdown screen, warning lights and empty chairs.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "records": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dim records room with indigo shelves of paper files, filing cabinets, a single desk lamp and long shadows in the corners.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "server-room": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A cold server room with tall racks of blinking blue and green lights, cable bundles overhead and a raised floor.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "specimen-vault": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A dim specimen vault with tall cylindrical tanks of glowing violet and teal liquid, pipes and a strange plant floating in one.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "train": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "The inside of an abandoned underground shuttle train carriage with red seats, windows showing a dark tunnel and flickering lamps.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "vault": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A grand underground vault chamber with a giant round gold vault door, deep blue stone walls and dramatic light.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "vault-corridor": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "An armoured corridor with heavy riveted doors, yellow and black warning stripes and orange caged lamps.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "wake-bay": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A curved white robotics bay with rows of empty glowing charging cradles, soft cyan light, clean and calm but long abandoned.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ },
+ "warehouse": {
+  "model": "gemini-2.5-flash-image",
+  "prompt": "A huge underground warehouse with tall orange shelving, stacked wooden crates, a parked forklift and blue floor markings.\n\nStylised cinematic 3D environment art for a colourful mobile adventure game for teenagers, like a polished animated film. Wide interior view of the empty location from a high angle, vertical 9:16. Rich saturated accent colours, expressive lighting, clear shapes, believable architecture with details like door frames, vents, cables, signage and wear. The middle of the image is an open, uncluttered floor area. No people, no robots, no characters, no text, no captions, no logos, no watermark. Part of the Meridian Vault, an abandoned underground research facility."
+ }
+}
