@@ -8,6 +8,7 @@ import Animated, { Easing, FadeIn, FadeOut, useAnimatedStyle, useSharedValue, wi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import type { StoryBeat } from '../../game/story';
+import { sound } from '../../services/audio/sound';
 import { voice } from '../../services/audio/voice';
 import type { StoryScene } from '../../services/story/storyScenes';
 import { useApp } from '../../state/useApp';
@@ -117,6 +118,10 @@ export function CinematicStory({ kicker, title, beats, scenes, onDone }: { kicke
     if (beat) voice.say(beat.text, beat.speaker);
   }, [beat]);
   useEffect(() => () => voice.stop(), []);
+  // The score follows Pip's mood in each shot.
+  const mood = scenes[at]?.mood ?? 'neutral';
+  useEffect(() => sound.setScene(`story-${mood}`), [mood]);
+  useEffect(() => () => sound.setScene(null), []);
   if (!beat) return null;
   const sp = NAME[beat.speaker];
   const scene = scenes[at];
