@@ -5,6 +5,9 @@ Two engines:
   gemini (default): Google's Gemini text-to-speech, which acts each line from its persona and
       direction (src/game/voiceDirection.ts). Needs GEMINI_API_KEY in the environment. Never
       commit the key. Optional GEMINI_TTS_MODEL (default gemini-2.5-pro-preview-tts).
+      The AI Studio key is capped at 50 Pro clips a day. With GOOGLE_TTS_SA_JSON (a service
+      account key's JSON, Cloud Text-to-Speech API enabled on its project) the same model is
+      used through Google Cloud instead, which has no daily cap.
   kokoro: the offline Kokoro-82M model (Apache-2.0). Natural but flat; no acting.
       python3 -m pip install kokoro-onnx soundfile, and KOKORO_DIR holding kokoro-v1.0.onnx and
       voices-v1.0.bin from https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0
@@ -20,15 +23,18 @@ changed lines are re-recorded) and src/services/audio/voiceClips.generated.ts.
 """
 import argparse
 import base64
+import io
 import json
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import os
 import re
 import subprocess
 import sys
 import tempfile
+import wave
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "assets", "voice")
@@ -77,8 +83,67 @@ def gemini_model():
     return os.environ.get("GEMINI_TTS_MODEL", "gemini-2.5-pro-preview-tts")
 
 
+_token = {"value": None, "expires": 0}
+
+
+def cloud_token():
+    """OAuth access token for the service account in GOOGLE_TTS_SA_JSON (signed JWT grant)."""
+    if _token["value"] and time.time() < _token["expires"] - 60:
+        return _token["value"]
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import padding
+
+    sa = json.loads(os.environ["GOOGLE_TTS_SA_JSON"])
+    b64 = lambda b: base64.urlsafe_b64encode(b).rstrip(b"=")
+    now = int(time.time())
+    claims = {"iss": sa["client_email"], "scope": "https://www.googleapis.com/auth/cloud-platform", "aud": sa["token_uri"], "iat": now, "exp": now + 3600}
+    unsigned = b64(json.dumps({"alg": "RS256", "typ": "JWT"}).encode()) + b"." + b64(json.dumps(claims).encode())
+    keyobj = serialization.load_pem_private_key(sa["private_key"].encode(), password=None)
+    jwt = unsigned + b"." + b64(keyobj.sign(unsigned, padding.PKCS1v15(), hashes.SHA256()))
+    form = urllib.parse.urlencode({"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": jwt.decode()}).encode()
+    with urllib.request.urlopen(urllib.request.Request(sa["token_uri"], data=form), timeout=60) as r:
+        tok = json.load(r)
+    _token.update(value=tok["access_token"], expires=now + tok.get("expires_in", 3600))
+    return _token["value"]
+
+
+def cloud_pcm(l):
+    """Same Gemini voice model through Cloud Text-to-Speech, which has per-minute limits only."""
+    sa = json.loads(os.environ["GOOGLE_TTS_SA_JSON"])
+    notes = l.get("direction") or "in the character's usual manner"
+    body = {
+        "input": {
+            "prompt": f"{l['persona']} Scene: {SCENE} Performance: {notes}. Natural human delivery with real feeling, varied pacing and pauses where they help.",
+            "text": speakable(l["spoken"]),
+        },
+        "voice": {"languageCode": "en-US", "name": l["cast"]["gemini"], "modelName": gemini_model().replace("-preview-tts", "-tts")},
+        "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": 24000},
+    }
+    for attempt in range(8):
+        req = urllib.request.Request(
+            "https://texttospeech.googleapis.com/v1/text:synthesize",
+            data=json.dumps(body).encode(),
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {cloud_token()}", "x-goog-user-project": sa["project_id"]},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                audio = base64.b64decode(json.load(r)["audioContent"])
+            with wave.open(io.BytesIO(audio)) as w:
+                return w.readframes(w.getnframes())
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode(errors="replace")
+            if e.code in (429, 500, 503) and attempt < 7:
+                print(f"  {e.code}, retrying in {20 * (attempt + 1)}s", flush=True)
+                time.sleep(20 * (attempt + 1))
+                continue
+            sys.exit(f"Cloud TTS error {e.code}: {msg[:800]}")
+    sys.exit("Cloud TTS kept failing")
+
+
 def gemini_pcm(l):
     """Returns 24 kHz mono 16-bit PCM for one line, waiting out rate limits."""
+    if os.environ.get("GOOGLE_TTS_SA_JSON"):
+        return cloud_pcm(l)
     key = gemini_key()
     model = gemini_model()
     body = {
@@ -146,8 +211,8 @@ def main():
 
         kdir = os.environ.get("KOKORO_DIR", ".")
         kokoro = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
-    elif not gemini_key():
-        sys.exit("Set GEMINI_API_KEY (or use --engine kokoro).")
+    elif not gemini_key() and not os.environ.get("GOOGLE_TTS_SA_JSON"):
+        sys.exit("Set GEMINI_API_KEY or GOOGLE_TTS_SA_JSON (or use --engine kokoro).")
 
     made = 0
     for i, l in enumerate(todo):
