@@ -151,9 +151,15 @@ export class VoiceOver {
     const clip = this.clips[voiceKey(who, key ?? text)];
     if (clip !== undefined) {
       try {
-        this.release = this.player.play(clip, end);
-        // If the player never reports the end (a lost event), move on anyway.
-        this.safety = setTimeout(end, Math.max(4000, line.length * 120));
+        // If the player never reports the end (a lost event), move on anyway. Acted takes run
+        // up to ~210 ms per character, so the first guess is generous; once the clip has loaded
+        // its real length replaces it. Ending early would cut the line off mid-word.
+        this.safety = setTimeout(end, Math.max(8000, line.length * 300));
+        this.release = this.player.play(clip, end, (seconds) => {
+          if (id !== this.token) return;
+          if (this.safety) clearTimeout(this.safety);
+          this.safety = setTimeout(end, seconds * 1000 + 2000);
+        });
       } catch (e) {
         log.debug('voice', 'clip failed', e);
         end();

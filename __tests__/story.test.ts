@@ -93,10 +93,37 @@ describe('recorded voices', () => {
     const v = new VoiceOver(e as never, { [voiceKey('HALE', 'Hello, Pip.')]: 42 }, player);
     const end = jest.fn();
     v.say('Hello, Pip.', 'HALE', end);
-    expect(player.play).toHaveBeenCalledWith(42, expect.any(Function));
+    expect(player.play).toHaveBeenCalledWith(42, expect.any(Function), expect.any(Function));
     expect(e.speak).not.toHaveBeenCalled();
     ends[0]();
     expect(end).toHaveBeenCalledWith(true);
+  });
+
+  test('a slow, acted take is not cut off before the recording ends', () => {
+    jest.useFakeTimers();
+    try {
+      const e = fakeEngine();
+      let reportLength: (s: number) => void = () => undefined;
+      const stop = jest.fn();
+      const player = {
+        play: jest.fn((_src: number, _onEnd: () => void, onDuration?: (s: number) => void) => {
+          reportLength = onDuration!;
+          return stop;
+        }),
+      };
+      const text = 'Signal. Subject 7 is awake. Begin.';
+      const v = new VoiceOver(e as never, { [voiceKey('WITNESS', text)]: 1 }, player);
+      const end = jest.fn();
+      v.say(text, 'WITNESS', end);
+      reportLength(9);
+      jest.advanceTimersByTime(9000);
+      expect(stop).not.toHaveBeenCalled();
+      expect(end).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(2500); // the player never reported the end: move on
+      expect(end).toHaveBeenCalledWith(true);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   test('a filled-in line finds its recording by the line as written', () => {
@@ -104,7 +131,7 @@ describe('recorded voices', () => {
     const player = { play: jest.fn(() => jest.fn()) };
     const v = new VoiceOver(e as never, { [voiceKey('WITNESS', 'Exit reached in {moves} moves. Logged.')]: 7 }, player);
     v.say('Exit reached in 12 moves. Logged.', 'WITNESS', undefined, 'Exit reached in {moves} moves. Logged.');
-    expect(player.play).toHaveBeenCalledWith(7, expect.any(Function));
+    expect(player.play).toHaveBeenCalledWith(7, expect.any(Function), expect.any(Function));
   });
 
   test('a sequence plays in order and stops when cut off', () => {
