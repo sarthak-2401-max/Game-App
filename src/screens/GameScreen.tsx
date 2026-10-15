@@ -6,6 +6,8 @@ import { useRewardedOffer } from '../components/ads/RewardedOffer';
 import { Board, themeLook } from '../components/board/Board';
 import { Ambient } from '../components/Ambient';
 import { PowerUpBar } from '../components/game/PowerUpBar';
+import { DPad } from '../components/game/DPad';
+import { RoomBanner } from '../components/game/RoomBanner';
 import { MonitorBar, MONITOR_HEIGHT } from '../components/game/MonitorBar';
 import { StarChecklist } from '../components/game/Stars';
 import { Icon } from '../components/Icon';
@@ -19,7 +21,7 @@ import { fillTemplate, openedCells } from '../game/observer/observer';
 import { getInterlude, interludeAfter, isInterludeId } from '../game/observer/rooms';
 import { OBSERVATION_PALETTE } from '../theme/chapters';
 import { memoryView } from '../state/memory';
-import { starCriteria, starsForWin, type StarCriteria } from '../state/mastery';
+import { parFor, starCriteria, starsForWin, type StarCriteria } from '../state/mastery';
 import { clueLabel, useWitness } from './game/useWitness';
 import { getPowerUp, POWERUP_TUNING, type PowerUpId } from '../config/powerups';
 import { movesAllowed, remainingCores } from '../game/engine';
@@ -126,7 +128,8 @@ export function GameScreen() {
     const fallbackH = dims.height - insets.top - insets.bottom - 112 - MONITOR_HEIGHT - (settings.showDpad ? 214 : 96);
     const availW = (area?.w ?? dims.width - 24) - frame;
     const availH = (area?.h ?? fallbackH) - frame;
-    return Math.max(16, Math.floor(Math.min(availW / room.width, availH / room.height, 64)));
+    // The board stands on a plinth a third of a cell deep.
+    return Math.max(16, Math.floor(Math.min(availW / room.width, availH / (room.height + PLINTH), 64)));
   }, [room, area, dims, insets, settings.showDpad]);
 
   // ---- Chapter opening story ----------------------------------------------------------------
@@ -407,6 +410,8 @@ export function GameScreen() {
   const today = dayKey();
   const limit = movesAllowed(room, state);
   const movesLeft = limit === Infinity ? undefined : Math.max(0, limit - state.moves);
+  // The move star, shown live so players can chase it (absent where there is no known par).
+  const target = parFor(room) !== undefined ? starCriteria(room).movesTarget : undefined;
   const coresLeft = remainingCores(room, state);
   const totalCores = room.items.filter((i) => i.kind === 'core').length;
   const hasClock = room.drones.length + room.platforms.length > 0 || room.tags.some((t) => t.startsWith('timed'));
@@ -621,7 +626,10 @@ export function GameScreen() {
         <CoinBadge coins={app.save.coins} compact />
       </View>
       <View style={styles.statsRow}>
-        <Stat label="Moves" value={movesLeft !== undefined ? `${movesLeft} left` : String(state.moves)} warn={movesLeft !== undefined && movesLeft <= 3} />
+        <Stat label="Moves" value={movesLeft !== undefined ? `${movesLeft} left` : String(state.moves)} warn={movesLeft !== undefined && movesLeft <= 3} pop={!reduced} />
+        {target !== undefined && (
+          <Stat label={state.moves <= target ? '★ Target' : 'Target missed'} value={`${state.moves}/${target}`} accent={state.moves <= target ? colors.gold : undefined} muted={state.moves > target} pop={false} />
+        )}
         {session.timeLeftMs !== undefined && <Stat label="Time" value={fmtTime(session.timeLeftMs)} warn={session.timeLeftMs < 10_000} />}
         {totalCores > 0 && <Stat label="Cores" value={`${totalCores - coresLeft}/${totalCores}`} />}
         {(state.keys.gold > 0 || state.keys.blue > 0) && (
@@ -682,6 +690,11 @@ export function GameScreen() {
             openingCells={session.attempt === 1 ? openedCells(room) : undefined}
             palette={observation ? OBSERVATION_PALETTE : undefined}
           />
+          {!reduced && <RoomBanner show={`${room.id}:${session.visit}`} kicker={title} title={room.name} color={palette.glow} />}
+          <View style={[styles.plinth, { height: Math.round(cell * PLINTH), backgroundColor: palette.wallSide, borderTopColor: `${palette.glow}66` }]}>
+            <View style={[styles.plinthTrim, { backgroundColor: palette.glow }]} />
+            <View style={styles.plinthShade} />
+          </View>
         </View>
       </View>
 
@@ -699,25 +712,7 @@ export function GameScreen() {
           <IconButton icon="hint" label="Hint" onPress={openHint} disabled={failed || won} />
           {!settings.showDpad && canWait && <IconButton icon="wait" label="Wait one turn" onPress={() => onAction('wait')} disabled={!inputEnabled} />}
         </View>
-        {settings.showDpad && (
-          <View style={styles.dpad}>
-            <View style={styles.dpadRow}>
-              <IconButton icon="up" label="Move up" size={58} onPress={() => onAction('up')} disabled={!inputEnabled} />
-            </View>
-            <View style={styles.dpadRow}>
-              <IconButton icon="left" label="Move left" size={58} onPress={() => onAction('left')} disabled={!inputEnabled} />
-              {canWait ? (
-                <IconButton icon="wait" label="Wait one turn" size={58} onPress={() => onAction('wait')} disabled={!inputEnabled} />
-              ) : (
-                <View style={{ width: 58 }} />
-              )}
-              <IconButton icon="right" label="Move right" size={58} onPress={() => onAction('right')} disabled={!inputEnabled} />
-            </View>
-            <View style={styles.dpadRow}>
-              <IconButton icon="down" label="Move down" size={58} onPress={() => onAction('down')} disabled={!inputEnabled} />
-            </View>
-          </View>
-        )}
+        {settings.showDpad && <DPad onAction={onAction} disabled={!inputEnabled} canWait={canWait} glow={palette.glow} />}
       </View>
 
       {/* Pause */}
@@ -912,11 +907,14 @@ function echoStatus(room: { echo?: { linger: number }; echoTrack?: unknown[] }, 
   return left <= 6 ? `Fading ${left}` : 'Walking';
 }
 
-function Stat({ label, value, warn, accent }: { label: string; value: string; warn?: boolean; accent?: string }) {
+function Stat({ label, value, warn, accent, muted, pop = true }: { label: string; value: string; warn?: boolean; accent?: string; muted?: boolean; pop?: boolean }) {
   return (
-    <View style={[styles.stat, warn && { borderColor: colors.danger }, accent ? { borderColor: accent } : null]} accessible accessibilityLabel={`${label}: ${value}`}>
+    <View style={[styles.stat, warn && { borderColor: colors.danger }, accent ? { borderColor: accent } : null, muted && { opacity: 0.5 }]} accessible accessibilityLabel={`${label}: ${value}`}>
       <Text style={[styles.statLabel, accent ? { color: accent } : null]}>{label}</Text>
-      <Text style={[styles.statValue, warn && { color: colors.danger }]}>{value}</Text>
+      {/* Re-keyed on change so each new value pops in. */}
+      <Animated.Text key={value} entering={pop ? ZoomIn.duration(160) : undefined} style={[styles.statValue, warn && { color: colors.danger }]}>
+        {value}
+      </Animated.Text>
     </View>
   );
 }
@@ -926,6 +924,8 @@ function interstitialDue(completedRoom: number): boolean {
   const app = useApp.getState();
   return shouldShowInterstitial(app.save, { completedRoom, now: Date.now(), today: dayKey(), consentFlowActive: app.consentRunning });
 }
+
+const PLINTH = 0.34;
 
 const fmtTime = (ms: number) => {
   const s = Math.ceil(ms / 1000);
@@ -962,13 +962,14 @@ const styles = StyleSheet.create({
   statLabel: { color: colors.textMuted, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
   statValue: { color: colors.text, fontWeight: '800', fontSize: 14, fontVariant: ['tabular-nums'] },
   boardWrap: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', marginVertical: space.sm, overflow: 'hidden' },
-  boardFrame: { padding: 4, borderRadius: radius.md, backgroundColor: '#05070C', borderWidth: 1, borderColor: '#1C2538', shadowColor: colors.cyan, shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 8 }, elevation: 12 },
+  boardFrame: { padding: 4, paddingBottom: 0, borderRadius: radius.md, backgroundColor: '#05070C', borderWidth: 1, borderColor: '#1C2538', shadowColor: colors.cyan, shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 8 }, elevation: 12, overflow: 'hidden' },
+  plinth: { marginHorizontal: -4, marginTop: 4, borderTopWidth: 1, overflow: 'hidden' },
+  plinthTrim: { position: 'absolute', left: 0, right: 0, top: '30%', height: 2, opacity: 0.45 },
+  plinthShade: { position: 'absolute', left: 0, right: 0, bottom: 0, height: '50%', backgroundColor: '#00000059' },
   intro: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, flexDirection: 'row', gap: 8, alignItems: 'center', backgroundColor: '#0B1A24EE', borderColor: colors.cyanDim, borderWidth: 1, borderRadius: radius.md, padding: 10 },
   introText: { color: colors.text, flex: 1, fontWeight: '600', fontSize: 14 },
   controls: { gap: space.sm, alignItems: 'center' },
   toolRow: { flexDirection: 'row', gap: space.md, justifyContent: 'center' },
-  dpad: { alignItems: 'center', gap: 4 },
-  dpadRow: { flexDirection: 'row', gap: 4 },
   center: { color: colors.text, textAlign: 'center', fontSize: 15, fontWeight: '600' },
   centerDim: { color: colors.textDim, textAlign: 'center', fontSize: 13 },
   rewardRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#1B160C', borderRadius: radius.md, paddingVertical: 8, paddingHorizontal: 12 },

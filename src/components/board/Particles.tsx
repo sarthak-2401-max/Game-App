@@ -13,6 +13,10 @@ export interface BurstSpec {
   color: string;
   count: number;
   rainbow?: boolean;
+  /** Distance multiplier (default 1), dot size as a fraction of a cell, duration in ms. */
+  spread?: number;
+  dot?: number;
+  ms?: number;
 }
 
 const RAINBOW = ['#3BE8FF', '#FFB547', '#B38CFF', '#4CF2A0', '#FF8FD1'];
@@ -33,13 +37,13 @@ function Particle({ progress, angle, dist, color, size }: { progress: SharedValu
 export function Burst({ spec, w, size }: { spec: BurstSpec; w: number; size: number }) {
   const progress = useSharedValue(0);
   useEffect(() => {
-    progress.value = withTiming(1, { duration: 520, easing: Easing.out(Easing.cubic) });
-  }, [progress]);
+    progress.value = withTiming(1, { duration: spec.ms ?? 520, easing: Easing.out(Easing.cubic) });
+  }, [progress, spec.ms]);
   const parts = useMemo(
     () =>
       Array.from({ length: spec.count }, (_, i) => ({
         angle: (Math.PI * 2 * i) / spec.count + jitter(`${spec.id}a${i}`) * 0.4,
-        dist: size * (0.6 + jitter(`${spec.id}d${i}`) * 0.7),
+        dist: size * (0.6 + jitter(`${spec.id}d${i}`) * 0.7) * (spec.spread ?? 1),
         color: spec.rainbow ? RAINBOW[i % RAINBOW.length] : spec.color,
       })),
     [spec, size],
@@ -50,7 +54,7 @@ export function Burst({ spec, w, size }: { spec: BurstSpec; w: number; size: num
       style={[styles.origin, { left: colOf(w, spec.cell) * size + size / 2, top: rowOf(w, spec.cell) * size + size / 2 }]}
     >
       {parts.map((p, i) => (
-        <Particle key={i} progress={progress} angle={p.angle} dist={p.dist} color={p.color} size={Math.max(3, size * 0.09)} />
+        <Particle key={i} progress={progress} angle={p.angle} dist={p.dist} color={p.color} size={Math.max(2, size * (spec.dot ?? 0.09))} />
       ))}
     </View>
   );

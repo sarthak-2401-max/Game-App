@@ -8,7 +8,10 @@ import { chapterPalette, type Palette } from '../../theme/chapters';
 import { colOf, dirBetween, rowOf } from '../../game/grid';
 import type { Action, Dir, GameState, Room, StepEvent } from '../../game/types';
 import { colors } from '../../theme/theme';
+import { Breathe, Flash, FloatText, Motes, PlayerFx, Ring, useBumpNudge } from './Fx';
+import { ActorLight, Lighting, type LightPool } from './Lighting';
 import { Burst, type BurstSpec } from './Particles';
+import { TELE_COLORS } from './glyphs';
 import { deriveModel, type TileView } from './derive';
 import {
   CheckpointGlyph,
@@ -130,6 +133,8 @@ const TerrainTile = memo(function TerrainTile({
   alt,
   wallAbove,
   wallLeft,
+  wallBelow,
+  wallRight,
 }: {
   k: TileView['tile']['k'];
   size: number;
@@ -140,15 +145,46 @@ const TerrainTile = memo(function TerrainTile({
   alt: boolean;
   wallAbove: boolean;
   wallLeft: boolean;
+  wallBelow: boolean;
+  wallRight: boolean;
 }) {
   const base = { position: 'absolute' as const, left: x, top: y, width: size, height: size };
   const depth = Math.round(size * WALL_DEPTH);
   if (k === 'wall') {
-    // A raised block seen from the front: lit top face, darker front face, soft edge light.
+    // A raised block seen from above and in front. Neighbouring walls merge into one solid mass:
+    // edges are lit only where the block is exposed, and the front face (with a strip of
+    // chapter-coloured trim light) shows only where floor lies in front of it.
+    const face = !wallBelow;
+    const top = face ? size - depth : size;
+    const r = 4;
     return (
       <View style={base}>
-        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: size - depth, backgroundColor: t.wall, borderTopWidth: 2, borderTopColor: t.wallEdge, borderTopLeftRadius: 3, borderTopRightRadius: 3 }} />
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth, backgroundColor: t.wallSide, borderTopWidth: 1, borderTopColor: '#00000040' }} />
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            height: top,
+            backgroundColor: t.wall,
+            borderTopWidth: wallAbove ? 0 : 2,
+            borderTopColor: t.wallEdge,
+            borderLeftWidth: wallLeft ? 0 : 1,
+            borderLeftColor: `${t.wallEdge}AA`,
+            borderRightWidth: wallRight ? 0 : 1,
+            borderRightColor: '#00000040',
+            borderTopLeftRadius: !wallAbove && !wallLeft ? r : 0,
+            borderTopRightRadius: !wallAbove && !wallRight ? r : 0,
+          }}
+        >
+          {!wallAbove && <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: top * 0.38, backgroundColor: '#FFFFFF0D' }} />}
+        </View>
+        {face && (
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth, backgroundColor: t.wallSide, borderTopWidth: 1, borderTopColor: '#00000059' }}>
+            <View style={{ position: 'absolute', left: 0, right: 0, top: depth * 0.32, height: Math.max(1.5, depth * 0.1), backgroundColor: t.glow, opacity: 0.32 }} />
+            <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth * 0.45, backgroundColor: '#00000038' }} />
+          </View>
+        )}
       </View>
     );
   }
@@ -178,6 +214,7 @@ const TerrainTile = memo(function TerrainTile({
         },
       ]}
     >
+      {pattern === 'plain' && <View style={{ position: 'absolute', left: size * 0.07, right: size * 0.07, top: size * 0.07, bottom: size * 0.07, borderRadius: 3, borderWidth: 1, borderColor: '#FFFFFF07', backgroundColor: alt ? '#FFFFFF04' : 'transparent' }} />}
       {pattern === 'grid' && <View style={{ position: 'absolute', left: size * 0.2, right: size * 0.2, top: size * 0.2, bottom: size * 0.2, borderWidth: 1, borderColor: '#ffffff0d', borderRadius: 3 }} />}
       {pattern === 'dots' &&
         [0.2, 0.8].flatMap((a) =>
@@ -311,7 +348,12 @@ const Feature = memo(function Feature({
   const t = v.tile;
   switch (t.k) {
     case 'exit':
-      return <ExitGlyph s={size} open={exitOpen} style={exitStyle} coresLeft={coresLeft} />;
+      return (
+        <>
+          <Breathe size={size} color={theme.glow} enabled={exitOpen && !reduced} />
+          <ExitGlyph s={size} open={exitOpen} style={exitStyle} coresLeft={coresLeft} />
+        </>
+      );
     case 'spikes':
       return <SpikesGlyph s={size} raised={!!v.raised} warning={v.warning} />;
     case 'door':
@@ -477,6 +519,8 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           k={v.tile.k}
           wallAbove={v.cell >= w && model.tiles[v.cell - w]?.tile.k === 'wall'}
           wallLeft={v.cell % w > 0 && model.tiles[v.cell - 1]?.tile.k === 'wall'}
+          wallBelow={v.cell + w < model.tiles.length && model.tiles[v.cell + w]?.tile.k === 'wall'}
+          wallRight={v.cell % w < w - 1 && model.tiles[v.cell + 1]?.tile.k === 'wall'}
           size={size}
           x={colOf(w, v.cell) * size}
           y={rowOf(w, v.cell) * size}
@@ -502,9 +546,69 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
       if (e.type === 'crumble') out.push({ id: `${seq}c${e.at}`, cell: e.at, color: '#8A7656', count: 6 });
       if (e.type === 'teleport') out.push({ id: `${seq}t`, cell: e.to, color: '#C77DFF', count: 10 });
       if (e.type === 'fill') out.push({ id: `${seq}f${e.at}`, cell: e.at, color: '#8A6A44', count: 8 });
+      if (e.type === 'move') out.push({ id: `${seq}m`, cell: e.from, color: '#C9D3E655', count: 5, spread: 0.45, dot: 0.06, ms: 380 });
+      if (e.type === 'push') out.push({ id: `${seq}pu`, cell: e.to, color: '#E3B26A88', count: 6, spread: 0.6, dot: 0.06, ms: 420 });
     }
     return out;
   }, [events, seq, reducedMotion, room, state.player, look.victory]);
+
+  const floats = useMemo(() => {
+    if (reducedMotion) return [];
+    const out: { id: string; cell: number; text: string; color: string }[] = [];
+    for (const e of events) {
+      if (e.type === 'pickup') {
+        const it = room.items[e.item];
+        const text = e.kind === 'core' ? (model.coresLeft ? `Core · ${model.coresLeft} left` : 'Exit open!') : e.kind === 'coin' ? (it.hidden ? '+ Hidden coin!' : '+ Coin') : `+ ${it.color === 'blue' ? 'Blue' : 'Gold'} key`;
+        out.push({ id: `${seq}ft${e.item}`, cell: it.cell, text, color: e.kind === 'core' ? colors.cyan : colors.amber });
+      }
+      if (e.type === 'unlock') out.push({ id: `${seq}fu`, cell: e.at, text: 'Unlocked', color: colors.gold });
+      if (e.type === 'checkpoint') out.push({ id: `${seq}fc`, cell: e.at, text: 'Checkpoint', color: colors.success });
+      if (e.type === 'shielded') out.push({ id: `${seq}fs`, cell: e.at, text: 'Shield!', color: '#5CC8FF' });
+    }
+    return out;
+  }, [events, seq, reducedMotion, room, model.coresLeft]);
+
+  const exitCell = useMemo(() => room.tiles.findIndex((t) => t.k === 'exit'), [room]);
+  const rings = useMemo(() => {
+    if (reducedMotion) return [];
+    const out: { id: string; cell: number; color: string }[] = [];
+    for (const e of events) {
+      if (e.type === 'switch') out.push({ id: `${seq}rs`, cell: e.at, color: colors.cyan });
+      if (e.type === 'teleport') out.push({ id: `${seq}rt`, cell: e.to, color: '#C77DFF' });
+      if (e.type === 'pickup' && e.kind === 'core' && model.exitOpen && exitCell >= 0) out.push({ id: `${seq}rx`, cell: exitCell, color: theme.glow });
+      if (e.type === 'win') out.push({ id: `${seq}rw`, cell: state.player, color: theme.glow });
+    }
+    return out;
+  }, [events, seq, reducedMotion, model.exitOpen, exitCell, theme.glow, state.player]);
+  const flash = reducedMotion ? undefined : events.some((e) => e.type === 'win') ? theme.glow : events.some((e) => e.type === 'death') ? colors.danger : undefined;
+
+  // Light pools under glowing things. Rebuilt only when what glows changes.
+  const glowKey = `${model.exitOpen}|${model.items.map((i) => i.index).join(',')}|${model.beams.map((b) => b.cells.join(',')).join('/')}`;
+  const pools = useMemo<LightPool[]>(() => {
+    const out: LightPool[] = [];
+    room.tiles.forEach((t, cell) => {
+      if (t.k === 'exit') out.push({ cell, color: model.exitOpen ? theme.glow : '#8A94AA', r: model.exitOpen ? 2.1 : 1.3, strength: model.exitOpen ? 0.38 : 0.12 });
+      if (t.k === 'tele') out.push({ cell, color: TELE_COLORS[t.pair % TELE_COLORS.length], r: 1.3, strength: 0.22 });
+      if (t.k === 'checkpoint') out.push({ cell, color: colors.success, r: 1, strength: 0.14 });
+    });
+    for (const { item } of model.items) out.push({ cell: item.cell, color: item.kind === 'core' ? colors.cyan : colors.amber, r: item.kind === 'core' ? 1.3 : 0.9, strength: item.kind === 'core' ? 0.26 : 0.16 });
+    for (const b of model.beams) for (const c of b.cells) out.push({ cell: c, color: colors.danger, r: 0.8, strength: 0.12 });
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, glowKey, theme.glow]);
+
+  // Each room (and each fresh attempt) settles into place.
+  const enter = useSharedValue(reducedMotion ? 1 : 0);
+  useEffect(() => {
+    if (reducedMotion) {
+      enter.value = 1;
+      return;
+    }
+    enter.value = 0;
+    enter.value = withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) });
+  }, [room.id, room.variant, reducedMotion, enter]);
+
+  const nudge = useBumpNudge(seq, events, state.player, w, size, reducedMotion);
 
   const moveFrom = events.find((e): e is Extract<StepEvent, { type: 'move' }> => e.type === 'move');
 
@@ -518,7 +622,10 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
       shake.value = withSequence(withTiming(-2, { duration: 30 }), withTiming(2, { duration: 40 }), withTiming(0, { duration: 30 }));
     }
   }, [seq, events, reducedMotion, shake]);
-  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
+  const shakeStyle = useAnimatedStyle(() => ({
+    opacity: 0.2 + 0.8 * enter.value,
+    transform: [{ translateX: shake.value }, { translateY: (1 - enter.value) * 14 }, { scale: 0.97 + 0.03 * enter.value }],
+  }));
 
   const dead = state.status === 'dead';
   const won = state.status === 'won';
@@ -560,6 +667,7 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         accessibilityLabel={`Room grid, ${room.width} by ${room.height}. Swipe or use the arrow buttons to move.`}
       >
         {terrain}
+        <Lighting id={`${room.id}${room.variant ?? ''}`} w={w} h={room.height} size={size} pools={pools} layer="pools" />
         {model.tiles.map((v) =>
           v.tile.k === 'floor' || v.tile.k === 'wall' || v.tile.k === 'pit' || v.tile.k === 'crumble' ? null : (
             <View key={`f${v.cell}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, v.cell) * size, top: rowOf(w, v.cell) * size, width: size, height: size, zIndex: 1 }]}>
@@ -638,12 +746,15 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           </Mover>
         )}
         <Mover cell={state.player} w={w} size={size} reduced={reducedMotion} z={8}>
+          {!dead && !won && <ActorLight id="player" size={size} color={String(skin.color)} strength={dark ? 0.12 : 0.22} r={1.5} />}
           <Shadow size={size} scale={0.8} />
-          <View style={{ opacity: dead ? 0.35 : 1 }}>
-            <Bob enabled={!reducedMotion && !dead} amount={size * 0.05} period={1400}>
-              <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} />
-            </Bob>
-          </View>
+          <Animated.View style={[{ opacity: dead ? 0.35 : 1 }, nudge]}>
+            <PlayerFx seq={seq} events={events} w={w} size={size} reduced={reducedMotion}>
+              <Bob enabled={!reducedMotion && !dead} amount={size * 0.05} period={1400}>
+                <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} />
+              </Bob>
+            </PlayerFx>
+          </Animated.View>
           {shielded && <View pointerEvents="none" style={{ position: 'absolute', left: size * 0.04, top: size * 0.02, width: size * 0.92, height: size * 0.92, borderRadius: size, borderWidth: 2, borderColor: '#5CC8FF', backgroundColor: '#5CC8FF22' }} />}
         </Mover>
         {model.drones.map((d) => (
@@ -657,6 +768,15 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         {bursts.map((b) => (
           <Burst key={b.id} spec={b} w={w} size={size} />
         ))}
+        {rings.map((r) => (
+          <Ring key={r.id} cell={r.cell} w={w} size={size} color={r.color} />
+        ))}
+        {floats.map((f) => (
+          <FloatText key={f.id} cell={f.cell} w={w} size={size} text={f.text} color={f.color} />
+        ))}
+        <Lighting id={`${room.id}${room.variant ?? ''}`} w={w} h={room.height} size={size} pools={[]} layer="vignette" />
+        {!reducedMotion && <Motes W={w * size} H={room.height * size} color={theme.glow} count={Math.round((w * room.height) / 6)} seed={room.index} />}
+        {flash && <Flash key={`fl${seq}`} color={flash} seq={seq} />}
         <Darkness visible={!!dark} cx={(colOf(w, state.player) + 0.5) * size} cy={(rowOf(w, state.player) + 0.5) * size} w={w * size} h={room.height * size} size={size} reduced={reducedMotion} />
         {dark &&
           clues?.map((c) =>
