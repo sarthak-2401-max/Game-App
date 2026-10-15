@@ -1,7 +1,8 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { DEFAULT_COSMETICS, getCosmetic } from '../../config/cosmetics';
 import { chapterPalette, type Palette } from '../../theme/chapters';
 import { colOf, dirBetween, rowOf } from '../../game/grid';
@@ -19,6 +20,9 @@ import {
   DroneNextGlyph as DroneNextGlyphRaw,
   EmitterGlyph,
   ExitGlyph,
+  EyeGlyph,
+  RecordingGlyph,
+  WallWritingGlyph,
   KeyGlyph as KeyGlyphRaw,
   LockGlyph,
   PlateGlyph,
@@ -36,6 +40,16 @@ const DroneGlyph = memo(DroneGlyphRaw);
 const DroneNextGlyph = memo(DroneNextGlyphRaw);
 const KeyGlyph = memo(KeyGlyphRaw);
 const PlayerGlyph = memo(PlayerGlyphRaw);
+
+/** A clue drawn on the board (see game/observer/clues.ts). */
+export interface BoardClue {
+  id: string;
+  cell: number;
+  kind: 'wall' | 'recording' | 'object' | 'sigil';
+  found: boolean;
+  /** UV writing: only drawn while the room is dark. */
+  uv?: boolean;
+}
 
 export interface BoardLook {
   skin: string;
@@ -65,6 +79,13 @@ interface Props {
   frozen?: boolean;
   /** Shield power-up armed: show a bubble around the player. */
   shielded?: boolean;
+  clues?: BoardClue[];
+  /** Lights out: only the area around the player stays lit. */
+  dark?: boolean;
+  /** Wall cells that slide open once when the room loads (a room-memory variant). */
+  openingCells?: number[];
+  /** Overrides the environment palette (the Observation Wing). */
+  palette?: Palette;
 }
 
 const MOVE_MS = 110;
@@ -195,6 +216,61 @@ const Crate = memo(function Crate({ size }: { size: number }) {
   );
 });
 
+/**
+ * A section of wall that slides into the floor when it opens (doors drawn as walls, and cells a
+ * room-memory variant opens). `from` lets it start closed and open after a delay on mount.
+ */
+function ShiftWall({ size, closed, t, reduced, from }: { size: number; closed: boolean; t: BoardTheme; reduced: boolean; from?: { closed: boolean; delay: number } }) {
+  const depth = Math.round(size * WALL_DEPTH);
+  const h = useSharedValue(from ? (from.closed ? 1 : 0) : closed ? 1 : 0);
+  useEffect(() => {
+    const target = closed ? 1 : 0;
+    if (reduced) h.value = target;
+    else {
+      const anim = withTiming(target, { duration: 320, easing: Easing.inOut(Easing.cubic) });
+      h.value = from ? withDelay(from.delay, anim) : anim;
+    }
+    // `from` only applies to the first render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closed, reduced, h]);
+  const st = useAnimatedStyle(() => ({ height: size * h.value, opacity: 0.2 + 0.8 * h.value }));
+  return (
+    <View style={{ width: size, height: size }}>
+      {/* The slot the wall sinks into. */}
+      <View style={{ position: 'absolute', left: size * 0.06, right: size * 0.06, bottom: size * 0.08, height: 3, borderRadius: 2, backgroundColor: '#00000080' }} />
+      <Animated.View style={[{ position: 'absolute', left: 0, right: 0, bottom: 0, overflow: 'hidden' }, st]}>
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: size }}>
+          <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: size - depth, backgroundColor: t.wall, borderTopWidth: 2, borderTopColor: t.wallEdge, borderTopLeftRadius: 3, borderTopRightRadius: 3 }} />
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth, backgroundColor: t.wallSide, borderTopWidth: 1, borderTopColor: '#00000040' }} />
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Lights out: everything beyond a few cells of the player falls into shadow. */
+function Darkness({ visible, cx, cy, w, h, size, reduced }: { visible: boolean; cx: number; cy: number; w: number; h: number; size: number; reduced: boolean }) {
+  const o = useSharedValue(visible ? 1 : 0);
+  useEffect(() => {
+    o.value = reduced ? (visible ? 1 : 0) : withTiming(visible ? 1 : 0, { duration: visible ? 180 : 600 });
+  }, [visible, reduced, o]);
+  const st = useAnimatedStyle(() => ({ opacity: o.value }));
+  return (
+    <Animated.View pointerEvents="none" style={[styles.abs, { left: 0, top: 0, width: w, height: h, zIndex: 15 }, st]}>
+      <Svg width={w} height={h}>
+        <Defs>
+          <RadialGradient id="lightsOut" cx={cx} cy={cy} r={size * 3.2} fx={cx} fy={cy} gradientUnits="userSpaceOnUse">
+            <Stop offset="0" stopColor="#000" stopOpacity={0} />
+            <Stop offset="0.45" stopColor="#000" stopOpacity={0.25} />
+            <Stop offset="1" stopColor="#000" stopOpacity={0.8} />
+          </RadialGradient>
+        </Defs>
+        <Rect x={0} y={0} width={w} height={h} fill="url(#lightsOut)" />
+      </Svg>
+    </Animated.View>
+  );
+}
+
 /** Gentle hover for actors and pickups so the room feels alive. */
 function Bob({ enabled, amount, period, children }: { enabled: boolean; amount: number; period: number; children: React.ReactNode }) {
   const v = useSharedValue(0);
@@ -214,6 +290,8 @@ function Bob({ enabled, amount, period, children }: { enabled: boolean; amount: 
 interface FeatureProps {
   v: TileView;
   size: number;
+  theme: BoardTheme;
+  reduced: boolean;
   exitOpen: boolean;
   exitStyle: string;
   coresLeft: number;
@@ -223,6 +301,8 @@ interface FeatureProps {
 const Feature = memo(function Feature({
   v,
   size,
+  theme,
+  reduced,
   exitOpen,
   exitStyle,
   coresLeft,
@@ -235,7 +315,7 @@ const Feature = memo(function Feature({
     case 'spikes':
       return <SpikesGlyph s={size} raised={!!v.raised} warning={v.warning} />;
     case 'door':
-      return <DoorGlyph s={size} closed={!!v.active} invert={t.invert} ch={t.ch} />;
+      return t.look === 'wall' ? <ShiftWall size={size} closed={!!v.active} t={theme} reduced={reduced} /> : <DoorGlyph s={size} closed={!!v.active} invert={t.invert} ch={t.ch} />;
     case 'switch':
       return <SwitchGlyph s={size} on={!!v.active} ch={t.ch} />;
     case 'plate':
@@ -264,6 +344,8 @@ function shallowEqual(a: object, b: object): boolean {
 function featurePropsEqual(p: FeatureProps, n: FeatureProps): boolean {
   return (
     p.size === n.size &&
+    p.theme === n.theme &&
+    p.reduced === n.reduced &&
     p.exitOpen === n.exitOpen &&
     p.exitStyle === n.exitStyle &&
     p.coresLeft === n.coresLeft &&
@@ -376,10 +458,10 @@ function TrailGhost({ cell, w, size, color, seq }: { cell: number; w: number; si
   );
 }
 
-export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded }: Props) {
+export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded, clues, dark, openingCells, palette }: Props) {
   const w = room.width;
   const model = useMemo(() => deriveModel(room, state), [room, state]);
-  const theme = useMemo(() => themeLook(look.theme, chapter ?? room.chapter), [look.theme, chapter, room.chapter]);
+  const theme = useMemo(() => palette ?? themeLook(look.theme, chapter ?? room.chapter), [palette, look.theme, chapter, room.chapter]);
   const pattern = String(getCosmetic(look.tile)?.look.pattern ?? 'plain');
   const exitStyle = String(getCosmetic(look.exit)?.look.style ?? 'portal');
   const skin = getCosmetic(look.skin)?.look ?? { color: colors.cyan, shape: 'circle' };
@@ -441,6 +523,11 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
   const dead = state.status === 'dead';
   const won = state.status === 'won';
 
+  // The echo fades out over its last few turns.
+  const echoCell = state.echo !== undefined && state.echo >= 0 ? state.echo : undefined;
+  const echoLeft = room.echo && room.echoTrack ? room.echoTrack.length + room.echo.linger - state.moves : 0;
+  const echoOpacity = 0.55 * Math.min(1, Math.max(0.15, echoLeft / 6));
+
   const act = (a: Action) => {
     if (inputEnabled && onAction) onAction(a);
   };
@@ -476,7 +563,29 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         {model.tiles.map((v) =>
           v.tile.k === 'floor' || v.tile.k === 'wall' || v.tile.k === 'pit' || v.tile.k === 'crumble' ? null : (
             <View key={`f${v.cell}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, v.cell) * size, top: rowOf(w, v.cell) * size, width: size, height: size, zIndex: 1 }]}>
-              <Feature v={v} size={size} exitOpen={model.exitOpen} exitStyle={exitStyle} coresLeft={model.coresLeft} reached={checkpointCell === v.cell} />
+              <Feature v={v} size={size} theme={theme} reduced={reducedMotion} exitOpen={model.exitOpen} exitStyle={exitStyle} coresLeft={model.coresLeft} reached={checkpointCell === v.cell} />
+            </View>
+          ),
+        )}
+        {openingCells?.map((c) => (
+          <View key={`open${room.id}${c}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, c) * size, top: rowOf(w, c) * size, zIndex: 1 }]}>
+            <ShiftWall size={size} closed={false} t={theme} reduced={reducedMotion} from={{ closed: true, delay: 700 }} />
+          </View>
+        ))}
+        {clues?.map((c) =>
+          c.uv ? null : (
+            <View key={`clue${c.id}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, c.cell) * size, top: rowOf(w, c.cell) * size, width: size, height: size, zIndex: 2 }]}>
+              {c.kind === 'wall' ? (
+                <WallWritingGlyph s={size} found={c.found} />
+              ) : c.kind === 'sigil' ? (
+                <EyeGlyph s={size} found={c.found} />
+              ) : c.kind === 'object' ? (
+                <View style={{ opacity: c.found ? 0.35 : 1 }}>
+                  <KeyGlyph s={size} color="gold" />
+                </View>
+              ) : (
+                <RecordingGlyph s={size} found={c.found} />
+              )}
             </View>
           ),
         )}
@@ -520,6 +629,14 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
             ) : null,
           )}
         {moveFrom && trailColor !== 'transparent' && !reducedMotion && <TrailGhost cell={moveFrom.from} w={w} size={size} color={trailColor} seq={seq} />}
+        {echoCell !== undefined && (
+          <Mover cell={echoCell} w={w} size={size} reduced={reducedMotion} z={7}>
+            <View style={{ opacity: echoOpacity }} accessible accessibilityLabel="Your echo">
+              <View style={{ position: 'absolute', left: size * 0.1, top: size * 0.08, width: size * 0.8, height: size * 0.8, borderRadius: size, borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.witness }} />
+              <PlayerGlyph s={size} color={colors.witness} shape={String(skin.shape)} />
+            </View>
+          </Mover>
+        )}
         <Mover cell={state.player} w={w} size={size} reduced={reducedMotion} z={8}>
           <Shadow size={size} scale={0.8} />
           <View style={{ opacity: dead ? 0.35 : 1 }}>
@@ -540,6 +657,15 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         {bursts.map((b) => (
           <Burst key={b.id} spec={b} w={w} size={size} />
         ))}
+        <Darkness visible={!!dark} cx={(colOf(w, state.player) + 0.5) * size} cy={(rowOf(w, state.player) + 0.5) * size} w={w * size} h={room.height * size} size={size} reduced={reducedMotion} />
+        {dark &&
+          clues?.map((c) =>
+            c.uv ? (
+              <View key={`uv${c.id}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, c.cell) * size, top: rowOf(w, c.cell) * size, width: size, height: size, zIndex: 16 }]}>
+                <WallWritingGlyph s={size} uv found={c.found} />
+              </View>
+            ) : null,
+          )}
         {frozen && <View pointerEvents="none" style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, backgroundColor: '#B8A6FF1F', borderWidth: 2, borderColor: '#B8A6FF88', zIndex: 20 }]} />}
       </Animated.View>
     </GestureDetector>

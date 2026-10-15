@@ -13,6 +13,7 @@ import { defaultSave, type SaveData, type Settings } from '../services/storage/s
 import { dayKey } from '../utils/dates';
 import { log } from '../utils/log';
 import { noteDay, rollAdDay } from './progression';
+import { backfillStars } from './mastery';
 
 export type Route =
   | { name: 'home' }
@@ -21,7 +22,7 @@ export type Route =
   | { name: 'rewards'; tab?: RewardsTab }
   | { name: 'settings' }
   | { name: 'privacy' }
-  | { name: 'journal' };
+  | { name: 'journal'; tab?: 'story' | 'witness' };
 
 export type RewardsTab = 'shop' | 'achievements' | 'daily' | 'coins';
 
@@ -33,6 +34,8 @@ interface AppState {
   stack: Route[];
   consentRunning: boolean;
   privacyOptionsRequired: boolean;
+  /** When this app launch started (for first-session timing). */
+  openedAt: number;
   init(store?: KeyValueStore): Promise<void>;
   update(fn: (s: SaveData) => SaveData): void;
   setSettings(patch: Partial<Settings>): void;
@@ -55,13 +58,15 @@ export const useApp = create<AppState>((set, get) => ({
   stack: [{ name: 'home' }],
   consentRunning: false,
   privacyOptionsRequired: false,
+  openedAt: Date.now(),
 
   async init(store = asyncStore) {
     if (get().ready) return;
+    set({ openedAt: Date.now() });
     repo = new SaveRepository(store);
     const res = await repo.load();
     const today = dayKey();
-    let save = rollAdDay(noteDay(res.save, today), today);
+    let save = backfillStars(rollAdDay(noteDay(res.save, today), today));
     save = { ...save, stats: { ...save.stats, sessions: save.stats.sessions + 1 } };
     let notice: string | null = null;
     if (res.outcome === 'restoredBackup') notice = 'Your save could not be read, so your last backup was restored.';

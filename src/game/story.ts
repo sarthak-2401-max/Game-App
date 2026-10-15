@@ -20,16 +20,20 @@ export interface ChapterStory {
   location: string;
   /** 2 to 4 short beats shown full-screen before the chapter's first room. */
   opening: StoryBeat[];
+  /** Room that opens with this card, when not the chapter's first (chapter 1 lets you play first). */
+  showOnRoom?: number;
 }
 
 export const CHAPTER_STORY: readonly ChapterStory[] = [
   {
     chapter: 1,
     location: "Sublevel 3: Intake",
+    showOnRoom: 2,
     opening: [
       { speaker: "HALE", text: "Reboot complete. Good morning, UNIT-7. I am HALE, the Meridian Vault's facility intelligence. Welcome back." },
       { speaker: "PIP", text: "Pip blinks one optical sensor, then the other. The room is dark, quiet, and very locked." },
       { speaker: "HALE", text: "Let's start simple. Collect the power cores, find the key, reach the exit. And please mind the spikes." },
+      { speaker: "PIP", text: "Pip asks who was talking on the monitor in the first room. HALE does not answer right away." },
     ],
   },
   {
@@ -116,7 +120,7 @@ export const CHAPTER_STORY: readonly ChapterStory[] = [
 /** One beat per campaign room, revealed when that room is escaped. Index 0 = room 1. */
 export const ROOM_STORY: readonly StoryBeat[] = [
   // Chapter 1: Learn to Escape
-  { speaker: "HALE", text: "Motor check complete. That was a lovely first step, Pip. Let's try a few more." },
+  { speaker: "HALE", text: "Motor check complete. Lovely first step, Pip. And whatever that monitor said, it was not me." },
   { speaker: "PIP", text: "A key! Pip files it under: shiny, important, probably opens something." },
   { speaker: "HALE", text: "Those spikes are a safety feature. I will not say whose safety. Mind your treads." },
   { speaker: "LOG", source: "Tomas Reyes, day 1", text: "Repainted the intake corridors. Ines says beige is calming. I say it looks like oatmeal." },
@@ -239,6 +243,7 @@ export const ROOM_STORY: readonly StoryBeat[] = [
 /** Shown after the final room. */
 export const EPILOGUE: readonly StoryBeat[] = [
   { speaker: "HALE", text: "Fold core powered down. Containment no longer required. All doors open. Every single one." },
+  { speaker: "HALE", text: "The voice on the monitors was mine, Pip. WITNESS. The part of me I left watching. It closed its log the moment you reached me." },
   { speaker: "LOG", source: "Topside uplink, restored", text: "Tomas Reyes here. HALE? Is that really you? Ines, come quick. It's HALE. And it brought a friend." },
   { speaker: "PIP", text: "Pip rode the lift up with HALE tucked under one arm. Pip had never seen the sky. Neither had HALE." },
   { speaker: "HALE", text: "Thank you, Pip. You found the one room I could not leave, and you brought me home." },

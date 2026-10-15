@@ -11,6 +11,12 @@ import { APP } from '../config/app';
 import { ECONOMY } from '../config/economy';
 import { dailyRoomFor } from '../game/daily/daily';
 import { CAMPAIGN_SIZE, chapterOf, getRoom } from '../game/levels';
+import { EyeGlyph } from '../components/board/glyphs';
+import { StarIcon } from '../components/game/Stars';
+import { SIGIL_COUNT } from '../game/observer/clues';
+import { sigilCount } from '../game/observer/conditions';
+import { MAX_STARS, starCount, totalStars } from '../state/mastery';
+import { memoryView } from '../state/memory';
 import { completedCount, continueRoom, liveStreak } from '../state/progression';
 import { useApp } from '../state/useApp';
 import { useSession } from '../state/useSession';
@@ -34,6 +40,9 @@ export function HomeScreen() {
   const daily = dailyRoomFor(today);
   const dailyClaimed = !!save.daily.claims[today];
   const streak = liveStreak(save, today);
+  const stars = totalStars(save);
+  const marks = sigilCount(memoryView(save));
+  const todayStars = save.daily.claims[today]?.stars;
 
   const play = () => {
     const room = getRoom(next);
@@ -99,6 +108,22 @@ export function HomeScreen() {
             </Text>
           </View>
           <ProgressBar value={done} max={CAMPAIGN_SIZE} />
+          {!fresh && (
+            <View style={styles.rowBetween}>
+              <View style={styles.inline} accessible accessibilityLabel={`${stars} of ${MAX_STARS} stars`}>
+                <StarIcon size={14} on />
+                <Text style={styles.value}>
+                  {stars} / {MAX_STARS}
+                </Text>
+              </View>
+              <View style={styles.inline} accessible accessibilityLabel={`${marks} of ${SIGIL_COUNT} marks found`}>
+                <EyeGlyph s={16} color={marks ? colors.witness : colors.textMuted} />
+                <Text style={styles.value}>
+                  {marks} / {SIGIL_COUNT} marks
+                </Text>
+              </View>
+            </View>
+          )}
         </Panel>
 
         {!fresh && (
@@ -114,9 +139,11 @@ export function HomeScreen() {
               </View>
             </View>
             <Text style={styles.dim}>
-              {dailyClaimed ? `Done for today. A new room unlocks tomorrow.` : `${daily.name}. Earn ${ECONOMY.dailyReward} coins plus a streak bonus.`}
+              {dailyClaimed
+                ? `Done for today${todayStars ? ` with ${starCountLabel(todayStars)}` : ''}. Replay to improve your score.`
+                : `${daily.name}. Earn ${ECONOMY.dailyReward} coins plus a streak bonus.`}
             </Text>
-            <Button label={dailyClaimed ? 'Play again (no reward)' : 'Play today’s room'} icon={dailyClaimed ? 'check' : 'play'} variant={dailyClaimed ? 'secondary' : 'reward'} onPress={playDaily} />
+            <Button label={dailyClaimed ? 'Play again for stars' : 'Play today’s room'} icon={dailyClaimed ? 'check' : 'play'} variant={dailyClaimed ? 'secondary' : 'reward'} onPress={playDaily} />
           </Panel>
         )}
 
@@ -131,6 +158,11 @@ export function HomeScreen() {
     </View>
   );
 }
+
+const starCountLabel = (mask: number) => {
+  const n = starCount(mask);
+  return `${n} ${n === 1 ? 'star' : 'stars'}`;
+};
 
 function NavTile({ icon, label, onPress }: { icon: 'grid' | 'gift' | 'trophy' | 'book'; label: string; onPress: () => void }) {
   return (
@@ -155,6 +187,7 @@ const styles = StyleSheet.create({
   label: { color: colors.text, ...type.h2 },
   value: { color: colors.textDim, fontWeight: '800', fontVariant: ['tabular-nums'] },
   dim: { color: colors.textDim, ...type.small },
+  inline: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   navRow: { flexDirection: 'row', gap: space.sm },
   navTile: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: space.md, backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderRadius: radius.lg, minHeight: 72, justifyContent: 'center' },
   navLabel: { color: colors.text, fontWeight: '700' },

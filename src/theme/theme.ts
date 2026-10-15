@@ -19,6 +19,9 @@ export const colors = {
   blue: '#5A8CFF',
   gold: '#FFD36E',
   violet: '#B38CFF',
+  /** WITNESS, the Observer: clinical white with a red recording light. */
+  witness: '#DDE3F0',
+  rec: '#FF5468',
   overlay: 'rgba(3,5,10,0.82)',
 } as const;
 

@@ -6,13 +6,16 @@ A portrait, turn-based escape-room puzzle game for iOS and Android, built with E
 
 - **100 campaign rooms** in 10 chapters, plus 12 rotating daily challenges and 3 bonus-vault rooms. Every room is proven solvable by a solver that drives the real game engine.
 - **Story:** you are Pip, a maintenance robot waking up inside the sealed Meridian Vault. Every chapter opens with a story card, every escaped room recovers one story beat, and the Journal keeps them all (`src/game/story.ts`).
+- **WITNESS, the Observer:** a scripted voice on the monitors that reacts to what you actually did (deaths, hints, choices, marks found), 14 optional clues and 10 hidden marks, rooms that remember an earlier choice, and four Observation interludes including a secret room. See [docs/WITNESS.md](docs/WITNESS.md).
+- **The Echo:** in Observation rooms, your previous attempt replays as a ghost that can hold plates for you. Deterministic and solver-verified.
+- **Mastery:** up to 3 stars per room and a daily score; hints, revives and power-ups never cost a star.
 - **Power-ups:** Pathfinder (next 5 steps), Shield (survive one hit), Overclock (+5 moves or +20 s) and Freeze (clock stops for 3 actions). They unlock after rooms 5, 20, 30 and 50, and are earned from chapter milestones, an optional ad, or bought with coins (`src/config/powerups.ts`). Real-money purchases are not implemented yet.
 - **Look:** a 3D-style board (raised walls with front faces and cast shadows, crates, contact shadows, hovering pickups), Pip as a robot character, and a colour palette per chapter (`src/theme/chapters.ts`).
-- **Progression:** Escape Coins, 22 cosmetics, 14 achievements, a daily streak with a one-day grace period.
+- **Progression:** Escape Coins, 25 cosmetics, 19 achievements, a daily streak with a one-day grace period.
 - **Monetisation:** optional rewarded ads (revive, hint, double reward, free coins, bonus rooms, power-ups) and conservative interstitials, through Google AdMob with UMP consent and iOS App Tracking Transparency.
 - **Offline-first:** no account, no server. Progress is a versioned local save with migrations, a backup and corruption recovery.
 
-> Status: verified in automated tests and a browser build, and played in Expo Go on an iPhone (before the story and power-up update). It has **not** yet been built natively or connected to a real AdMob account. Store screenshots in `store-assets/` predate the new look and need regenerating. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [docs/STORE_CHECKLIST.md](docs/STORE_CHECKLIST.md).
+> Status: verified in automated tests and a browser build, and played in Expo Go on an iPhone (before the story, power-up and Observer updates). It has **not** yet been built natively or connected to a real AdMob account. Store screenshots in `store-assets/` predate the new look and need regenerating. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [docs/STORE_CHECKLIST.md](docs/STORE_CHECKLIST.md).
 
 ## Quick start
 
@@ -59,6 +62,8 @@ src/game/                    pure, deterministic rules (no React)
   daily/                     daily pool, bonus rooms, deterministic daily selection
   solver/ validator.ts       BFS solver, structural + solvability validation
   hints.ts                   "next 3 moves" hint
+  echo.ts                    echo tracks for Observation rooms
+  observer/                  WITNESS script, clue catalog, interludes, memory conditions
 src/state/                   progression (pure), session (pure), zustand stores
 src/services/                ads (AdMob, simulator, consent), storage, analytics, audio, haptics
 src/components/ screens/     UI (board renderer in components/board)
@@ -84,6 +89,8 @@ Navigation is a small stack in the zustand app store (`src/state/useApp.ts`) rat
 - [ASSETS.md](docs/ASSETS.md): provenance of every asset
 - [ANALYTICS.md](docs/ANALYTICS.md): event list and how to plug in a provider
 - [LEVEL_DESIGN.md](docs/LEVEL_DESIGN.md) and [LEVEL_REPORT.md](docs/LEVEL_REPORT.md): room format, tooling, per-room stats
+- [WITNESS.md](docs/WITNESS.md): the Observer, room memory, the Echo and the clue catalog
+- [AUDIT.md](docs/AUDIT.md) and [UPGRADE_REPORT.md](docs/UPGRADE_REPORT.md): audit before the Observer upgrade and what it changed
 - [TEST_RESULTS.md](docs/TEST_RESULTS.md): what was executed and the results
 - [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md), [STORE_CHECKLIST.md](docs/STORE_CHECKLIST.md), [ROADMAP.md](docs/ROADMAP.md)
 

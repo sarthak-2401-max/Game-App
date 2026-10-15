@@ -14,7 +14,7 @@
 // Any other character must be defined in the room's legend.
 
 import { DELTA, idx } from './grid';
-import type { Dir, Item, KeyColor, PathMode, Room, Route, Tile } from './types';
+import type { Dir, EchoConfig, Item, KeyColor, PathMode, Room, Route, Tile } from './types';
 
 export interface RouteSpec {
   /** Moves from the starting cell, e.g. "RRRR" or "RRDDLLUU". */
@@ -40,6 +40,8 @@ export interface LevelSpec {
   timeLimit?: number;
   intro?: string;
   hint?: string;
+  /** Makes this an echo room. `reference` is a first attempt that proves it solvable. */
+  echo?: Partial<Omit<EchoConfig, 'reference'>> & { reference: string };
 }
 
 const T = (t: Tile): CellSpec => ({ tile: t });
@@ -153,6 +155,9 @@ export function parseLevel(spec: LevelSpec, id: string, chapter: number, index: 
     intro: spec.intro,
     hint: spec.hint,
     tags: deriveTags(tiles, items, blocks, drones, platforms, spec),
+    ...(spec.echo
+      ? { echo: { linger: spec.echo.linger ?? 40, maxRecord: spec.echo.maxRecord ?? 60, presses: spec.echo.presses ?? true, reference: spec.echo.reference } }
+      : {}),
   };
 }
 
@@ -162,7 +167,7 @@ export function deriveTags(
   blocks: number[],
   drones: Route[],
   platforms: Route[],
-  spec: Pick<LevelSpec, 'moveLimit' | 'timeLimit'>,
+  spec: Pick<LevelSpec, 'moveLimit' | 'timeLimit' | 'echo'>,
 ): string[] {
   const tags = new Set<string>();
   for (const t of tiles) {
@@ -176,5 +181,6 @@ export function deriveTags(
   if (platforms.length) tags.add('platform');
   if (spec.moveLimit !== undefined) tags.add('moveLimit');
   if (spec.timeLimit !== undefined) tags.add('timer');
+  if (spec.echo) tags.add('echo');
   return [...tags].sort();
 }

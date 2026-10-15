@@ -59,7 +59,7 @@ export function EmitterGlyph({ s, dir, active, warning, ch }: P & { dir: Dir; ac
   return (
     <Svg width={s} height={s}>
       <Rect x={s * 0.1} y={s * 0.1} width={s * 0.8} height={s * 0.8} rx={s * 0.12} fill="#2A1E26" stroke="#5A3A44" strokeWidth={1.5} />
-      <G rotation={ROT[dir]} origin={`${s / 2}, ${s / 2}`}>
+      <G transform={`rotate(${ROT[dir]} ${s / 2} ${s / 2})`}>
         <Rect x={s * 0.5} y={s * 0.38} width={s * 0.42} height={s * 0.24} rx={2} fill="#3A2830" />
         <Circle cx={s * 0.8} cy={s / 2} r={s * 0.11} fill={lens} />
       </G>
@@ -285,6 +285,44 @@ export function CrackGlyph({ s }: P) {
     <Svg width={s} height={s}>
       <Path d={`M ${s * 0.2} ${s * 0.3} L ${s * 0.42} ${s * 0.48} L ${s * 0.36} ${s * 0.7} M ${s * 0.42} ${s * 0.48} L ${s * 0.7} ${s * 0.42} L ${s * 0.82} ${s * 0.6}`} stroke="#3A4258" strokeWidth={2} fill="none" />
       <Rect x={2} y={2} width={s - 4} height={s - 4} rx={3} fill="none" stroke="#C9973F" strokeOpacity={0.35} strokeDasharray="3 4" strokeWidth={1.5} />
+    </Svg>
+  );
+}
+
+// ---- WITNESS layer: clues and marks ----------------------------------------------------------
+
+/** WITNESS's mark: an eye. Found marks are drawn faintly. */
+export function EyeGlyph({ s, color = colors.witness, found }: P & { color?: string; found?: boolean }) {
+  const o = found ? 0.35 : 1;
+  return (
+    <Svg width={s} height={s} opacity={o}>
+      <Path d={`M ${s * 0.18} ${s * 0.5} Q ${s * 0.5} ${s * 0.2} ${s * 0.82} ${s * 0.5} Q ${s * 0.5} ${s * 0.8} ${s * 0.18} ${s * 0.5} Z`} fill="none" stroke={color} strokeWidth={Math.max(1.5, s * 0.05)} />
+      <Circle cx={s / 2} cy={s / 2} r={s * 0.11} fill={color} />
+      <Circle cx={s / 2} cy={s / 2} r={s * 0.04} fill={colors.rec} />
+    </Svg>
+  );
+}
+
+/** A recording: a small data disc with a red light. */
+export function RecordingGlyph({ s, found }: P & { found?: boolean }) {
+  return (
+    <Svg width={s} height={s} opacity={found ? 0.35 : 1}>
+      <Rect x={s * 0.26} y={s * 0.32} width={s * 0.48} height={s * 0.36} rx={s * 0.06} fill="#1C2130" stroke={colors.witness} strokeWidth={1.5} />
+      <Circle cx={s * 0.4} cy={s * 0.5} r={s * 0.07} fill="none" stroke={colors.witness} strokeWidth={1.2} />
+      <Circle cx={s * 0.6} cy={s * 0.5} r={s * 0.07} fill="none" stroke={colors.witness} strokeWidth={1.2} />
+      {!found && <Circle cx={s * 0.68} cy={s * 0.37} r={s * 0.035} fill={colors.rec} />}
+    </Svg>
+  );
+}
+
+/** Writing on a wall face. UV writing (revealed in the dark) glows violet. */
+export function WallWritingGlyph({ s, uv, found }: P & { uv?: boolean; found?: boolean }) {
+  const c = uv ? '#C9A6FF' : '#D9D2C2';
+  return (
+    <Svg width={s} height={s} opacity={found ? 0.45 : 0.95}>
+      <Path d={`M ${s * 0.2} ${s * 0.28} l ${s * 0.18} ${s * 0.04} l ${s * 0.12} -${s * 0.05} l ${s * 0.3} ${s * 0.03}`} stroke={c} strokeWidth={1.6} fill="none" strokeLinecap="round" />
+      <Path d={`M ${s * 0.18} ${s * 0.42} l ${s * 0.26} -${s * 0.02} l ${s * 0.1} ${s * 0.04} l ${s * 0.26} -${s * 0.03}`} stroke={c} strokeWidth={1.6} fill="none" strokeLinecap="round" />
+      <Path d={`M ${s * 0.22} ${s * 0.56} l ${s * 0.32} ${s * 0.02}`} stroke={c} strokeWidth={1.6} fill="none" strokeLinecap="round" />
     </Svg>
   );
 }

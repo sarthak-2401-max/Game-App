@@ -10,6 +10,7 @@ import { COSMETICS, type Cosmetic, type CosmeticSlot } from '../config/cosmetics
 import { ECONOMY } from '../config/economy';
 import { POWERUPS } from '../config/powerups';
 import { buyPowerUp, powerUpCount } from '../state/powerups';
+import { StarRow } from '../components/game/Stars';
 import { dailyRoomFor } from '../game/daily/daily';
 import { adService } from '../services/ads/adService';
 import { analytics } from '../services/analytics/analytics';
@@ -239,7 +240,8 @@ function Daily() {
   const navigate = useApp((s) => s.navigate);
   const today = dayKey();
   const streak = liveStreak(save, today);
-  const claimed = !!save.daily.claims[today];
+  const claim = save.daily.claims[today];
+  const claimed = !!claim;
   const room = dailyRoomFor(today);
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -275,9 +277,17 @@ function Daily() {
       </Panel>
       <Panel style={{ gap: space.md }}>
         <Text style={styles.itemName}>Today: {room.name}</Text>
-        <Text style={styles.dim}>{claimed ? 'Completed. Come back tomorrow for a new room.' : `Reward: ${ECONOMY.dailyReward} coins + streak bonus.`}</Text>
+        <Text style={styles.dim}>
+          {claimed ? 'Completed. Replays can raise your score, but the coins are paid once.' : `Reward: ${ECONOMY.dailyReward} coins + streak bonus.`}
+        </Text>
+        {claim && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+            <StarRow mask={claim.stars ?? 1} size={18} />
+            {claim.bestMoves !== undefined && <Text style={styles.dim}>Best: {claim.bestMoves} moves</Text>}
+          </View>
+        )}
         <Button
-          label={claimed ? 'Play again (no reward)' : 'Play today’s room'}
+          label={claimed ? 'Play again for stars' : 'Play today’s room'}
           icon="play"
           variant={claimed ? 'secondary' : 'reward'}
           onPress={() => {

@@ -7,6 +7,8 @@ const tm = (period: number, on: number, offset = 0): Timing => ({ period, on, of
 export const sw = (ch: number): CellSpec => ({ tile: { k: 'switch', ch } });
 export const plate = (ch: number): CellSpec => ({ tile: { k: 'plate', ch } });
 export const door = (ch: number, invert = false): CellSpec => ({ tile: { k: 'door', ch, invert } });
+/** A door drawn as a section of wall that slides into the floor while open. */
+export const shift = (ch: number, invert = false): CellSpec => ({ tile: { k: 'door', ch, invert, look: 'wall' } });
 /** Spikes driven by a channel: retracted while it is active, or raised while active if `raisedWhenOn`. */
 export const chSpikes = (ch: number, raisedWhenOn = false): CellSpec => ({
   tile: { k: 'spikes', mode: { kind: 'channel', ch, raisedWhenActive: raisedWhenOn } },

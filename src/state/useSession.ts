@@ -6,6 +6,8 @@ import { analytics } from '../services/analytics/analytics';
 import { useApp } from './useApp';
 import { recordAttempt, recordFailure } from './progression';
 import { consumePowerUp } from './powerups';
+import { memoryView, noteDeathMemory, noteHintMemory, noteReviveMemory } from './memory';
+import { resolveRoom } from '../game/observer/observer';
 import type { PowerUpId } from '../config/powerups';
 import * as S from './session';
 
@@ -36,8 +38,23 @@ const props = (s: S.Session) => ({
 function afterChange(prev: S.Session, next: S.Session) {
   const failedNow = (next.state.status === 'dead' && prev.state.status !== 'dead') || (next.timedOut && !prev.timedOut);
   if (failedNow) {
-    useApp.getState().update((sv) => recordFailure(sv, next.room));
+    useApp.getState().update((sv) => noteDeathMemory(recordFailure(sv, next.room), next.room));
     analytics.track('level_failed', { ...props(next), cause: next.timedOut ? 'timeout' : next.state.death, moves: next.state.moves });
+  }
+}
+
+/** Time to first interaction and to first escape, measured once per install. */
+function noteFirstSession(won: boolean) {
+  const app = useApp.getState();
+  const st = app.save.stats;
+  const ms = Date.now() - app.openedAt;
+  if (st.firstMoveMs === undefined) {
+    app.update((sv) => ({ ...sv, stats: { ...sv.stats, firstMoveMs: ms } }));
+    analytics.track('first_interaction', { ms });
+  }
+  if (won && st.firstWinMs === undefined) {
+    app.update((sv) => ({ ...sv, stats: { ...sv.stats, firstWinMs: ms } }));
+    analytics.track('first_completion', { ms });
   }
 }
 
@@ -46,7 +63,9 @@ export const useSession = create<SessionState>((set, get) => ({
   paused: false,
 
   start(room, kind, day) {
-    const session = S.newSession(room, kind, day);
+    // Campaign rooms can have room-memory variants (each one solver-verified).
+    const played = kind === 'campaign' ? resolveRoom(room, memoryView(useApp.getState().save)) : room;
+    const session = S.newSession(played, kind, day);
     set({ session, paused: false });
     useApp.getState().update((sv) => recordAttempt(sv, room));
     analytics.track(kind === 'daily' ? 'daily_challenge_started' : 'level_started', props(session));
@@ -60,6 +79,7 @@ export const useSession = create<SessionState>((set, get) => ({
     if (!s || get().paused) return;
     const next = S.act(s, a);
     set({ session: next });
+    if (next.state !== s.state) noteFirstSession(next.state.status === 'won');
     afterChange(s, next);
   },
 
@@ -103,7 +123,10 @@ export const useSession = create<SessionState>((set, get) => ({
   revive() {
     const s = get().session;
     if (!s) return;
-    set({ session: S.applyRevive(s) });
+    const next = S.applyRevive(s);
+    if (next === s) return;
+    set({ session: next });
+    useApp.getState().update((sv) => noteReviveMemory(sv, s.room));
   },
 
   setPaused(p) {
@@ -114,7 +137,7 @@ export const useSession = create<SessionState>((set, get) => ({
     const s = get().session;
     if (!s) return;
     set({ session: { ...s, hintsUsed: s.hintsUsed + 1 } });
-    useApp.getState().update((sv) => ({ ...sv, stats: { ...sv.stats, hintsUsed: sv.stats.hintsUsed + 1 } }));
+    useApp.getState().update((sv) => noteHintMemory({ ...sv, stats: { ...sv.stats, hintsUsed: sv.stats.hintsUsed + 1 } }, s.room));
   },
 
   spendPowerUp(id) {
@@ -127,6 +150,7 @@ export const useSession = create<SessionState>((set, get) => ({
     if (!spent) return 'none_left';
     app.update(() => spent);
     set({ session: S.applyPowerUp(s, id) });
+    if (id === 'pathfinder') app.update((sv) => noteHintMemory(sv, s.room));
     analytics.track('powerup_used', { ...props(s), powerup: id });
     return null;
   },

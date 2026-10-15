@@ -102,5 +102,6 @@ export function useRewardedOffer() {
     </Sheet>
   );
 
-  return { offer, sheet, adReady: ready };
+  /** True while the offer sheet or its ad is on screen (callers pause timers and input). */
+  return { offer, sheet, adReady: ready, open: !!req || busy };
 }

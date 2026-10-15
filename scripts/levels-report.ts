@@ -1,11 +1,14 @@
-// Validates every campaign + daily room against the real engine and writes:
+// Validates every campaign, daily, interlude and room-memory variant against the real engine.
+// Echo rooms are solved with their reference echo, and must be unsolvable without one. Writes:
 //   src/game/levels/solutions.generated.json  (shortest solutions, used for hints)
 //   docs/LEVEL_REPORT.md                       (difficulty metrics per room)
 // Usage: npx tsx scripts/levels-report.ts [--from N] [--to N] [--no-write]
 import { writeFileSync } from 'node:fs';
-import { CAMPAIGN } from '../src/game/levels';
+import { CAMPAIGN, getRoomById } from '../src/game/levels';
+import { solutionKey, withReferenceEcho } from '../src/game/echo';
+import { allVariantRooms, INTERLUDES } from '../src/game/observer/rooms';
 import { BONUS_ROOMS, DAILY_ROOMS } from '../src/game/daily/catalog';
-import { analyze, encodeSolution } from '../src/game/solver/solver';
+import { analyze, encodeSolution, solve } from '../src/game/solver/solver';
 import { validateSolvable, validateStructure } from '../src/game/validator';
 import type { Room } from '../src/game/types';
 
@@ -18,8 +21,10 @@ const write = !args.includes('--no-write');
 const rows: string[] = [];
 const solutions: Record<string, string> = {};
 let failures = 0;
-const all: Room[] = [...CAMPAIGN, ...DAILY_ROOMS, ...BONUS_ROOMS];
-for (const room of all) {
+const all: Room[] = [...CAMPAIGN, ...DAILY_ROOMS, ...BONUS_ROOMS, ...INTERLUDES.map((i) => i.room), ...allVariantRooms(getRoomById)];
+for (const base of all) {
+  const room = withReferenceEcho(base);
+  const key = solutionKey(room);
   const isDaily = room.chapter === 0;
   if (!isDaily && (room.index < from || room.index > to)) continue;
   if (isDaily && args.includes('--no-daily')) continue;
@@ -27,12 +32,13 @@ for (const room of all) {
   const issues = validateStructure(room);
   const { issues: solveIssues, result } = validateSolvable(room);
   issues.push(...solveIssues);
+  if (base.echo && solve(base).solvable) issues.push({ room: key, message: 'echo room is solvable without an echo' });
   const a = result.solvable ? analyze(room, result.solution) : undefined;
   const ms = Date.now() - t0;
-  if (result.solvable) solutions[room.id] = encodeSolution(result.solution);
+  if (result.solvable) solutions[key] = encodeSolution(result.solution);
   if (issues.length) failures++;
   const line = [
-    room.id,
+    key,
     room.name.padEnd(22),
     `${room.width}x${room.height}`,
     `min=${result.solution.length}`,
@@ -45,7 +51,7 @@ for (const room of all) {
     issues.length ? `\n   !! ${issues.map((i) => i.message).join('; ')}` : '',
   ].filter(Boolean).join(' ');
   console.log(line);
-  rows.push(`| ${room.id} | ${room.name} | ${room.width}x${room.height} | ${result.solution.length} | ${room.moveLimit ?? ''} | ${room.timeLimit ?? ''} | ${a?.reachable ?? ''}${a?.truncated ? '+' : ''} | ${a?.deadEnds ?? ''} | ${a?.criticalChoices ?? ''} | ${room.tags.join(', ')} | ${issues.length ? 'FAIL: ' + issues.map((i) => i.message).join('; ') : 'ok'} |`);
+  rows.push(`| ${key} | ${room.name} | ${room.width}x${room.height} | ${result.solution.length} | ${room.moveLimit ?? ''} | ${room.timeLimit ?? ''} | ${a?.reachable ?? ''}${a?.truncated ? '+' : ''} | ${a?.deadEnds ?? ''} | ${a?.criticalChoices ?? ''} | ${room.tags.join(', ')} | ${issues.length ? 'FAIL: ' + issues.map((i) => i.message).join('; ') : 'ok'} |`);
 }
 console.log(`\n${failures} room(s) with issues`);
 if (write && from === 1 && to === 999) {

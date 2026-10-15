@@ -34,6 +34,9 @@ export const CAMPAIGN: readonly Room[] = build();
 export const CAMPAIGN_SIZE = CAMPAIGN.length;
 export const ROOMS_PER_CHAPTER = 10;
 
+/** The authored spec of campaign room `n` (used to build room-memory variants). */
+export const campaignSpec = (n: number): LevelSpec => SPECS[Math.floor((n - 1) / 10)][(n - 1) % 10];
+
 export const getRoom = (n: number): Room | undefined => CAMPAIGN[n - 1];
 export const getRoomById = (id: string) => CAMPAIGN.find((r) => r.id === id);
 export const chapterOf = (n: number) => CHAPTERS[Math.floor((n - 1) / ROOMS_PER_CHAPTER)];

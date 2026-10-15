@@ -32,7 +32,7 @@ function Router() {
     case 'privacy':
       return <PrivacyScreen />;
     case 'journal':
-      return <JournalScreen />;
+      return <JournalScreen tab={route.tab} />;
     default:
       return <HomeScreen />;
   }

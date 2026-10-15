@@ -18,6 +18,11 @@ No third-party analytics SDK ships in this version. `src/services/analytics/anal
 | `achievement_unlocked` | id |
 | `daily_challenge_started`, `daily_challenge_completed` | room_id, claimed, moves |
 | `save_recovered`, `progress_reset` | outcome |
+| `first_interaction`, `first_completion` | ms since app open (first session only) |
+| `witness_heard` | id, room_id |
+| `clue_found` | id, room_id, kind |
+| `stars_earned` | room_id, stars, prev (bitmasks) |
+| `interlude_skipped` | room_id |
 
 Properties are deliberately non-identifying: room ids, counts, placements. Never add names, emails or device identifiers.
 

@@ -5,7 +5,7 @@ import type { RewardedPlacement } from '../../config/ads';
 import { DEFAULT_COSMETICS, type CosmeticSlot } from '../../config/cosmetics';
 import { isPowerUpId, type PowerUpId } from '../../config/powerups';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export interface RoomRecord {
   completed: boolean;
@@ -16,6 +16,16 @@ export interface RoomRecord {
   firstClearAt?: string;
   attempts: number;
   rewarded: boolean; // completion reward already paid
+  /** Mastery stars ever earned, as a bitmask (1 escape, 2 move target, 4 room objective). */
+  stars?: number;
+}
+
+export interface DailyClaim {
+  completedAt: string;
+  reward: number;
+  /** Best mastery result on that day's challenge (replays can improve it; they never pay again). */
+  stars?: number;
+  bestMoves?: number;
 }
 
 export interface Settings {
@@ -60,7 +70,7 @@ export interface SaveData {
   cosmetics: { owned: string[]; selected: Record<CosmeticSlot, string> };
   achievements: Record<string, { progress: number; unlockedAt?: string }>;
   daily: {
-    claims: Record<string, { completedAt: string; reward: number }>;
+    claims: Record<string, DailyClaim>;
     streak: { count: number; lastDay?: string; best: number };
     /** Latest local day the app has seen; used to detect the device clock moving backwards. */
     latestDaySeen?: string;
@@ -75,6 +85,9 @@ export interface SaveData {
     firstOpenAt: string;
     playSeconds: number;
     flawlessChapterStreak: Record<number, boolean>;
+    /** First session: milliseconds from app open to the first move and to the first escape. */
+    firstMoveMs?: number;
+    firstWinMs?: number;
   };
   tutorialCompleted: boolean;
   settings: Settings;
@@ -92,6 +105,12 @@ export interface SaveData {
     chaptersSeen: number[];
     epilogueSeen: boolean;
   };
+  /**
+   * Room memory: what the player did, as named counters. Keys look like "r004.hint",
+   * "o01.route.observer", "clue.c03" or "obs.w12" (a WITNESS line heard). Read only through
+   * conditions that select between pre-verified content, so bad values can't break a room.
+   */
+  memory: { flags: Record<string, number> };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -141,6 +160,7 @@ export function defaultSave(now = new Date()): SaveData {
     consent: { personalizedAds: false },
     powerups: { inventory: {}, unlocked: [], used: 0 },
     story: { chaptersSeen: [], epilogueSeen: false },
+    memory: { flags: {} },
   };
 }
 
@@ -188,6 +208,9 @@ const MIGRATIONS: Record<number, (s: AnySave) => AnySave> = {
       version: 2,
     } as unknown as AnySave;
   },
+  // v3 adds room memory, mastery stars and daily scores. Everything else is kept as-is; stars
+  // for rooms finished before v3 are back-filled once by `backfillStars` (it needs room data).
+  2: (old) => ({ ...old, memory: { flags: {} }, version: 3 }),
 };
 
 export class SaveFormatError extends Error {}
@@ -210,6 +233,23 @@ const num = (v: unknown, d: number, min = 0) => (typeof v === 'number' && Number
 const bool = (v: unknown, d: boolean) => (typeof v === 'boolean' ? v : d);
 const obj = <T>(v: unknown, d: T): T => (v && typeof v === 'object' && !Array.isArray(v) ? (v as T) : d);
 const strArr = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []);
+const stars = (v: unknown) => (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 7 ? v : undefined);
+
+export const MEMORY_KEY = /^[a-z0-9][a-z0-9_.~-]{0,47}$/i;
+const MAX_FLAGS = 4000;
+
+/** Keeps only well-formed flags with finite, non-negative values. Anything else is dropped. */
+export function sanitizeFlags(v: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  let n = 0;
+  for (const [k, val] of Object.entries(obj<Record<string, unknown>>(v, {}))) {
+    if (n >= MAX_FLAGS) break;
+    if (!MEMORY_KEY.test(k) || typeof val !== 'number' || !Number.isFinite(val) || val <= 0) continue;
+    out[k] = Math.min(1_000_000, Math.floor(val));
+    n++;
+  }
+  return out;
+}
 
 /** Fills missing fields and repairs invalid values, keeping everything that is valid. */
 export function sanitize(input: AnySave): SaveData {
@@ -226,7 +266,9 @@ export function sanitize(input: AnySave): SaveData {
       firstClearAt: typeof rr.firstClearAt === 'string' ? rr.firstClearAt : undefined,
       attempts: num(rr.attempts, 0),
       rewarded: bool(rr.rewarded, bool(rr.completed, false)),
+      stars: stars(rr.stars),
     };
+    if (rooms[id].stars === undefined) delete rooms[id].stars;
   }
   const cos = obj(s.cosmetics, d.cosmetics);
   const owned = [...new Set([...d.cosmetics.owned, ...strArr(cos.owned)])];
@@ -251,7 +293,16 @@ export function sanitize(input: AnySave): SaveData {
     cosmetics: { owned, selected },
     achievements: obj(s.achievements, {}),
     daily: {
-      claims: obj(daily.claims, {}),
+      claims: (() => {
+        const out: Record<string, DailyClaim> = {};
+        for (const [day, c] of Object.entries(obj<Record<string, unknown>>(daily.claims, {}))) {
+          const cc = obj<Partial<DailyClaim>>(c, {});
+          out[day] = { completedAt: typeof cc.completedAt === 'string' ? cc.completedAt : d.createdAt, reward: num(cc.reward, 0) };
+          if (stars(cc.stars) !== undefined) out[day].stars = stars(cc.stars);
+          if (typeof cc.bestMoves === 'number' && cc.bestMoves > 0) out[day].bestMoves = Math.floor(cc.bestMoves);
+        }
+        return out;
+      })(),
       streak: { ...d.daily.streak, ...obj(daily.streak, {}) },
       latestDaySeen: typeof daily.latestDaySeen === 'string' ? daily.latestDaySeen : undefined,
     },
@@ -286,5 +337,6 @@ export function sanitize(input: AnySave): SaveData {
         epilogueSeen: bool(st.epilogueSeen, false),
       };
     })(),
+    memory: { flags: sanitizeFlags(obj<Record<string, unknown>>(s.memory, {}).flags) },
   };
 }

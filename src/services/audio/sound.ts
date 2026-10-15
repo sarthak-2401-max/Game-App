@@ -7,7 +7,8 @@ import { log } from '../../utils/log';
 
 export type SoundCue =
   | 'move' | 'bump' | 'push' | 'switch' | 'door' | 'coin' | 'key' | 'core' | 'warning'
-  | 'teleport' | 'crumble' | 'fail' | 'win' | 'unlock' | 'tap';
+  | 'teleport' | 'crumble' | 'fail' | 'win' | 'unlock' | 'tap'
+  | 'observer' | 'clue' | 'echo' | 'reveal' | 'star';
 
  
 const SOURCES: Record<SoundCue, number> = {
@@ -26,6 +27,11 @@ const SOURCES: Record<SoundCue, number> = {
   win: require('../../../assets/audio/win.wav'),
   unlock: require('../../../assets/audio/unlock.wav'),
   tap: require('../../../assets/audio/tap.wav'),
+  observer: require('../../../assets/audio/observer.wav'),
+  clue: require('../../../assets/audio/clue.wav'),
+  echo: require('../../../assets/audio/echo.wav'),
+  reveal: require('../../../assets/audio/reveal.wav'),
+  star: require('../../../assets/audio/star.wav'),
 };
 const MUSIC: number = require('../../../assets/audio/music.wav');
  

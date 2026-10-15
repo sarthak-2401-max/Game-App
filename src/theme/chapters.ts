@@ -29,3 +29,6 @@ export const CHAPTER_PALETTES: readonly Palette[] = [
 ];
 
 export const chapterPalette = (chapter: number): Palette => CHAPTER_PALETTES[Math.max(0, Math.min(CHAPTER_PALETTES.length - 1, chapter - 1))];
+
+/** The Observation Wing: WITNESS's clinical white test cells (interlude rooms). */
+export const OBSERVATION_PALETTE: Palette = { bg: '#05060A', floor: '#15171D', floorAlt: '#181B22', wall: '#2D313B', wallEdge: '#C9D3E6', wallSide: '#191C23', glow: '#DDE3F0' };

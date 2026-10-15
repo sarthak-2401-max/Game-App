@@ -29,7 +29,13 @@ export type AnalyticsEvent =
   | 'powerup_used'
   | 'powerup_purchased'
   | 'powerup_unlocked'
-  | 'story_viewed';
+  | 'story_viewed'
+  | 'first_interaction'
+  | 'first_completion'
+  | 'clue_found'
+  | 'witness_heard'
+  | 'interlude_skipped'
+  | 'stars_earned';
 
 export type EventProps = Record<string, string | number | boolean | undefined>;
 
