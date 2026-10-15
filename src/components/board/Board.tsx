@@ -13,6 +13,10 @@ import { ActorLight, Lighting, type LightPool } from './Lighting';
 import { Burst, type BurstSpec } from './Particles';
 import { TELE_COLORS } from './glyphs';
 import { deriveModel, type TileView } from './derive';
+import { Decor } from './decor';
+import { planDecor } from './decorPlan';
+import { FloorDetail, WallDetail } from './materials';
+import type { Environment, FloorMaterial, Landmark, WallMaterial } from '../../game/environments';
 import {
   CheckpointGlyph,
   CoinGlyph as CoinGlyphRaw,
@@ -89,6 +93,10 @@ interface Props {
   openingCells?: number[];
   /** Overrides the environment palette (the Observation Wing). */
   palette?: Palette;
+  /** The room's place in the Vault: materials, set dressing and air (campaign rooms, default theme). */
+  environment?: Environment;
+  /** The set piece on the room's back wall. */
+  landmark?: Landmark;
 }
 
 const MOVE_MS = 110;
@@ -135,6 +143,9 @@ const TerrainTile = memo(function TerrainTile({
   wallLeft,
   wallBelow,
   wallRight,
+  floorMat,
+  wallMat,
+  seed,
 }: {
   k: TileView['tile']['k'];
   size: number;
@@ -147,6 +158,9 @@ const TerrainTile = memo(function TerrainTile({
   wallLeft: boolean;
   wallBelow: boolean;
   wallRight: boolean;
+  floorMat?: FloorMaterial;
+  wallMat?: WallMaterial;
+  seed: number;
 }) {
   const base = { position: 'absolute' as const, left: x, top: y, width: size, height: size };
   const depth = Math.round(size * WALL_DEPTH);
@@ -185,6 +199,7 @@ const TerrainTile = memo(function TerrainTile({
             <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: depth * 0.45, backgroundColor: '#00000038' }} />
           </View>
         )}
+        {wallMat && <WallDetail m={wallMat} s={size} top={top} depth={depth} face={face} t={t} seed={seed} />}
       </View>
     );
   }
@@ -214,9 +229,10 @@ const TerrainTile = memo(function TerrainTile({
         },
       ]}
     >
-      {pattern === 'plain' && <View style={{ position: 'absolute', left: size * 0.07, right: size * 0.07, top: size * 0.07, bottom: size * 0.07, borderRadius: 3, borderWidth: 1, borderColor: '#FFFFFF07', backgroundColor: alt ? '#FFFFFF04' : 'transparent' }} />}
-      {pattern === 'grid' && <View style={{ position: 'absolute', left: size * 0.2, right: size * 0.2, top: size * 0.2, bottom: size * 0.2, borderWidth: 1, borderColor: '#ffffff0d', borderRadius: 3 }} />}
-      {pattern === 'dots' &&
+      {floorMat && <FloorDetail m={floorMat} s={size} t={t} seed={seed} alt={alt} />}
+      {!floorMat && pattern === 'plain' && <View style={{ position: 'absolute', left: size * 0.07, right: size * 0.07, top: size * 0.07, bottom: size * 0.07, borderRadius: 3, borderWidth: 1, borderColor: '#FFFFFF07', backgroundColor: alt ? '#FFFFFF04' : 'transparent' }} />}
+      {!floorMat && pattern === 'grid' && <View style={{ position: 'absolute', left: size * 0.2, right: size * 0.2, top: size * 0.2, bottom: size * 0.2, borderWidth: 1, borderColor: '#ffffff0d', borderRadius: 3 }} />}
+      {!floorMat && pattern === 'dots' &&
         [0.2, 0.8].flatMap((a) =>
           [0.2, 0.8].map((b) => (
             <View key={`${a}${b}`} style={{ position: 'absolute', left: size * a - 1.5, top: size * b - 1.5, width: 3, height: 3, borderRadius: 2, backgroundColor: '#ffffff14' }} />
@@ -500,10 +516,10 @@ function TrailGhost({ cell, w, size, color, seq }: { cell: number; w: number; si
   );
 }
 
-export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded, clues, dark, openingCells, palette }: Props) {
+export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded, clues, dark, openingCells, palette, environment, landmark }: Props) {
   const w = room.width;
   const model = useMemo(() => deriveModel(room, state), [room, state]);
-  const theme = useMemo(() => palette ?? themeLook(look.theme, chapter ?? room.chapter), [palette, look.theme, chapter, room.chapter]);
+  const theme = useMemo(() => palette ?? environment?.palette ?? themeLook(look.theme, chapter ?? room.chapter), [palette, environment, look.theme, chapter, room.chapter]);
   const pattern = String(getCosmetic(look.tile)?.look.pattern ?? 'plain');
   const exitStyle = String(getCosmetic(look.exit)?.look.style ?? 'portal');
   const skin = getCosmetic(look.skin)?.look ?? { color: colors.cyan, shape: 'circle' };
@@ -527,12 +543,18 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           t={theme}
           pattern={pattern}
           alt={(rowOf(w, v.cell) + colOf(w, v.cell)) % 2 === 1}
+          floorMat={environment?.floor}
+          wallMat={environment?.wall}
+          seed={room.index * 1000 + v.cell}
         />
       )),
     // Terrain only changes when tiles are modified (crumble, fill, unlock) or the theme changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [room, modsKey, size, theme, pattern],
+    [room, modsKey, size, theme, pattern, environment],
   );
+
+  // Set dressing never moves during a room, so it is planned once per room.
+  const decor = useMemo(() => (environment ? planDecor(room, environment, room.index) : undefined), [room, environment]);
 
   // Particle bursts from this action's events.
   const bursts = useMemo<BurstSpec[]>(() => {
@@ -667,6 +689,12 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         accessibilityLabel={`Room grid, ${room.width} by ${room.height}. Swipe or use the arrow buttons to move.`}
       >
         {terrain}
+        {environment && decor && (
+          <>
+            <Decor room={room} env={environment} plan={decor} size={size} depth={Math.round(size * WALL_DEPTH)} landmark={landmark ?? 'cradle'} layer="floor" />
+            <Decor room={room} env={environment} plan={decor} size={size} depth={Math.round(size * WALL_DEPTH)} landmark={landmark ?? 'cradle'} layer="walls" />
+          </>
+        )}
         <Lighting id={`${room.id}${room.variant ?? ''}`} w={w} h={room.height} size={size} pools={pools} layer="pools" />
         {model.tiles.map((v) =>
           v.tile.k === 'floor' || v.tile.k === 'wall' || v.tile.k === 'pit' || v.tile.k === 'crumble' ? null : (
@@ -775,7 +803,7 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           <FloatText key={f.id} cell={f.cell} w={w} size={size} text={f.text} color={f.color} />
         ))}
         <Lighting id={`${room.id}${room.variant ?? ''}`} w={w} h={room.height} size={size} pools={[]} layer="vignette" />
-        {!reducedMotion && <Motes W={w * size} H={room.height * size} color={theme.glow} count={Math.round((w * room.height) / 6)} seed={room.index} />}
+        {!reducedMotion && <Motes W={w * size} H={room.height * size} color={theme.glow} count={Math.round((w * room.height) / 6)} seed={room.index} kind={environment?.particles} />}
         {flash && <Flash key={`fl${seq}`} color={flash} seq={seq} />}
         <Darkness visible={!!dark} cx={(colOf(w, state.player) + 0.5) * size} cy={(rowOf(w, state.player) + 0.5) * size} w={w * size} h={room.height * size} size={size} reduced={reducedMotion} />
         {dark &&
