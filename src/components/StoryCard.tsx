@@ -1,5 +1,6 @@
 // Full-screen story card: shows a sequence of beats one at a time. Tap anywhere to advance.
-// With voiceover on, each beat is read aloud as it appears.
+// With voiceover on, each beat is read aloud as it appears. The speaker's animated portrait
+// sits on top and comes alive while its line plays; the newest line types itself out.
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
@@ -9,8 +10,11 @@ import { voice } from '../services/audio/voice';
 import { useApp } from '../state/useApp';
 import { colors, radius, space } from '../theme/theme';
 import { Ambient } from './Ambient';
-import { PlayerGlyph } from './board/glyphs';
 import { Icon } from './Icon';
+import type { StoryScene } from '../services/story/storyScenes';
+import { CinematicStory } from './story/CinematicStory';
+import { Portrait } from './story/Portrait';
+import { useVoiceSpeaking } from './story/useVoiceSpeaking';
 import { Button } from './ui';
 
 export const SPEAKER: Record<StoryBeat['speaker'], { name: string; color: string }> = {
@@ -31,22 +35,47 @@ export function ListenButton({ beat, color }: { beat: StoryBeat; color: string }
 }
 
 /** `listen` adds a replay button; off where the beat already sits inside a pressable. */
-export function BeatView({ beat, compact, listen = true }: { beat: StoryBeat; compact?: boolean; listen?: boolean }) {
+export function BeatView({ beat, compact, listen = true, typed }: { beat: StoryBeat; compact?: boolean; listen?: boolean; typed?: boolean }) {
   const sp = SPEAKER[beat.speaker];
+  const text = useTyped(beat.text, !!typed);
   return (
     <View style={[styles.beat, compact && styles.beatCompact, { borderLeftColor: sp.color }]}>
       <View style={styles.speakerRow}>
         <Text style={[styles.speaker, { color: sp.color }]}>{beat.source ? `${sp.name} · ${beat.source}` : sp.name}</Text>
         {listen && <ListenButton beat={beat} color={sp.color} />}
       </View>
-      <Text style={[compact ? styles.textCompact : styles.text, beat.speaker === 'LOG' && styles.logText]}>{beat.text}</Text>
+      <Text style={[compact ? styles.textCompact : styles.text, beat.speaker === 'LOG' && styles.logText]} accessibilityLabel={beat.text}>
+        {text}
+      </Text>
     </View>
   );
 }
 
-export function StoryCard({ kicker, title, beats, onDone }: { kicker: string; title: string; beats: readonly StoryBeat[]; onDone: () => void }) {
+/** Types `text` out at a reading pace when `on`; otherwise returns it whole. */
+function useTyped(text: string, on: boolean): string {
+  const [n, setN] = useState(on ? 0 : text.length);
+  useEffect(() => {
+    if (!on) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restart the typewriter for a new line
+    setN(0);
+    const t = setInterval(() => setN((k) => (k >= text.length ? (clearInterval(t), k) : k + 1)), 40);
+    return () => clearInterval(t);
+  }, [text, on]);
+  return on ? text.slice(0, n) : text;
+}
+
+/** With `scenes` (one illustration per beat) the card plays as a cinematic; otherwise it lists the beats. */
+export function StoryCard(props: { kicker: string; title: string; beats: readonly StoryBeat[]; scenes?: readonly (StoryScene | undefined)[]; onDone: () => void }) {
+  if (props.scenes?.some((s) => s !== undefined)) return <CinematicStory {...props} scenes={props.scenes} />;
+  return <BeatList {...props} />;
+}
+
+function BeatList({ kicker, title, beats, onDone }: { kicker: string; title: string; beats: readonly StoryBeat[]; onDone: () => void }) {
   const insets = useSafeAreaInsets();
+  const reduced = useApp((st) => st.save.settings.reducedMotion);
+  const speaking = useVoiceSpeaking();
   const [shown, setShown] = useState(1);
+  const current = beats[shown - 1];
   const done = shown >= beats.length;
   const finish = () => {
     voice.stop();
@@ -64,9 +93,11 @@ export function StoryCard({ kicker, title, beats, onDone }: { kicker: string; ti
       <Ambient color={colors.cyan} cy={0.3} strength={0.14} />
       <Pressable style={styles.fill} onPress={advance} accessibilityRole="button" accessibilityLabel={done ? 'Begin' : 'Next'}>
         <View style={styles.scan} pointerEvents="none" />
-        <View style={styles.emblem}>
-          <PlayerGlyph s={72} color={colors.cyan} shape="circle" />
-        </View>
+        {current && (
+          <Animated.View key={current.speaker} entering={reduced ? undefined : FadeIn.duration(250)} style={styles.emblem}>
+            <Portrait speaker={current.speaker} speaking={speaking} reduced={reduced} />
+          </Animated.View>
+        )}
         <Text style={styles.kicker}>{kicker}</Text>
         <Text style={styles.title} accessibilityRole="header">
           {title}
@@ -74,7 +105,7 @@ export function StoryCard({ kicker, title, beats, onDone }: { kicker: string; ti
         <View style={styles.beats}>
           {beats.slice(0, shown).map((b, i) => (
             <Animated.View key={i} entering={FadeInDown.duration(350)}>
-              <BeatView beat={b} listen={false} />
+              <BeatView beat={b} listen={false} typed={!reduced && i === shown - 1} />
             </Animated.View>
           ))}
         </View>
