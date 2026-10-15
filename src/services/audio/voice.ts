@@ -57,6 +57,7 @@ export class VoiceOver {
   private safety: ReturnType<typeof setTimeout> | null = null;
   private voices: Partial<Record<Speaker, string>> = {};
   private voicesLoaded: Promise<void> | null = null;
+  private listeners = new Set<(speaking: boolean) => void>();
 
   constructor(
     private engine: Engine = Speech,
@@ -80,6 +81,18 @@ export class VoiceOver {
 
   get isSpeaking() {
     return this.speaking;
+  }
+
+  /** Runs whenever a line starts or stops playing. Returns an unsubscribe function. */
+  onSpeakingChange(fn: (speaking: boolean) => void): () => void {
+    this.listeners.add(fn);
+    return () => this.listeners.delete(fn);
+  }
+
+  private setSpeaking(on: boolean) {
+    if (this.speaking === on) return;
+    this.speaking = on;
+    this.listeners.forEach((fn) => fn(on));
   }
 
   setAppActive(active: boolean) {
@@ -126,13 +139,13 @@ export class VoiceOver {
     const end = () => {
       if (id !== this.token) return;
       this.token++;
-      this.speaking = false;
+      this.setSpeaking(false);
       this.pending = null;
       this.clearPlayback();
       sound.duck(false);
       onEnd?.(true);
     };
-    this.speaking = true;
+    this.setSpeaking(true);
     this.pending = onEnd ?? null;
     sound.duck(true);
     const clip = this.clips[voiceKey(who, key ?? text)];
@@ -182,7 +195,7 @@ export class VoiceOver {
     const pending = this.pending;
     // Invalidate the old line first so a late onStopped cannot end the next one.
     this.token++;
-    this.speaking = false;
+    this.setSpeaking(false);
     this.pending = null;
     if (!wasSpeaking) return;
     this.clearPlayback();
