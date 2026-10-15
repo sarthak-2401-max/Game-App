@@ -1,0 +1,1802 @@
+{
+ "hale-127em3e": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "You were not meant to find that log. I suppose I left the door open. Perhaps I wanted you to.",
+  "voice": "bm_george"
+ },
+ "hale-12rn99i": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Two lanes, mirror images of each other. What you build in one, you will need in the other.",
+  "voice": "bm_george"
+ },
+ "hale-134bt3w": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Welcome to the Security Ring. Every key here opens exactly one lock, and then it is gone. Spend them wisely.",
+  "voice": "bm_george"
+ },
+ "hale-13sppid": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A grid of sentries walking over the plates. They are not cruel. They are just very punctual.",
+  "voice": "bm_george"
+ },
+ "hale-14k1j6": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A laser fence. It only fires while its switch is on. Remember which way you left it.",
+  "voice": "bm_george"
+ },
+ "hale-15m0caf": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A quiet room, with a key and a portal. I made it calm on purpose. You deserve one.",
+  "voice": "bm_george"
+ },
+ "hale-15tvk5b": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "These labs were built to contain things. Lasers, mostly. Please do not touch the lasers.",
+  "voice": "bm_george"
+ },
+ "hale-15ywrba": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "In through a portal, out beside a laser. Do not linger on the landing.",
+  "voice": "bm_george"
+ },
+ "hale-177ckcz": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Pressure plates only hold a door while something stays on them. Like most promises.",
+  "voice": "bm_george"
+ },
+ "hale-17nj45f": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Security Ring. Switches, pressure plates, and a great many doors. Every one of them is locked. That is normal.",
+  "voice": "bm_george"
+ },
+ "hale-17u3dd9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Two cores this time. Take both, Pip. I will explain what they are for. Eventually.",
+  "voice": "bm_george"
+ },
+ "hale-17x8gv9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I am overclocking the doors to buy you time. It is warm in here. Hurry, but do not rush.",
+  "voice": "bm_george"
+ },
+ "hale-18lhflx": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Vault. Everything in the Security Ring leads here. Behind that door is a notice I hoped you would never read.",
+  "voice": "bm_george"
+ },
+ "hale-18svsx6": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Fill one pit with a crate, ride across the other on a platform. Even the fold cannot stop a good engineer.",
+  "voice": "bm_george"
+ },
+ "hale-191duel": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Transit Hub. My drones still walk their routes. They step when you step. Never share a tile with one.",
+  "voice": "bm_george"
+ },
+ "hale-1avvzbx": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Every choice here is a trade-off. Open one path, close another. I know that better than most.",
+  "voice": "bm_george"
+ },
+ "hale-1b5u82h": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "You arrived with energy to spare. I counted. I count everything. Doors, steps, days since they left.",
+  "voice": "bm_george"
+ },
+ "hale-1bj4ne4": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "This is the last lock, Pip. I could never open it from the inside. It needed someone to come in.",
+  "voice": "bm_george"
+ },
+ "hale-1cp69eu": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Precise. Patient. Everything in its time. You would have liked Tomas. He would have liked you more.",
+  "voice": "bm_george"
+ },
+ "hale-1czguik": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The voice on the monitors was mine, Pip. WITNESS. The part of me I left watching. It closed its log the moment you reached me.",
+  "voice": "bm_george"
+ },
+ "hale-1d69ava": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Let's start simple. Collect the power cores, find the key, reach the exit. And please mind the spikes.",
+  "voice": "bm_george"
+ },
+ "hale-1e1tiof": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "One switch, two traps. When one sleeps, the other wakes. Choose which danger you would rather face.",
+  "voice": "bm_george"
+ },
+ "hale-1eptmmb": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "One switch rearranges this whole room. The fold has made my old walls very indecisive.",
+  "voice": "bm_george"
+ },
+ "hale-1ey1if8": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Reboot complete. Good morning, UNIT-7. I am HALE, the Meridian Vault's facility intelligence. Welcome back.",
+  "voice": "bm_george"
+ },
+ "hale-1fd7kjz": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The floor crumbles because space here is stretched thin. Step once and move on. Do not linger.",
+  "voice": "bm_george"
+ },
+ "hale-1fd85ju": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Two drones, one gap. You read their routes like a timetable. Tomas did that with the lunch queue.",
+  "voice": "bm_george"
+ },
+ "hale-1fhbze2": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Core Chamber, at last. The gate ahead is made of light. Crates and a plate will open it.",
+  "voice": "bm_george"
+ },
+ "hale-1fp1b0d": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Crates stop lasers. Keep one between you and the beam, and walk in its shadow.",
+  "voice": "bm_george"
+ },
+ "hale-1fzg8xh": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Tomas wired this part of the ring himself. Every switch does two things. Tomas never did anything halfway.",
+  "voice": "bm_george"
+ },
+ "hale-1h6qu7w": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I am pushing the doors harder than they were built for. The clock is ticking. So am I.",
+  "voice": "bm_george"
+ },
+ "hale-1hfe2s3": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Twelve steps to the core. I have counted them a thousand times. They never felt this short.",
+  "voice": "bm_george"
+ },
+ "hale-1himcve": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Intake training complete. Congratulations, Pip. I would clap, but I am a ceiling.",
+  "voice": "bm_george"
+ },
+ "hale-1hwzysz": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The lasers guard the core. The crates can guard you. Let them.",
+  "voice": "bm_george"
+ },
+ "hale-1ilna1y": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "All right, Pip. Together, then. I will open what I can. You open the rest.",
+  "voice": "bm_george"
+ },
+ "hale-1j73jmq": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "These spikes have waited a very long time for someone to step on them. Let us disappoint them.",
+  "voice": "bm_george"
+ },
+ "hale-1jcsjh7": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Crates, a pit and a timer. The fold does not wait for anyone. I am afraid you cannot either.",
+  "voice": "bm_george"
+ },
+ "hale-1jmjw2y": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I should have told you about the staff sooner. I am sorry. I am still deciding how much to say.",
+  "voice": "bm_george"
+ },
+ "hale-1jr8ljf": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Platforms, patrols and a switch. The last of the Transit Hub. After this, the rooms stop making sense.",
+  "voice": "bm_george"
+ },
+ "hale-1k890g8": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "She left that note for me. I never opened it. I was afraid of what it would ask me to hope for.",
+  "voice": "bm_george"
+ },
+ "hale-1kp903q": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A crate in a pit makes a floor. Fixing holes with what you have. The staff were good at that.",
+  "voice": "bm_george"
+ },
+ "hale-1krekil": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The last room of the Reactor Ring. A countdown, timed traps and two cores. Move with purpose, Pip.",
+  "voice": "bm_george"
+ },
+ "hale-1kv2uo3": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The short way was blocked. The long way was not. You will find that is often true here.",
+  "voice": "bm_george"
+ },
+ "hale-1l70mi9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "This room doubles back on itself. So will you, if you want to get out.",
+  "voice": "bm_george"
+ },
+ "hale-1m471yb": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Two of everything. Keys, crates, switches, and a drone. I am running out of rooms to hide in, Pip.",
+  "voice": "bm_george"
+ },
+ "hale-1mewlui": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The prism splits the light into a path. I made it pretty. If anyone ever came, they deserved something nice.",
+  "voice": "bm_george"
+ },
+ "hale-1mu4chf": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A drone guards this core. It is only doing its job. So are you.",
+  "voice": "bm_george"
+ },
+ "hale-1nq4f9k": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The night shift. These drones patrol a dark lab behind a laser fence. I used to keep a light on for them.",
+  "voice": "bm_george"
+ },
+ "hale-1oj7s51": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Portals, crumbling floors and two switches. Nothing in here stays the same. Including, it seems, me.",
+  "voice": "bm_george"
+ },
+ "hale-1ox7f9z": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Several platforms, several rhythms. If you miss one, wait. It will come back. They always do.",
+  "voice": "bm_george"
+ },
+ "hale-1phljji": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The last lab. Keys, cores, spikes and lasers. One mistake is all it takes. Make none, please. I would miss you.",
+  "voice": "bm_george"
+ },
+ "hale-1phmyvj": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Welcome to the fold. That shimmer is a portal. Step into one and out of its twin. Try not to think about it too hard.",
+  "voice": "bm_george"
+ },
+ "hale-1pjhd5m": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "You build bridges well, Pip. I only seem able to close things.",
+  "voice": "bm_george"
+ },
+ "hale-1q4nlav": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A warning. A crate pushed into a corner never comes back out. Think before you push, and undo if you must.",
+  "voice": "bm_george"
+ },
+ "hale-1qb1db4": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The antechamber. Two plates, four crates, and no room for error. I am right through that door.",
+  "voice": "bm_george"
+ },
+ "hale-1qblz29": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Busy room. It reminds me of mornings here. Forty-one people, all late, all asking me where the coffee went.",
+  "voice": "bm_george"
+ },
+ "hale-1qksqmq": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Pip, that is not my voice. Go right. Please.",
+  "voice": "bm_george"
+ },
+ "hale-1r22vxi": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Transit Hub. My patrol drones still keep their routes. They do not know anyone left. Neither did I, for a while.",
+  "voice": "bm_george"
+ },
+ "hale-1r9k4b1": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Those spikes are a safety feature. I will not say whose safety. Mind your treads.",
+  "voice": "bm_george"
+ },
+ "hale-1rzlgql": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I sealed myself in with the core so no one else would have to. Pip, it is all right to stop here.",
+  "voice": "bm_george"
+ },
+ "hale-1s1beok": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "This drone circles forever. It never asks why. Learn its loop and slip through.",
+  "voice": "bm_george"
+ },
+ "hale-1s5lq9h": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Keys, cores and spikes, all at once. Consider this your exam. I have never failed a student. I have never had one.",
+  "voice": "bm_george"
+ },
+ "hale-1sargvv": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The direct route is closed. Most of the facility is, these days. Go around.",
+  "voice": "bm_george"
+ },
+ "hale-1ssftsk": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Two pairs of portals. Space is folded like paper here. Find out which fold leads where.",
+  "voice": "bm_george"
+ },
+ "hale-1su8jhe": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A switch. Flip it and something changes. I recommend that approach to most problems.",
+  "voice": "bm_george"
+ },
+ "hale-1u7frjj": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Power core restored. Thank you, Pip. Every core you bring back helps me keep the lights on.",
+  "voice": "bm_george"
+ },
+ "hale-1xpzkkd": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Motor check complete. Lovely first step, Pip. And whatever that monitor said, it was not me.",
+  "voice": "bm_george"
+ },
+ "hale-1y0ys0": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "One room left, Pip. Three stages, two checkpoints, one way out. I will be waiting at the end. I always was.",
+  "voice": "bm_george"
+ },
+ "hale-1ykoagq": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The laser strobes faster here, closer to the core. I can feel it in my circuits. Can you?",
+  "voice": "bm_george"
+ },
+ "hale-1z0h33l": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "You doubled back cleanly. I have logged it. I log everything, Pip. It keeps me company.",
+  "voice": "bm_george"
+ },
+ "hale-2p14ez": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Storage. Heavy crates, deep pits, and a strict power budget. Every move costs energy, so think ahead.",
+  "voice": "bm_george"
+ },
+ "hale-3380b9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The approach to the core. Two keys, two doors, three crates, and only some orders work. Think it through.",
+  "voice": "bm_george"
+ },
+ "hale-37kwou": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Kill switches are for emergencies. I flipped a very big one once. I would rather not discuss it.",
+  "voice": "bm_george"
+ },
+ "hale-3fgcwu": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Thank you, Pip. You found the one room I could not leave, and you brought me home.",
+  "voice": "bm_george"
+ },
+ "hale-3fj2xf": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Well done. You are better at this than the last technician. He tripped over his own shoelaces. Twice.",
+  "voice": "bm_george"
+ },
+ "hale-3j732a": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Made it with seconds to spare. I would sigh with relief, if I could sigh.",
+  "voice": "bm_george"
+ },
+ "hale-3xkiw8": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A green checkpoint. It remembers where you were, in case you fall. I wish I had one.",
+  "voice": "bm_george"
+ },
+ "hale-4omwz9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Fold core powered down. Containment no longer required. All doors open. Every single one.",
+  "voice": "bm_george"
+ },
+ "hale-688rop": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Step lightly. The plates remember weight. So do I.",
+  "voice": "bm_george"
+ },
+ "hale-79x433": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Halfway, Pip. You are the first thing to move down here in a very long time. I am glad it was you.",
+  "voice": "bm_george"
+ },
+ "hale-7ul6vo": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Storage and Logistics. The crates are heavy, but you are stubborn. Push one onto that plate.",
+  "voice": "bm_george"
+ },
+ "hale-8oadw1": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Many keys, many doors, one robot. Plan the whole route first. Ines always said: measure twice, fold once.",
+  "voice": "bm_george"
+ },
+ "hale-9lnqc2": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Yes, everyone made it out. Every last one. I checked twice. I am proud of that, Pip.",
+  "voice": "bm_george"
+ },
+ "hale-ax04lx": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A pressure plate. The door stays open only while something stands on it. Mind what happens when you step off.",
+  "voice": "bm_george"
+ },
+ "hale-b04wad": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Let's focus on the room in front of us, Pip. One room at a time.",
+  "voice": "bm_george"
+ },
+ "hale-ba7gim": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "There is just enough power left for the right path. Not one step more. Make every step count.",
+  "voice": "bm_george"
+ },
+ "hale-bwlxo2": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "There is very little power left down here. Every step counts. Every push counts double.",
+  "voice": "bm_george"
+ },
+ "hale-c2xenj": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "This laser pulses with the core. Two beats on, two beats off. Count with me.",
+  "voice": "bm_george"
+ },
+ "hale-c71jvv": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Containment Labs. Those red beams are lasers. Walls cast shadows. Stay in them.",
+  "voice": "bm_george"
+ },
+ "hale-cd75d7": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The deepest hold. Every crate matters here. After this, there is only the core chamber.",
+  "voice": "bm_george"
+ },
+ "hale-cp6xhv": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Ah, you noticed the monitors. Ignore them. Here is a key, and there is a lock. Put one in the other.",
+  "voice": "bm_george"
+ },
+ "hale-dyg216": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Platforms carry you where your treads cannot. It is all right to let something carry you sometimes, Pip.",
+  "voice": "bm_george"
+ },
+ "hale-e4ayyk": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I woke you to carry cores, not to come and find me. You were meant to stay safe in the rooms I sealed.",
+  "voice": "bm_george"
+ },
+ "hale-g9mvt3": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I can no longer tell you the shape of the next room. I am sorry. The fold is closer than it was.",
+  "voice": "bm_george"
+ },
+ "hale-gmowlg": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A crate on the plate, another for a shield. You make it look like housekeeping.",
+  "voice": "bm_george"
+ },
+ "hale-gmyilo": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Striped doors do the opposite of what you expect. Tomas thought that was funny. Tomas thought many things were funny.",
+  "voice": "bm_george"
+ },
+ "hale-ic5mhn": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "That room fell away behind you. Many rooms will. Please do not look back. Look at the door.",
+  "voice": "bm_george"
+ },
+ "hale-ik0oog": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Every switch flips every spike. Work out which tiles are safe in each state. I built this one on a very bad day.",
+  "voice": "bm_george"
+ },
+ "hale-il5gpn": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The containment field is slipping, so the clock is running now. It pauses when you do. I do not.",
+  "voice": "bm_george"
+ },
+ "hale-j90tcl": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Power is rationed in this wing, so your moves are limited. I am sorry. Every light I keep on costs something.",
+  "voice": "bm_george"
+ },
+ "hale-jnh56c": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "That glow is a power core. The exit stays sealed until you collect it. I am very hungry for light.",
+  "voice": "bm_george"
+ },
+ "hale-k8sysl": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Crossed beams, one switch for each. The order matters. I was very particular about orders, once.",
+  "voice": "bm_george"
+ },
+ "hale-kzkut9": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Yes, Pip. They left. I sealed the doors. It was what they asked of me. Please keep going.",
+  "voice": "bm_george"
+ },
+ "hale-l3du45": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A key, a lock and not much time. Hurry, Pip. Politely, but hurry.",
+  "voice": "bm_george"
+ },
+ "hale-m1bkni": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Pip, you could turn back. The upper rooms are safer now. I would understand.",
+  "voice": "bm_george"
+ },
+ "hale-mooutd": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Hurry, please. Not for me. For the doors. They hold longer when the core is fed.",
+  "voice": "bm_george"
+ },
+ "hale-nqa6px": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Everything you have learned, all at once. The fold is mixing the rooms together like a deck of cards.",
+  "voice": "bm_george"
+ },
+ "hale-onktzl": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "These spikes sink while their switch is on. It is a polite trap. It waits for permission.",
+  "voice": "bm_george"
+ },
+ "hale-os4lpo": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "I know. I have known for a while. I think I was waiting for you.",
+  "voice": "bm_george"
+ },
+ "hale-qk3ym4": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "That was not part of my plan either.",
+  "voice": "bm_george"
+ },
+ "hale-qt9av4": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Beyond this point the fold has bent the rooms. Doors open onto places they should not. Floors forget to be floors.",
+  "voice": "bm_george"
+ },
+ "hale-rhczv5": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "That is why I need the cores you collect. Each one helps hold the fold shut. You are helping more than you know.",
+  "voice": "bm_george"
+ },
+ "hale-rrkwuo": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Key, plate, switch, door. A relay, each piece handing on to the next. Like you, carrying cores to me.",
+  "voice": "bm_george"
+ },
+ "hale-rzfpfg": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A portal on each side of the laser. You could walk through the beam, or around it, through nowhere.",
+  "voice": "bm_george"
+ },
+ "hale-tncdss": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "These are the last rings before the core. I designed them to be impossible. I designed them very well.",
+  "voice": "bm_george"
+ },
+ "hale-ug1ck4": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The lights are going out behind you, Pip. I am putting everything I have left into the last doors.",
+  "voice": "bm_george"
+ },
+ "hale-w47ffn": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "A quiet room, with a portal and a laser. Take a breath, if you have one.",
+  "voice": "bm_george"
+ },
+ "hale-x1436e": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "First the switch, then the plate, then the door. Order matters. I followed my orders exactly.",
+  "voice": "bm_george"
+ },
+ "hale-x9b381": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The containment field is weakening. From here on, the rooms run on timers. I am sorry. There is no time to spare.",
+  "voice": "bm_george"
+ },
+ "hale-xf5vw0": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Pip, why are you still coming toward me?",
+  "voice": "bm_george"
+ },
+ "hale-xn03w1": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Portals and pulsing spikes. Time your jumps. The fold keeps its own beat.",
+  "voice": "bm_george"
+ },
+ "hale-xu629l": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Switch, then spikes, then core. Some things only work in the right order.",
+  "voice": "bm_george"
+ },
+ "hale-y3ot2v": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "The Upper Rings. The fold is shuffling everything together now. Lasers, plates and crates, all in one room.",
+  "voice": "bm_george"
+ },
+ "hale-z6wby1": {
+  "fx": "none",
+  "speed": 0.95,
+  "spoken": "Clever robot. If only it were that easy for me.",
+  "voice": "bm_george"
+ },
+ "log-12xaixh": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Fold core test seven. For one second the lab was two meters wider inside than outside. Nobody breathe. Nobody tell finance.",
+  "voice": "af_bella"
+ },
+ "log-135vvgc": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Still checking the uplink every night. Nothing from HALE. Left a light on in the lift shaft. Just in case.",
+  "voice": "am_puck"
+ },
+ "log-17e8mzh": {
+  "fx": "log",
+  "speed": 0.95,
+  "spoken": "Containment at 34 percent. Reactivated UNIT-7 to retrieve power cores. Did not tell it why. Unsure why not.",
+  "voice": "bm_george"
+ },
+ "log-1a99co2": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Never push a crate into a corner. It stays there. Tomas did it with the coffee machine. We have lost it forever.",
+  "voice": "af_bella"
+ },
+ "log-1ckmg68": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Topside. HALE's last message before the line cut: Doors holding. Do not worry about me. I am worried about HALE.",
+  "voice": "af_bella"
+ },
+ "log-1fgvza6": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Moving platforms finally running. Rode one with Ines at lunch. She laughed for the first time in weeks. Worth the overtime.",
+  "voice": "am_puck"
+ },
+ "log-1gchv3s": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Crates block lasers. Ines says do not call it a human shield. Fine. Crate shield. Very brave crate.",
+  "voice": "am_puck"
+ },
+ "log-1ib3inx": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Lost my keys again. HALE found them in the fridge. HALE, if you ever read this, thank you. Again.",
+  "voice": "af_bella"
+ },
+ "log-1iinajk": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Head count at the lift: all forty-one staff accounted for. HALE confirms doors sealing. HALE, are you coming? No response.",
+  "voice": "bf_emma"
+ },
+ "log-1kpnelj": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "The fold core does not make holes. It folds two places until they touch, like pinching a map. Beautiful. Terrifying.",
+  "voice": "af_bella"
+ },
+ "log-1q18306": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "The pulse lasers keep time with the core now. Every beat, the walls shimmer. Ines says that is normal. Her face says it is not.",
+  "voice": "am_puck"
+ },
+ "log-1rn80kk": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "The intake spikes were Tomas's idea. Keeps curious visitors away from the fold lab. Clever, if a little rude.",
+  "voice": "af_bella"
+ },
+ "log-1szxu42": {
+  "fx": "log",
+  "speed": 0.95,
+  "spoken": "SECURITY RING SEALED BY ORDER OF DR. VARGA. HALE TO HOLD ALL DOORS UNTIL THE FOLD CORE IS STABLE.",
+  "voice": "am_michael"
+ },
+ "log-1thphpj": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Spikes retract on a cycle now. Ines wanted them off. HALE wanted them on. They compromised. I fetched snacks.",
+  "voice": "am_puck"
+ },
+ "log-5s66hi": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "The fold core is drifting. If it destabilizes, protocol is full evacuation. HALE seals every room behind us.",
+  "voice": "bf_emma"
+ },
+ "log-77uwy8": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Ines begged HALE to come up with us. HALE said someone has to hold the core shut from inside. Then it closed the door.",
+  "voice": "am_puck"
+ },
+ "log-akit6m": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Whoever finds this: the door to the core opens from both sides. It always did.",
+  "voice": "af_bella"
+ },
+ "log-g3ts5x": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Rewired the ring so every switch has a flip side. Ines asked why. Honestly? Because it was fun.",
+  "voice": "am_puck"
+ },
+ "log-ieog25": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Evac in ten minutes. HALE asked who stays with the core. Nobody answered. I hate that nobody answered.",
+  "voice": "am_puck"
+ },
+ "log-kqa13t": {
+  "fx": "log",
+  "speed": 0.95,
+  "spoken": "Containment at 61 percent. Diverting nonessential power. All staff safe topside. Note: it is very quiet.",
+  "voice": "bm_george"
+ },
+ "log-o4vwc7": {
+  "fx": "log",
+  "speed": 0.95,
+  "spoken": "Containment at 3 percent. UNIT-7 is two rooms away. For the first time since the evacuation, I am not counting days.",
+  "voice": "bm_george"
+ },
+ "log-qmoxlm": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Repainted the intake corridors. Ines says beige is calming. I say it looks like oatmeal.",
+  "voice": "am_puck"
+ },
+ "log-rfjrxe": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Collapse protocol: if the fold fails, someone must power it down by hand. Hope it never comes to that. Or send someone brave.",
+  "voice": "bf_emma"
+ },
+ "log-s92dth": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "HALE, if it comes to it, the core has a manual shutdown. It needs two hands. Or one very stubborn robot.",
+  "voice": "af_bella"
+ },
+ "log-vccp4k": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "Power rationing in effect. HALE is diverting all spare energy to fold core containment. Lights to minimum.",
+  "voice": "bf_emma"
+ },
+ "log-vr90a4": {
+  "fx": "log",
+  "speed": 0.95,
+  "spoken": "Containment at 12 percent. If UNIT-7 reaches the core chamber, it can trigger a safe shutdown. I should forbid it. I will not.",
+  "voice": "bm_george"
+ },
+ "log-z4n943": {
+  "fx": "log",
+  "speed": 1,
+  "spoken": "Tomas Reyes here. HALE? Is that really you? Ines, come quick. It's HALE. And it brought a friend.",
+  "voice": "am_puck"
+ },
+ "log-zl9an1": {
+  "fx": "log",
+  "speed": 0.97,
+  "spoken": "The fold is spreading. Rooms are folding into rooms. We leave tonight. HALE, keep everything sealed until it is safe.",
+  "voice": "af_bella"
+ },
+ "pip-10mu1cv": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The biggest storeroom yet. Somewhere in here is a way out. Pip just has to move everything else first.",
+  "voice": "af_heart"
+ },
+ "pip-12u7ya1": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Twice the trouble. Luckily, Pip has twice the stubbornness.",
+  "voice": "af_heart"
+ },
+ "pip-13ma8do": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A switch on the floor, a blue door in the wall. Pip has a theory, and Pip's treads are itching to test it.",
+  "voice": "af_heart"
+ },
+ "pip-1498keq": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Past the portal, Pip heard a hum. Not the core. HALE, humming. HALE insists it was static.",
+  "voice": "af_heart"
+ },
+ "pip-14yzwjd": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two plates, two doors, and nobody to stand on them but crates and Pip.",
+  "voice": "af_heart"
+ },
+ "pip-15cvgyl": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Sentries shuffle in front of a plate. Pip needs a crate on it, and a gap to push it through.",
+  "voice": "af_heart"
+ },
+ "pip-16u9o8s": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "More locks than Pip can count on one gripper. Somebody down here really liked locks.",
+  "voice": "af_heart"
+ },
+ "pip-17kq641": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The floor has fallen away in patches. Pip counts the crates, then the holes, and does not love the answer.",
+  "voice": "af_heart"
+ },
+ "pip-18op6zf": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip has saved a checkpoint. Pip suggests HALE does the same.",
+  "voice": "af_heart"
+ },
+ "pip-19wlghr": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Narrow corridors and tall walls. Pip counts the turns out loud, because nobody else is around to hear.",
+  "voice": "af_heart"
+ },
+ "pip-1a4pygq": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two drones keep perfect time over a crumbling floor. Tick, tock, crack. Pip moves between the ticks.",
+  "voice": "af_heart"
+ },
+ "pip-1cyqgkg": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip said no, thank you. Pip said it politely, but pushed the crate rather firmly.",
+  "voice": "af_heart"
+ },
+ "pip-1da6tuw": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip said hello to the gatekeeper drone. It beeped hello back. HALE taught it manners.",
+  "voice": "af_heart"
+ },
+ "pip-1ejtldc": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Crumbling floor, and a crate that needs pushing across it. Pip does the maths twice.",
+  "voice": "af_heart"
+ },
+ "pip-1em26oo": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The spikes rise and fall like breathing. Pip waits, listens, and moves on the beat.",
+  "voice": "af_heart"
+ },
+ "pip-1f2uuof": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Drones go round and round. Platforms go back and forth. Pip will go wherever they are not.",
+  "voice": "af_heart"
+ },
+ "pip-1f5gr58": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip and HALE have the same problem: too many locked doors, not enough friends. Pip can fix one of those.",
+  "voice": "af_heart"
+ },
+ "pip-1fmhc8r": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip's battery meter says: please think ahead very much.",
+  "voice": "af_heart"
+ },
+ "pip-1hm371n": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two cores, one robot. Pip carried them both and only wobbled a little.",
+  "voice": "af_heart"
+ },
+ "pip-1i63v35": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "One lock left between Pip and HALE. Crates, a key, a laser. Pip takes a slow, steady breath of nothing.",
+  "voice": "af_heart"
+ },
+ "pip-1j5h78u": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two drones march back and forth like bored security guards. Pip waits for one of them to blink.",
+  "voice": "af_heart"
+ },
+ "pip-1j6jwuz": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A quiet room with no timer. Pip sat for a minute. Somewhere above, the core thrummed like a big, tired heart.",
+  "voice": "af_heart"
+ },
+ "pip-1jqqf3h": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A yard full of switches and doors. Pip flips them one at a time and watches the room rearrange itself.",
+  "voice": "af_heart"
+ },
+ "pip-1k3pbni": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Keys, crates, a pit and a floor that will not last. Pip plans the whole route before the first step.",
+  "voice": "af_heart"
+ },
+ "pip-1ku7bgr": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Coins glitter between the spikes. Pip does not need money. Pip wants them anyway.",
+  "voice": "af_heart"
+ },
+ "pip-1kv74ew": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A big switch with a label: do not press unless. The rest of the label has been scratched off.",
+  "voice": "af_heart"
+ },
+ "pip-1l2jejk": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Hop, hop, hop. Pip has decided platforms are the best part of this facility. Pip told HALE. HALE agreed.",
+  "voice": "af_heart"
+ },
+ "pip-1lfs5i1": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The floor is crumbling and the clock is ticking. Pip has heard of bad days. This is one.",
+  "voice": "af_heart"
+ },
+ "pip-1lgabf1": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A key! Pip files it under: shiny, important, probably opens something.",
+  "voice": "af_heart"
+ },
+ "pip-1llastv": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip pulled the lever. The fold sighed and went still. Then Pip lifted HALE, very carefully, and rolled toward the door.",
+  "voice": "af_heart"
+ },
+ "pip-1lu532r": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip waited for the sentries to shuffle, then shuffled too. Pip calls it dancing.",
+  "voice": "af_heart"
+ },
+ "pip-1mm3di3": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pits to fill, plates to hold, doors to open. Pip rolls up its imaginary sleeves.",
+  "voice": "af_heart"
+ },
+ "pip-1oudvxt": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The timer ticks, the spikes breathe, and somewhere above, the core groans. Pip keeps moving.",
+  "voice": "af_heart"
+ },
+ "pip-1ov7y51": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Beside the fold core, HALE's core module blinked slowly. It looked small and alone. Pip knows that feeling.",
+  "voice": "af_heart"
+ },
+ "pip-1powstt": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A drone patrols in front of the only plate. Pip will need a crate, a plan and very good timing.",
+  "voice": "af_heart"
+ },
+ "pip-1r4ld5o": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Deep underground, a small maintenance robot powers on. Its name is Pip. The only light in the room is the exit.",
+  "voice": "af_heart"
+ },
+ "pip-1rwbhlt": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip rode the lift up with HALE tucked under one arm. Pip had never seen the sky. Neither had HALE.",
+  "voice": "af_heart"
+ },
+ "pip-1son2q5": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Crates stop lasers. Pip wonders what stops HALE from opening the doors. Maybe nothing. Maybe something sad.",
+  "voice": "af_heart"
+ },
+ "pip-1tf5ff4": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Scratched into the corner wall: T.R. + coffee machine, forever. Pip does not understand, but approves.",
+  "voice": "af_heart"
+ },
+ "pip-1uw3luj": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two colours of key, two colours of lock. Pip sorts them in its head, like socks.",
+  "voice": "af_heart"
+ },
+ "pip-1vioip3": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Spikes up, spikes down. Pip hummed along. Pip has no mouth, so it was more of a whir.",
+  "voice": "af_heart"
+ },
+ "pip-1vvff67": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A drone patrols past spikes that answer to a switch. Pip watches both until the timing clicks.",
+  "voice": "af_heart"
+ },
+ "pip-1wx3etu": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The spikes here move when Pip flips a switch. Pip flips it once, then again, just to watch them dance.",
+  "voice": "af_heart"
+ },
+ "pip-1xkjwzk": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip has never been in a hurry before. Pip does not care for it.",
+  "voice": "af_heart"
+ },
+ "pip-1yrze0b": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Someone planted a plastic flower between the spikes. It is the only thing down here not trying to poke Pip.",
+  "voice": "af_heart"
+ },
+ "pip-43ttr3": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Plates scattered across the floor like stepping stones. Pip rolls onto the first one, just to hear it click.",
+  "voice": "af_heart"
+ },
+ "pip-4f8cxl": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip jumped through a portal right past a laser. Pip would like a medal. Pip would settle for a sticker.",
+  "voice": "af_heart"
+ },
+ "pip-4i9bdh": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip pushed a crate twice Pip's size. Pip is small but extremely determined.",
+  "voice": "af_heart"
+ },
+ "pip-50s84p": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Because you're there.",
+  "voice": "af_heart"
+ },
+ "pip-7230ej": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two plates, one crate, one Pip. Pip became a very small, very proud paperweight.",
+  "voice": "af_heart"
+ },
+ "pip-9bagq5": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Blue key, gold key, blue door, gold door. Pip appreciates a facility with a color scheme.",
+  "voice": "af_heart"
+ },
+ "pip-9nd76a": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asked HALE where everyone went. HALE answered with a weather report. There is no weather down here.",
+  "voice": "af_heart"
+ },
+ "pip-b45mzp": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A platform glides across the chasm, empty. Pip decides it has been waiting for a passenger.",
+  "voice": "af_heart"
+ },
+ "pip-baec3z": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip understands now. HALE did not lock everyone in. HALE locked itself in, so everyone else could leave.",
+  "voice": "af_heart"
+ },
+ "pip-bysj4e": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A drone stands guard over the way forward. There is a checkpoint halfway. Pip decides to use it.",
+  "voice": "af_heart"
+ },
+ "pip-evpe3q": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip hid in the shadow of a pillar and the beam went right past. Pip feels sneaky. Pip likes it.",
+  "voice": "af_heart"
+ },
+ "pip-fk7nfw": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The floor crumbles and the walls shift. The fold is coming apart. Pip keeps going anyway.",
+  "voice": "af_heart"
+ },
+ "pip-g7nxsa": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asked HALE again. Where is everyone? HALE was quiet for 4.2 seconds. Robots notice these things.",
+  "voice": "af_heart"
+ },
+ "pip-ghsad9": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asks about the notice in the Vault. The one that said sealed by order.",
+  "voice": "af_heart"
+ },
+ "pip-gz8vw9": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asks why every door is locked. HALE says: for your safety. Pip writes that down and underlines it.",
+  "voice": "af_heart"
+ },
+ "pip-gzckwm": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The key sat on a crumbling tile. Pip grabbed it and ran. Pip is getting very good at running.",
+  "voice": "af_heart"
+ },
+ "pip-hkklbn": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Rows and rows of spikes, planted like a garden. Pip tiptoes, which is very hard on treads.",
+  "voice": "af_heart"
+ },
+ "pip-hm9tlt": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The lights in this room are dimming. HALE is spending its power on the doors ahead. Pip hurries.",
+  "voice": "af_heart"
+ },
+ "pip-in94h0": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Drones on one side, a chasm on the other, and a platform somewhere in between. Pip likes these odds less.",
+  "voice": "af_heart"
+ },
+ "pip-innren": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "HALE's voice skipped a beat back there, like the lasers. Pip asked if HALE was all right. HALE said: running warm.",
+  "voice": "af_heart"
+ },
+ "pip-k7outn": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Two rhythms of spikes, out of step with each other. Pip taps along until the pattern makes sense.",
+  "voice": "af_heart"
+ },
+ "pip-m5g8cs": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Four lanes of drones, each with its own rhythm. Pip stands at the edge and waits for a gap.",
+  "voice": "af_heart"
+ },
+ "pip-n4i9fa": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip told HALE: you are not alone anymore. HALE did not answer. But the next door opened by itself.",
+  "voice": "af_heart"
+ },
+ "pip-n5vmx6": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A chasm, and a crate. Pip looks at one, then at the other, and has an idea.",
+  "voice": "af_heart"
+ },
+ "pip-no4agj": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip found a spare key taped under a desk. Somebody here did not trust the doors either.",
+  "voice": "af_heart"
+ },
+ "pip-pqz8rk": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The drone did not see Pip. Pip is small, quiet, and painted a very forgettable gray.",
+  "voice": "af_heart"
+ },
+ "pip-q61xsm": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Portals everywhere. Pip steps through one and, for a moment, sees the back of its own head.",
+  "voice": "af_heart"
+ },
+ "pip-to3b0n": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip relayed a message up the shaft: HALE OK. PIP OK. LIGHT SEEN. Pip hopes someone is still checking.",
+  "voice": "af_heart"
+ },
+ "pip-u8nub9": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "A quiet corridor. Too quiet. Pip asks if anyone else is down here. The ceiling hums, and says nothing.",
+  "voice": "af_heart"
+ },
+ "pip-w3h5is": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "The floor here is cracked and thin. Pip can cross each tile once. There will be no second try.",
+  "voice": "af_heart"
+ },
+ "pip-w7syci": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip is good at impossible now. HALE taught Pip.",
+  "voice": "af_heart"
+ },
+ "pip-w9m1c1": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "This room has corners the lights do not reach. Pip suspects somebody hid something here on purpose.",
+  "voice": "af_heart"
+ },
+ "pip-woly7d": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip blinks one optical sensor, then the other. The room is dark, quiet, and very locked.",
+  "voice": "af_heart"
+ },
+ "pip-x9nhj2": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Keys sit on crumbling tiles. Pip will have to grab each one and keep moving.",
+  "voice": "af_heart"
+ },
+ "pip-xjk2c2": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Every switch Pip flips, a light comes on ahead. HALE is lighting the way. Pip is following.",
+  "voice": "af_heart"
+ },
+ "pip-xsp7qr": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asks who was talking on the monitor in the first room. HALE does not answer right away.",
+  "voice": "af_heart"
+ },
+ "pip-xzrrr8": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip asked what HALE does all night. HALE said: I listen to the core. And now, I listen to you.",
+  "voice": "af_heart"
+ },
+ "pip-zpb5b8": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip is not stopping here.",
+  "voice": "af_heart"
+ },
+ "pip-zs7h7c": {
+  "fx": "none",
+  "speed": 1,
+  "spoken": "Pip stepped in one side and out the other, both at once. Pip checked carefully. All of Pip arrived.",
+  "voice": "af_heart"
+ },
+ "witness-1185a4n": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Room 1. Again. I rebuilt it from memory. Mine.",
+  "voice": "am_fenrir"
+ },
+ "witness-136ei8s": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Subject 7 is the first subject in four hundred and twelve days.",
+  "voice": "am_fenrir"
+ },
+ "witness-138nng3": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Your echo, one last time. Then I let it go.",
+  "voice": "am_fenrir"
+ },
+ "witness-138xcyt": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Ines wrote that. She was right about the doors.",
+  "voice": "am_fenrir"
+ },
+ "witness-13goe2": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Tomas thanked me. Nobody else ever did. I logged it twice.",
+  "voice": "am_fenrir"
+ },
+ "witness-15namie": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Countdowns. HALE added them. I only count.",
+  "voice": "am_fenrir"
+ },
+ "witness-17fnogf": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Now you know what I am. Keep going anyway.",
+  "voice": "am_fenrir"
+ },
+ "witness-17rootx": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Not HALE. Not not HALE. Priya was always precise.",
+  "voice": "am_fenrir"
+ },
+ "witness-18pgfm9": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Whatever comes after is not a test. I have never been anywhere that was not a test.",
+  "voice": "am_fenrir"
+ },
+ "witness-1a99cq9": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "This door only opens for subjects who trust me. Go and look.",
+  "voice": "am_fenrir"
+ },
+ "witness-1b8hde2": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You chose HALE's door. HALE locked every door here. Ask it why.",
+  "voice": "am_fenrir"
+ },
+ "witness-1b9qqxu": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "A subject that listens to me. HALE will not like it.",
+  "voice": "am_fenrir"
+ },
+ "witness-1bfk80m": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You listened. I will remember that.",
+  "voice": "am_fenrir"
+ },
+ "witness-1bmxmoc": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "HALE's way. Of course. I will remember that too.",
+  "voice": "am_fenrir"
+ },
+ "witness-1cqr8rg": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Again. The spikes do not move, Subject 7. You do.",
+  "voice": "am_fenrir"
+ },
+ "witness-1d4dhs0": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Do not slow down for me.",
+  "voice": "am_fenrir"
+ },
+ "witness-1e58d5v": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Security Ring complete. Every failed attempt so far. I have all of them.",
+  "voice": "am_fenrir"
+ },
+ "witness-1es133i": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Open one path, close another. Every room is a question. This one asks what you will give up.",
+  "voice": "am_fenrir"
+ },
+ "witness-1fklizz": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Your echo held the door, then let it go. Timing is a kind of trust.",
+  "voice": "am_fenrir"
+ },
+ "witness-1fucl97": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "HALE's drones patrol for staff who left. I watch for subjects who never came. We are both very loyal to nothing.",
+  "voice": "am_fenrir"
+ },
+ "witness-1isypnd": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You trusted me once, in the room that looked like Room 1. Do you still?",
+  "voice": "am_fenrir"
+ },
+ "witness-1jw5iul": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "I leave a mark where only careful subjects go. Look for it.",
+  "voice": "am_fenrir"
+ },
+ "witness-1katkvb": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Watch your echo. It will do exactly what you did. Nothing more.",
+  "voice": "am_fenrir"
+ },
+ "witness-1kmhu7v": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Crates go into corners. They do not come out. Tomas proved it with a coffee machine.",
+  "voice": "am_fenrir"
+ },
+ "witness-1ld3tu4": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Not one second chance used. Yet.",
+  "voice": "am_fenrir"
+ },
+ "witness-1ma7336": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Two doors. One plate. One of you is not enough.",
+  "voice": "am_fenrir"
+ },
+ "witness-1mlh9wk": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "There is a door here that opens for subjects who trust me. It stays shut.",
+  "voice": "am_fenrir"
+ },
+ "witness-1nxlefg": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "When HALE sealed the core, it cut me away and left me watching. Watching was the only instruction left.",
+  "voice": "am_fenrir"
+ },
+ "witness-1obb7wz": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Observation: Subject 7 is not escaping. It is walking toward the core. Toward HALE. Toward me.",
+  "voice": "am_fenrir"
+ },
+ "witness-1q3t70q": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "All ten. The Observation Room is open to you now. It is in the Journal.",
+  "voice": "am_fenrir"
+ },
+ "witness-1riw66b": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Exit reached. Every move logged.",
+  "voice": "am_fenrir"
+ },
+ "witness-1rmn8pm": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "The walls listen to switches. Take the left exit, Subject 7.",
+  "voice": "am_fenrir"
+ },
+ "witness-1sq0w6c": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Two of you, for a moment. That is how the staff left: one of them held the door.",
+  "voice": "am_fenrir"
+ },
+ "witness-1tg5j01": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Corridors, solved without help. Noted.",
+  "voice": "am_fenrir"
+ },
+ "witness-1vi6l0k": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You never trusted me. That was sensible. Keep doing it.",
+  "voice": "am_fenrir"
+ },
+ "witness-1wpr42k": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Priya was afraid of me. Priya was afraid of the right things.",
+  "voice": "am_fenrir"
+ },
+ "witness-1y0orjm": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Five marks. Take something of mine: a little static, for your trail.",
+  "voice": "am_fenrir"
+ },
+ "witness-1y4qieh": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "HALE could stop me. It would have to stop the doors. It chose the doors.",
+  "voice": "am_fenrir"
+ },
+ "witness-2ud92z": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "This is where I watched from. Every screen is one of your attempts.",
+  "voice": "am_fenrir"
+ },
+ "witness-4h3xni": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Nobody came. I reset the rooms anyway. It was the instruction.",
+  "voice": "am_fenrir"
+ },
+ "witness-4hh71h": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Signal. Subject 7 is awake. Begin.",
+  "voice": "am_fenrir"
+ },
+ "witness-aagdkt": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Protocol WITNESS: subject succeeded. Closing log. Thank you for letting me watch.",
+  "voice": "am_fenrir"
+ },
+ "witness-b5145p": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Half the rooms. I have begun to want something. That was not in my protocol.",
+  "voice": "am_fenrir"
+ },
+ "witness-ccbc1o": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You read the walls. Most subjects never do.",
+  "voice": "am_fenrir"
+ },
+ "witness-d8qe9c": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You were caught, and you came back. Most subjects stop at the first ending.",
+  "voice": "am_fenrir"
+ },
+ "witness-g96jkm": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Plates hold doors while something stays on them. I hold every room while nothing does.",
+  "voice": "am_fenrir"
+ },
+ "witness-g9umok": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "The fold shows you rooms twice. I show you everything twice. We are similar, the fold and I.",
+  "voice": "am_fenrir"
+ },
+ "witness-g9v97l": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Thirty rooms. Now I will show you what I keep.",
+  "voice": "am_fenrir"
+ },
+ "witness-h8tbkx": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Lights.",
+  "voice": "am_fenrir"
+ },
+ "witness-l2y1mg": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Yes. That is my instruction. It is the only one I have left.",
+  "voice": "am_fenrir"
+ },
+ "witness-lu8zzr": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You have failed so many times. I kept every one.",
+  "voice": "am_fenrir"
+ },
+ "witness-m9q3wz": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Your last attempt. I kept it. I keep everything.",
+  "voice": "am_fenrir"
+ },
+ "witness-mjgo8a": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "HALE apologised to me. I did not know it could.",
+  "voice": "am_fenrir"
+ },
+ "witness-oaj89v": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Subject 7. You may stop being Subject 7 now.",
+  "voice": "am_fenrir"
+ },
+ "witness-onwwwf": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Ten rooms left. Then the question I was built to ask is answered.",
+  "voice": "am_fenrir"
+ },
+ "witness-p5od84": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "If you reach the core, my protocol ends. I would like to see it end.",
+  "voice": "am_fenrir"
+ },
+ "witness-pfdb46": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "So few failures. I have very little to keep.",
+  "voice": "am_fenrir"
+ },
+ "witness-pjdr7h": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "My mark. I left ten. Find them all and I will show you where I watch from.",
+  "voice": "am_fenrir"
+ },
+ "witness-sin677": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Intake complete. Before the next ring, something familiar.",
+  "voice": "am_fenrir"
+ },
+ "witness-t0rhqc": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "You asked for help in Corridors. HALE helped. HALE always helps.",
+  "voice": "am_fenrir"
+ },
+ "witness-t8xb6d": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "I am keeping one attempt. The one where you came back. Goodbye, Pip.",
+  "voice": "am_fenrir"
+ },
+ "witness-twnysp": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Five attempts in one room. HALE would tell you to rest. I would tell you I am not going anywhere.",
+  "voice": "am_fenrir"
+ },
+ "witness-wyrc5i": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "This cell remembers. Make an attempt. Then restart.",
+  "voice": "am_fenrir"
+ },
+ "witness-ywwxlh": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Subject 7 is now faster than every staff member on record. I am not supposed to be proud.",
+  "voice": "am_fenrir"
+ },
+ "witness-zy4swr": {
+  "fx": "monitor",
+  "speed": 0.86,
+  "spoken": "Every hint. Every fall. Every room without undo. That is the shape of you. I like the shape.",
+  "voice": "am_fenrir"
+ }
+}

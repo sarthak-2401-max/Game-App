@@ -22,7 +22,7 @@ import { getInterlude, interludeAfter, isInterludeId } from '../game/observer/ro
 import { OBSERVATION_PALETTE } from '../theme/chapters';
 import { memoryView } from '../state/memory';
 import { parFor, starCriteria, starsForWin, type StarCriteria } from '../state/mastery';
-import { clueLabel, useWitness } from './game/useWitness';
+import { clueLabel, useWitness, type SpokenLine } from './game/useWitness';
 import { getPowerUp, POWERUP_TUNING, type PowerUpId } from '../config/powerups';
 import { movesAllowed, remainingCores } from '../game/engine';
 import { neighbor } from '../game/grid';
@@ -77,7 +77,7 @@ interface Result {
   prevStars: number;
   criteria: StarCriteria;
   /** WITNESS's lines for this escape. */
-  witness: string[];
+  witness: SpokenLine[];
   /** Clues found during this visit. */
   found: string[];
 }
@@ -331,16 +331,29 @@ export function GameScreen() {
     if (resultTimer.current) clearTimeout(resultTimer.current);
   }, []);
 
-  // The escape's story beat is read aloud when the result card comes up.
-  const resultBeat = result && session?.kind === 'campaign' ? ROOM_STORY[session.room.index - 1] : undefined;
+  // The result card reads WITNESS's verdict, then the escape's story beat.
   useEffect(() => {
-    if (!resultBeat) return;
-    const t = setTimeout(() => voice.say(resultBeat.text, resultBeat.speaker), reduced ? 0 : 450);
+    if (!result || !session) return;
+    const beat = session.kind === 'campaign' ? ROOM_STORY[session.room.index - 1] : undefined;
+    const lines = [
+      ...result.witness.map((w) => ({ text: w.text, who: 'WITNESS' as const, key: w.voiceKey })),
+      ...(beat ? [{ text: beat.text, who: beat.speaker }] : []),
+    ];
+    const t = setTimeout(() => voice.sayAll(lines), reduced ? 0 : 450);
     return () => {
       clearTimeout(t);
       voice.stop();
     };
-  }, [resultBeat, reduced]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per result card
+  }, [result]);
+
+  // WITNESS comments on a failure.
+  const failLine = failed ? witness.failLine : undefined;
+  useEffect(() => {
+    if (!failLine) return;
+    voice.say(failLine.text, 'WITNESS', undefined, failLine.voiceKey);
+    return () => voice.stop();
+  }, [failLine]);
 
   // ---- Real-time countdown (pauses when paused, backgrounded or a sheet is open) --------------
   const appActive = useRef(true);
@@ -762,7 +775,7 @@ export function GameScreen() {
           <Icon name="flame" size={44} color={colors.danger} />
         </Animated.View>
         <Text style={styles.center}>{cause ? DEATH_TEXT[cause] : 'You failed.'}</Text>
-        {witness.failLine && <WitnessLine text={witness.failLine} />}
+        {witness.failLine && <WitnessLine text={witness.failLine.text} />}
         {room.echo && <Text style={styles.centerDim}>Retry, and this attempt walks beside you as your echo.</Text>}
         <Button label="Retry" variant="primary" icon="restart" onPress={() => { setHintCells(undefined); S().restart(); }} />
         {session.checkpoint && <Button label="Retry from checkpoint" icon="flame" onPress={() => S().fromCheckpoint()} />}
@@ -804,7 +817,7 @@ export function GameScreen() {
                   : ''}
             </Text>
             {result.witness.map((line, i) => (
-              <WitnessLine key={`w${i}`} text={line} />
+              <WitnessLine key={`w${i}`} text={line.text} />
             ))}
             {result.dailyStatus === 'already' && <Text style={styles.centerDim}>You already claimed today’s reward. A new challenge arrives tomorrow.</Text>}
             {result.dailyStatus === 'blocked' && <Text style={styles.centerDim}>Your device clock looks out of sync, so this daily reward can’t be claimed.</Text>}

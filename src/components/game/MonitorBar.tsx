@@ -18,6 +18,8 @@ export interface FeedItem {
   text: string;
   /** For clue items: opens the full clue when tapped. */
   clueId?: string;
+  /** The line as written, when `text` has numbers filled in: finds its recording. */
+  voiceKey?: string;
 }
 
 const MONO = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
@@ -80,9 +82,14 @@ export function MonitorBar({
       setVoiced(false);
       const key = item.key;
       // A cut-off earlier line reports back too: only this line's end counts.
-      voice.say(item.text, item.speaker, () => {
-        if (currentKey.current === key) setVoiced(true);
-      });
+      voice.say(
+        item.text,
+        item.speaker,
+        () => {
+          if (currentKey.current === key) setVoiced(true);
+        },
+        item.voiceKey,
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item?.key]);

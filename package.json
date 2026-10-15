@@ -53,6 +53,7 @@
     "forge": "tsx scripts/forge.ts",
     "assets:icons": "python3 scripts/make-icons.py",
     "assets:audio": "python3 scripts/make-audio.py",
+    "assets:voices": "python3 scripts/make-voices.py",
     "export:web": "expo export --platform web"
   },
   "private": true,
