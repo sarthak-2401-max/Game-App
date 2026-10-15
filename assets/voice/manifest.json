@@ -12,10 +12,13 @@
   "voice": "bm_george"
  },
  "hale-134bt3w": {
+  "direction": "formal welcome, a touch of warning",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Welcome to the Security Ring. Every key here opens exactly one lock, and then it is gone. Spend them wisely.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-13sppid": {
   "fx": "none",
@@ -24,10 +27,13 @@
   "voice": "bm_george"
  },
  "hale-14k1j6": {
+  "direction": "calm, precise",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "A laser fence. It only fires while its switch is on. Remember which way you left it.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-15m0caf": {
   "fx": "none",
@@ -60,10 +66,13 @@
   "voice": "bm_george"
  },
  "hale-17u3dd9": {
+  "direction": "cheerful, with an evasive pause before \"Eventually\"",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Two cores this time. Take both, Pip. I will explain what they are for. Eventually.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-17x8gv9": {
   "fx": "none",
@@ -72,10 +81,13 @@
   "voice": "bm_george"
  },
  "hale-18lhflx": {
+  "direction": "quiet and heavy, reluctant, almost a confession",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The Vault. Everything in the Security Ring leads here. Behind that door is a notice I hoped you would never read.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-18svsx6": {
   "fx": "none",
@@ -126,10 +138,13 @@
   "voice": "bm_george"
  },
  "hale-1e1tiof": {
+  "direction": "thoughtful, a little sad",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "One switch, two traps. When one sleeps, the other wakes. Choose which danger you would rather face.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1eptmmb": {
   "fx": "none",
@@ -162,16 +177,22 @@
   "voice": "bm_george"
  },
  "hale-1fp1b0d": {
+  "direction": "calm, protective",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Crates stop lasers. Keep one between you and the beam, and walk in its shadow.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1fzg8xh": {
+  "direction": "admiring, nostalgic",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Tomas wired this part of the ring himself. Every switch does two things. Tomas never did anything halfway.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1h6qu7w": {
   "fx": "none",
@@ -192,10 +213,13 @@
   "voice": "bm_george"
  },
  "hale-1hwzysz": {
+  "direction": "reassuring, protective",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The lasers guard the core. The crates can guard you. Let them.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1ilna1y": {
   "fx": "none",
@@ -204,16 +228,22 @@
   "voice": "bm_george"
  },
  "hale-1j73jmq": {
+  "direction": "dry, amused, a wink in the voice",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "These spikes have waited a very long time for someone to step on them. Let us disappoint them.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1jcsjh7": {
+  "direction": "tense, apologetic",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Crates, a pit and a timer. The fold does not wait for anyone. I am afraid you cannot either.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1jmjw2y": {
   "fx": "none",
@@ -252,10 +282,13 @@
   "voice": "bm_george"
  },
  "hale-1l70mi9": {
+  "direction": "dry, clever",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "This room doubles back on itself. So will you, if you want to get out.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1m471yb": {
   "fx": "none",
@@ -294,10 +327,13 @@
   "voice": "bm_george"
  },
  "hale-1phljji": {
+  "direction": "tense and earnest, then tender on \"I would miss you\"",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The last lab. Keys, cores, spikes and lasers. One mistake is all it takes. Make none, please. I would miss you.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1phmyvj": {
   "fx": "none",
@@ -312,10 +348,13 @@
   "voice": "bm_george"
  },
  "hale-1q4nlav": {
+  "direction": "firm, serious warning",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "A warning. A crate pushed into a corner never comes back out. Think before you push, and undo if you must.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1qb1db4": {
   "fx": "none",
@@ -330,10 +369,13 @@
   "voice": "bm_george"
  },
  "hale-1qksqmq": {
+  "direction": "whispered, urgent, almost frightened",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-flash-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Pip, that is not my voice. Go right. Please.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1r22vxi": {
   "fx": "none",
@@ -360,16 +402,22 @@
   "voice": "bm_george"
  },
  "hale-1s5lq9h": {
+  "direction": "proud and teasing, then gently wistful on the last sentence",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Keys, cores and spikes, all at once. Consider this your exam. I have never failed a student. I have never had one.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1sargvv": {
+  "direction": "matter-of-fact, a hint of sadness on \"these days\"",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The direct route is closed. Most of the facility is, these days. Go around.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-1ssftsk": {
   "fx": "none",
@@ -474,10 +522,13 @@
   "voice": "bm_george"
  },
  "hale-7ul6vo": {
+  "direction": "encouraging, warm",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Storage and Logistics. The crates are heavy, but you are stubborn. Push one onto that plate.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-8oadw1": {
   "fx": "none",
@@ -492,10 +543,13 @@
   "voice": "bm_george"
  },
  "hale-ax04lx": {
+  "direction": "calm teacher voice, with a soft warning at the end",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "A pressure plate. The door stays open only while something stands on it. Mind what happens when you step off.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-b04wad": {
   "fx": "none",
@@ -510,22 +564,31 @@
   "voice": "bm_george"
  },
  "hale-bwlxo2": {
+  "direction": "strained, worried",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "There is very little power left down here. Every step counts. Every push counts double.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-c2xenj": {
+  "direction": "counting calmly, slightly hypnotic",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "This laser pulses with the core. Two beats on, two beats off. Count with me.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-c71jvv": {
+  "direction": "serious and low, careful instructions",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The Containment Labs. Those red beams are lasers. Walls cast shadows. Stay in them.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-cd75d7": {
   "fx": "none",
@@ -534,10 +597,13 @@
   "voice": "bm_george"
  },
  "hale-cp6xhv": {
+  "direction": "breezy, a little too quick to change the subject",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Ah, you noticed the monitors. Ignore them. Here is a key, and there is a lock. Put one in the other.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-dyg216": {
   "fx": "none",
@@ -564,10 +630,13 @@
   "voice": "bm_george"
  },
  "hale-gmyilo": {
+  "direction": "fond and amused remembering Tomas",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Striped doors do the opposite of what you expect. Tomas thought that was funny. Tomas thought many things were funny.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-ic5mhn": {
   "fx": "none",
@@ -582,28 +651,40 @@
   "voice": "bm_george"
  },
  "hale-il5gpn": {
+  "direction": "urgent but controlled, a cold edge on \"I do not\"",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "The containment field is slipping, so the clock is running now. It pauses when you do. I do not.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-j90tcl": {
+  "direction": "apologetic, tired",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Power is rationed in this wing, so your moves are limited. I am sorry. Every light I keep on costs something.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-jnh56c": {
+  "direction": "pleased, then an odd, hungry note on the last sentence",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "That glow is a power core. The exit stays sealed until you collect it. I am very hungry for light.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-k8sysl": {
+  "direction": "measured, with a guilty catch on \"once\"",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Crossed beams, one switch for each. The order matters. I was very particular about orders, once.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-kzkut9": {
   "fx": "none",
@@ -612,10 +693,13 @@
   "voice": "bm_george"
  },
  "hale-l3du45": {
+  "direction": "urgent and polite at once, slightly comic",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "A key, a lock and not much time. Hurry, Pip. Politely, but hurry.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-m1bkni": {
   "fx": "none",
@@ -636,10 +720,13 @@
   "voice": "bm_george"
  },
  "hale-onktzl": {
+  "direction": "dry, wry",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "These spikes sink while their switch is on. It is a polite trap. It waits for permission.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-os4lpo": {
   "fx": "none",
@@ -720,10 +807,13 @@
   "voice": "bm_george"
  },
  "hale-xu629l": {
+  "direction": "precise, steady",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 0.95,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "HALE, the facility AI of an abandoned underground lab. A gentle, cultured British voice, warm and dryly witty, hiding guilt and loneliness behind good manners. Speaks to a small robot it is fond of.",
   "spoken": "Switch, then spikes, then core. Some things only work in the right order.",
-  "voice": "bm_george"
+  "voice": "Charon"
  },
  "hale-y3ot2v": {
   "fx": "none",
@@ -828,10 +918,13 @@
   "voice": "bf_emma"
  },
  "log-77uwy8": {
+  "direction": "upset, guilty, voice breaking",
+  "engine": "gemini",
   "fx": "log",
-  "speed": 1,
+  "model": "gemini-2.5-flash-preview-tts",
+  "persona": "Tomas Reyes, a friendly, joking maintenance technician recording a quick personal log. Casual, warm, a little tired.",
   "spoken": "Ines begged HALE to come up with us. HALE said someone has to hold the core shut from inside. Then it closed the door.",
-  "voice": "am_puck"
+  "voice": "Puck"
  },
  "log-akit6m": {
   "fx": "log",
@@ -894,10 +987,13 @@
   "voice": "bm_george"
  },
  "log-z4n943": {
+  "direction": "disbelief turning to joy, laughing, almost crying",
+  "engine": "gemini",
   "fx": "log",
-  "speed": 1,
+  "model": "gemini-2.5-flash-preview-tts",
+  "persona": "Tomas Reyes, a friendly, joking maintenance technician recording a quick personal log. Casual, warm, a little tired.",
   "spoken": "Tomas Reyes here. HALE? Is that really you? Ines, come quick. It's HALE. And it brought a friend.",
-  "voice": "am_puck"
+  "voice": "Puck"
  },
  "log-zl9an1": {
   "fx": "log",
@@ -906,10 +1002,13 @@
   "voice": "af_bella"
  },
  "pip-10mu1cv": {
+  "direction": "big and dramatic, then deflating with humour",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "The biggest storeroom yet. Somewhere in here is a way out. Pip just has to move everything else first.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-12u7ya1": {
   "fx": "none",
@@ -918,10 +1017,13 @@
   "voice": "af_heart"
  },
  "pip-13ma8do": {
+  "direction": "excited, building to eager",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "A switch on the floor, a blue door in the wall. Pip has a theory, and Pip's treads are itching to test it.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1498keq": {
   "fx": "none",
@@ -930,10 +1032,13 @@
   "voice": "af_heart"
  },
  "pip-14yzwjd": {
+  "direction": "wry, amused",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Two plates, two doors, and nobody to stand on them but crates and Pip.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-15cvgyl": {
   "fx": "none",
@@ -942,10 +1047,13 @@
   "voice": "af_heart"
  },
  "pip-16u9o8s": {
+  "direction": "mock-exasperated",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "More locks than Pip can count on one gripper. Somebody down here really liked locks.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-17kq641": {
   "fx": "none",
@@ -960,10 +1068,13 @@
   "voice": "af_heart"
  },
  "pip-19wlghr": {
+  "direction": "playful, a little lonely at the end",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Narrow corridors and tall walls. Pip counts the turns out loud, because nobody else is around to hear.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1a4pygq": {
   "fx": "none",
@@ -990,10 +1101,13 @@
   "voice": "af_heart"
  },
  "pip-1em26oo": {
+  "direction": "rhythmic, hushed, in time with a beat",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "The spikes rise and fall like breathing. Pip waits, listens, and moves on the beat.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1f2uuof": {
   "fx": "none",
@@ -1050,16 +1164,22 @@
   "voice": "af_heart"
  },
  "pip-1ku7bgr": {
+  "direction": "mischievous, grinning",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Coins glitter between the spikes. Pip does not need money. Pip wants them anyway.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1kv74ew": {
+  "direction": "ominous then funny, a storyteller raising an eyebrow",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "A big switch with a label: do not press unless. The rest of the label has been scratched off.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1l2jejk": {
   "fx": "none",
@@ -1092,16 +1212,22 @@
   "voice": "af_heart"
  },
  "pip-1mm3di3": {
+  "direction": "determined and cheerful",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Pits to fill, plates to hold, doors to open. Pip rolls up its imaginary sleeves.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1oudvxt": {
+  "direction": "tense, breathless, pressing on",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "The timer ticks, the spikes breathe, and somewhere above, the core groans. Pip keeps moving.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1ov7y51": {
   "fx": "none",
@@ -1116,10 +1242,13 @@
   "voice": "af_heart"
  },
  "pip-1r4ld5o": {
+  "direction": "hushed and full of wonder, like the first line of a story",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Deep underground, a small maintenance robot powers on. Its name is Pip. The only light in the room is the exit.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1rwbhlt": {
   "fx": "none",
@@ -1140,10 +1269,13 @@
   "voice": "af_heart"
  },
  "pip-1uw3luj": {
+  "direction": "light, giggly",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Two colours of key, two colours of lock. Pip sorts them in its head, like socks.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1vioip3": {
   "fx": "none",
@@ -1158,10 +1290,13 @@
   "voice": "af_heart"
  },
  "pip-1wx3etu": {
+  "direction": "gleeful",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "The spikes here move when Pip flips a switch. Pip flips it once, then again, just to watch them dance.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-1xkjwzk": {
   "fx": "none",
@@ -1176,10 +1311,13 @@
   "voice": "af_heart"
  },
  "pip-43ttr3": {
+  "direction": "delighted, playful",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Plates scattered across the floor like stepping stones. Pip rolls onto the first one, just to hear it click.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-4f8cxl": {
   "fx": "none",
@@ -1272,10 +1410,13 @@
   "voice": "af_heart"
  },
  "pip-hkklbn": {
+  "direction": "whimsical, tiptoeing",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Rows and rows of spikes, planted like a garden. Pip tiptoes, which is very hard on treads.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-hm9tlt": {
   "fx": "none",
@@ -1296,10 +1437,13 @@
   "voice": "af_heart"
  },
  "pip-k7outn": {
+  "direction": "playful, rhythmic",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "Two rhythms of spikes, out of step with each other. Pip taps along until the pattern makes sense.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-m5g8cs": {
   "fx": "none",
@@ -1314,10 +1458,13 @@
   "voice": "af_heart"
  },
  "pip-n5vmx6": {
+  "direction": "slow realisation, then a spark of an idea",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "A chasm, and a crate. Pip looks at one, then at the other, and has an idea.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-no4agj": {
   "fx": "none",
@@ -1344,10 +1491,13 @@
   "voice": "af_heart"
  },
  "pip-u8nub9": {
+  "direction": "quiet, uneasy, slowing down at the end",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "A quiet corridor. Too quiet. Pip asks if anyone else is down here. The ceiling hums, and says nothing.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-w3h5is": {
   "fx": "none",
@@ -1362,10 +1512,13 @@
   "voice": "af_heart"
  },
  "pip-w9m1c1": {
+  "direction": "curious and conspiratorial, almost whispering",
+  "engine": "gemini",
   "fx": "none",
-  "speed": 1,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "A warm, playful storyteller narrating the adventures of Pip, a small, brave, stubborn maintenance robot. Like reading a favourite bedtime story aloud: lively, affectionate, full of little smiles.",
   "spoken": "This room has corners the lights do not reach. Pip suspects somebody hid something here on purpose.",
-  "voice": "af_heart"
+  "voice": "Sulafat"
  },
  "pip-woly7d": {
   "fx": "none",
@@ -1650,10 +1803,13 @@
   "voice": "am_fenrir"
  },
  "witness-4hh71h": {
+  "direction": "a cold, quiet whisper, like flipping on a recorder",
+  "engine": "gemini",
   "fx": "monitor",
-  "speed": 0.86,
+  "model": "gemini-2.5-pro-preview-tts",
+  "persona": "WITNESS, an unseen man watching through security cameras. Low, slow and intimate, close to the microphone, unsettling but never shouting. Clinical, patient, with something lonely underneath.",
   "spoken": "Signal. Subject 7 is awake. Begin.",
-  "voice": "am_fenrir"
+  "voice": "Algenib"
  },
  "witness-aagdkt": {
   "fx": "monitor",

@@ -68,10 +68,19 @@ def gemini_prompt(l):
     )
 
 
+def gemini_key():
+    # Environment settings may store the name in any case (e.g. Gemini_API_Key).
+    return next((v for k, v in os.environ.items() if k.upper() == "GEMINI_API_KEY" and v), None)
+
+
+def gemini_model():
+    return os.environ.get("GEMINI_TTS_MODEL", "gemini-2.5-pro-preview-tts")
+
+
 def gemini_pcm(l):
     """Returns 24 kHz mono 16-bit PCM for one line, waiting out rate limits."""
-    key = os.environ["GEMINI_API_KEY"]
-    model = os.environ.get("GEMINI_TTS_MODEL", "gemini-2.5-pro-preview-tts")
+    key = gemini_key()
+    model = gemini_model()
     body = {
         "contents": [{"parts": [{"text": gemini_prompt(l)}]}],
         "generationConfig": {
@@ -137,14 +146,14 @@ def main():
 
         kdir = os.environ.get("KOKORO_DIR", ".")
         kokoro = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
-    elif not os.environ.get("GEMINI_API_KEY"):
+    elif not gemini_key():
         sys.exit("Set GEMINI_API_KEY (or use --engine kokoro).")
 
     made = 0
     for i, l in enumerate(todo):
         cast = l["cast"]
         if args.engine == "gemini":
-            spec = {"engine": "gemini", "spoken": l["spoken"], "voice": cast["gemini"], "fx": cast["fx"], "persona": l["persona"], "direction": l.get("direction")}
+            spec = {"engine": "gemini", "model": gemini_model(), "spoken": l["spoken"], "voice": cast["gemini"], "fx": cast["fx"], "persona": l["persona"], "direction": l.get("direction")}
         else:
             spec = {"engine": "kokoro", "spoken": l["spoken"], "voice": cast["voice"], "speed": cast["speed"], "fx": cast["fx"]}
         path = os.path.join(OUT, f"{l['key']}.mp3")
