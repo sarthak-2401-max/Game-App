@@ -249,3 +249,34 @@ describe('story scenes', () => {
     expect(EPILOGUE_SCENES.length).toBe(EPILOGUE.length);
   });
 });
+
+describe('reading ahead', () => {
+  test('a room warms its own and the next room\'s lines, and a chapter opening its paintings', async () => {
+    jest.resetModules();
+    const downloaded: number[] = [];
+    jest.doMock('expo-asset', () => ({
+      Asset: { fromModule: (m: number) => ({ downloadAsync: async () => void downloaded.push(m) }) },
+    }));
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { warmRoom } = require('../src/services/audio/prefetch') as typeof import('../src/services/audio/prefetch');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { SCENE_IMAGES } = require('../src/services/story/sceneImages.generated') as { SCENE_IMAGES: Record<string, number> };
+
+    // Room 10 is the last of chapter 1, so room 11 opens chapter 2.
+    warmRoom(10);
+    await new Promise((r) => setTimeout(r, 100));
+
+    const arrival = VOICE_CLIPS[voiceKey(ROOM_ARRIVAL[9].speaker, ROOM_ARRIVAL[9].text)];
+    const next = VOICE_CLIPS[voiceKey(ROOM_ARRIVAL[10].speaker, ROOM_ARRIVAL[10].text)];
+    expect(downloaded).toContain(arrival);
+    expect(downloaded).toContain(next);
+    expect(downloaded).toContain(SCENE_IMAGES['ch2-1']);
+
+    // Nothing is fetched twice.
+    const before = downloaded.length;
+    warmRoom(10);
+    await new Promise((r) => setTimeout(r, 100));
+    expect(downloaded).toHaveLength(before);
+    jest.dontMock('expo-asset');
+  });
+});

@@ -13,6 +13,7 @@ import { StarChecklist } from '../components/game/Stars';
 import { Icon } from '../components/Icon';
 import { BeatView, StoryCard } from '../components/StoryCard';
 import { chapterScenes, epilogueScenes, type StoryScene } from '../services/story/storyScenes';
+import { warmRoom } from '../services/audio/prefetch';
 import { Button, CoinBadge, IconButton, Sheet, ToggleRow } from '../components/ui';
 import { ACHIEVEMENTS } from '../config/achievements';
 import { DEFAULT_COSMETICS } from '../config/cosmetics';
@@ -141,6 +142,17 @@ export function GameScreen() {
     // The board stands on a plinth a third of a cell deep.
     return Math.max(16, Math.floor(Math.min(availW / room.width, availH / (room.height + PLINTH), 64)));
   }, [room, area, dims, insets, settings.showDpad]);
+
+  // ---- Reading ahead ------------------------------------------------------------------------
+  const kind = session?.kind;
+  const roomIndex = session?.room.index;
+  // Fetch this room's and the next room's voice lines (and any chapter painting) while the
+  // player solves, so the next room opens without a pause in the audio.
+  useEffect(() => {
+    if (kind !== 'campaign' || !roomIndex) return;
+    const t = setTimeout(() => warmRoom(roomIndex), 1200);
+    return () => clearTimeout(t);
+  }, [kind, roomIndex]);
 
   // ---- Chapter opening story ----------------------------------------------------------------
   useEffect(() => {
