@@ -137,6 +137,12 @@ def cloud_pcm(l):
                 time.sleep(20 * (attempt + 1))
                 continue
             sys.exit(f"Cloud TTS error {e.code}: {msg[:800]}")
+        except (TimeoutError, urllib.error.URLError) as e:
+            if attempt < 7:
+                print(f"  {e}, retrying in 20s", flush=True)
+                time.sleep(20)
+                continue
+            raise
     sys.exit("Cloud TTS kept failing")
 
 
