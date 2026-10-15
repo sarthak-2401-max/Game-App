@@ -50,8 +50,9 @@ export function StarChecklist({ stars, prev, criteria, reduced }: { stars: numbe
     <View style={styles.box}>
       <View style={styles.big}>
         {rows.map((r, i) => (
-          <Animated.View key={r.bit} entering={reduced ? undefined : ZoomIn.delay(150 + i * 140).duration(260)}>
-            <StarIcon size={30} on={(best & r.bit) !== 0} />
+          <Animated.View key={r.bit} entering={reduced ? undefined : ZoomIn.delay(200 + i * 180).springify().damping(9)} style={styles.bigStar}>
+            {(best & r.bit) !== 0 && <View style={styles.halo} />}
+            <StarIcon size={i === 1 ? 46 : 38} on={(best & r.bit) !== 0} />
           </Animated.View>
         ))}
       </View>
@@ -73,7 +74,9 @@ export function StarChecklist({ stars, prev, criteria, reduced }: { stars: numbe
 
 const styles = StyleSheet.create({
   box: { gap: 4, alignItems: 'stretch' },
-  big: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 4 },
+  big: { flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-end', gap: 14, marginBottom: 6 },
+  bigStar: { alignItems: 'center', justifyContent: 'center' },
+  halo: { position: 'absolute', width: '140%', height: '140%', borderRadius: 999, backgroundColor: '#FFD36E', opacity: 0.14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4 },
   label: { color: colors.text, fontSize: 13, fontWeight: '600', flex: 1 },
   todo: { color: colors.textMuted },
