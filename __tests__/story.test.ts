@@ -241,3 +241,11 @@ describe('voiceover', () => {
     expect(speakable('T.R. + coffee machine')).toBe('T R and coffee machine');
   });
 });
+
+describe('story scenes', () => {
+  const { CHAPTER_SCENES, EPILOGUE_SCENES } = require('../src/game/scenes') as typeof import('../src/game/scenes');
+  test('every chapter-opening and epilogue beat has its own scene', () => {
+    for (const st of CHAPTER_STORY) expect(CHAPTER_SCENES[st.chapter]?.length).toBe(st.opening.length);
+    expect(EPILOGUE_SCENES.length).toBe(EPILOGUE.length);
+  });
+});

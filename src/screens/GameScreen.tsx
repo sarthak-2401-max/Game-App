@@ -12,6 +12,8 @@ import { MonitorBar, MONITOR_HEIGHT } from '../components/game/MonitorBar';
 import { StarChecklist } from '../components/game/Stars';
 import { Icon } from '../components/Icon';
 import { BeatView, StoryCard } from '../components/StoryCard';
+import { sceneKey } from '../game/scenes';
+import { SCENE_IMAGES } from '../services/story/sceneImages.generated';
 import { Button, CoinBadge, IconButton, Sheet, ToggleRow } from '../components/ui';
 import { ACHIEVEMENTS } from '../config/achievements';
 import { DEFAULT_COSMETICS } from '../config/cosmetics';
@@ -86,6 +88,7 @@ interface StoryOverlay {
   kicker: string;
   title: string;
   beats: readonly StoryBeat[];
+  scenes?: readonly (number | undefined)[];
   onDone: () => void;
 }
 
@@ -151,6 +154,7 @@ export function GameScreen() {
       kicker: `Chapter ${ch.number} · ${st.location}`,
       title: ch.title,
       beats: st.opening,
+      scenes: st.opening.map((_, i) => SCENE_IMAGES[sceneKey('chapter', i, ch.number)]),
       onDone: () => {
         useApp.getState().update((sv) => markChapterIntroSeen(sv, ch.number));
         analytics.track('story_viewed', { kind: 'chapter', chapter: ch.number });
@@ -297,6 +301,7 @@ export function GameScreen() {
           kicker: 'Epilogue',
           title: 'Outside',
           beats: EPILOGUE,
+          scenes: EPILOGUE.map((_, i) => SCENE_IMAGES[sceneKey('epilogue', i)]),
           onDone: () => {
             useApp.getState().update(markEpilogueSeen);
             analytics.track('story_viewed', { kind: 'epilogue' });
@@ -900,7 +905,7 @@ export function GameScreen() {
       {getMore && getMoreSheet(getMore)}
       {offerSheet}
       {openClue && <ClueSheet id={openClue} onClose={() => setOpenClue(null)} />}
-      {story && <StoryCard kicker={story.kicker} title={story.title} beats={story.beats} onDone={story.onDone} />}
+      {story && <StoryCard kicker={story.kicker} title={story.title} beats={story.beats} scenes={story.scenes} onDone={story.onDone} />}
     </View>
   );
 }
