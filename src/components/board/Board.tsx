@@ -1,20 +1,21 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { DEFAULT_COSMETICS, getCosmetic } from '../../config/cosmetics';
 import { chapterPalette, type Palette } from '../../theme/chapters';
-import { colOf, dirBetween, rowOf } from '../../game/grid';
+import { colOf, DELTA, dirBetween, neighbor, rowOf } from '../../game/grid';
 import type { Action, Dir, GameState, Room, StepEvent } from '../../game/types';
 import { colors } from '../../theme/theme';
-import { Breathe, Flash, FloatText, Motes, PlayerFx, Ring, useBumpNudge } from './Fx';
+import { Breathe, Flash, FloatText, Flicker, Frost, Motes, PlayerFx, Ring, useBumpNudge, WinLights } from './Fx';
 import { ActorLight, Lighting, type LightPool } from './Lighting';
 import { Burst, type BurstSpec } from './Particles';
 import { TELE_COLORS } from './glyphs';
 import { deriveModel, type TileView } from './derive';
 import { Decor } from './decor';
 import { planDecor } from './decorPlan';
+import { pipInDanger, usePip } from './pip';
 import { FloorDetail, WallDetail } from './materials';
 import type { Environment, FloorMaterial, Landmark, WallMaterial } from '../../game/environments';
 import {
@@ -93,6 +94,8 @@ interface Props {
   openingCells?: number[];
   /** Overrides the environment palette (the Observation Wing). */
   palette?: Palette;
+  /** Restart count: a new attempt replays the room's entrance. */
+  attempt?: number;
   /** The room's place in the Vault: materials, set dressing and air (campaign rooms, default theme). */
   environment?: Environment;
   /** The set piece on the room's back wall. */
@@ -416,7 +419,7 @@ function featurePropsEqual(p: FeatureProps, n: FeatureProps): boolean {
 }
 
 /** Slides to a new cell; jumps (with a flash) when the move is longer than one cell. */
-function Mover({ cell, w, size, reduced, children, z = 1 }: { cell: number; w: number; size: number; reduced: boolean; children: React.ReactNode; z?: number }) {
+function Mover({ cell, w, size, reduced, children, z = 1, heavy }: { cell: number; w: number; size: number; reduced: boolean; children: React.ReactNode; z?: number; heavy?: boolean }) {
   const x = useSharedValue(colOf(w, cell) * size);
   const y = useSharedValue(rowOf(w, cell) * size);
   const o = useSharedValue(1);
@@ -431,13 +434,47 @@ function Mover({ cell, w, size, reduced, children, z = 1 }: { cell: number; w: n
       y.value = ny;
       if (far && !reduced) o.value = withSequence(withTiming(0.2, { duration: 0 }), withTiming(1, { duration: 220 }));
     } else {
-      const cfg = { duration: MOVE_MS, easing: Easing.out(Easing.quad) };
+      // Crates are heavy: a slower slide that settles hard instead of gliding.
+      const cfg = heavy ? { duration: MOVE_MS + 50, easing: Easing.out(Easing.cubic) } : { duration: MOVE_MS, easing: Easing.out(Easing.quad) };
       x.value = withTiming(nx, cfg);
       y.value = withTiming(ny, cfg);
     }
-  }, [cell, w, size, reduced, x, y, o]);
+  }, [cell, w, size, reduced, x, y, o, heavy]);
   const style = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }, { translateY: y.value }], opacity: o.value }));
   return <Animated.View style={[{ position: 'absolute', left: 0, top: 0, width: size, height: size, zIndex: z }, style]}>{children}</Animated.View>;
+}
+
+/** A hint step: the markers pop in one after another, tracing the route. */
+function HintStep({ cell, n, w, size, reduced }: { cell: number; n: number; w: number; size: number; reduced: boolean }) {
+  const p = useSharedValue(reduced ? 1 : 0);
+  useEffect(() => {
+    if (!reduced) p.value = withDelay(n * 90, withSpring(1, { damping: 9, stiffness: 220 }));
+  }, [n, reduced, p]);
+  const st = useAnimatedStyle(() => ({ opacity: Math.min(1, p.value), transform: [{ scale: p.value }] }));
+  return (
+    <View pointerEvents="none" style={[styles.abs, styles.center, { left: colOf(w, cell) * size, top: rowOf(w, cell) * size, width: size, height: size, zIndex: 6 }]}>
+      <Animated.View style={[{ width: size * 0.42, height: size * 0.42, borderRadius: size, borderWidth: 2, borderColor: colors.success, backgroundColor: '#4CF2A033', alignItems: 'center', justifyContent: 'center' }, st]}>
+        <Animated.Text style={{ color: colors.success, fontWeight: '800', fontSize: size * 0.22 }}>{n}</Animated.Text>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** A crate landing: it squashes as it stops, then settles. */
+function Thud({ cell, size, reduced, children }: { cell: number; size: number; reduced: boolean; children: React.ReactNode }) {
+  const sx = useSharedValue(1);
+  const sy = useSharedValue(1);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current || reduced) {
+      first.current = false;
+      return;
+    }
+    sx.value = withDelay(MOVE_MS, withSequence(withTiming(1.08, { duration: 70 }), withTiming(1, { duration: 140, easing: Easing.out(Easing.quad) })));
+    sy.value = withDelay(MOVE_MS, withSequence(withTiming(0.9, { duration: 70 }), withTiming(1, { duration: 140, easing: Easing.out(Easing.quad) })));
+  }, [cell, reduced, sx, sy]);
+  const st = useAnimatedStyle(() => ({ transform: [{ translateY: ((1 - sy.value) * size) / 2 }, { scaleX: sx.value }, { scaleY: sy.value }] }));
+  return <Animated.View style={[{ flex: 1 }, st]}>{children}</Animated.View>;
 }
 
 type BlockId = { id: number; cell: number };
@@ -482,7 +519,23 @@ function useBlockIds(blocks: number[], w: number) {
   return memo.ids;
 }
 
-function Beam({ dir, cells, w, size }: { dir: Dir; cells: number[]; w: number; size: number }) {
+/** Where a beam stops: the cell it would enter next (a wall, a door or a crate). */
+function beamEnd(b: { emitter: number; dir: Dir; cells: number[] }, w: number, h: number) {
+  return neighbor(w, h, b.cells.length ? b.cells[b.cells.length - 1] : b.emitter, b.dir);
+}
+
+/**
+ * A live laser: a hot core that shimmers, a soft halo, and a spark where it hits something.
+ * When a crate stops it the spark flares white-hot, so the block reads at a glance.
+ */
+function Beam({ dir, cells, w, size, end, crate, reduced }: { dir: Dir; cells: number[]; w: number; size: number; end: number; crate: boolean; reduced: boolean }) {
+  const p = useSharedValue(0);
+  useEffect(() => {
+    p.value = reduced ? 0.5 : withRepeat(withTiming(1, { duration: 420, easing: Easing.inOut(Easing.sin) }), -1, true);
+  }, [reduced, p]);
+  const core = useAnimatedStyle(() => ({ opacity: 0.75 + 0.25 * p.value }));
+  const halo = useAnimatedStyle(() => ({ opacity: 0.14 + 0.1 * p.value }));
+  const spark = useAnimatedStyle(() => ({ transform: [{ scale: 0.8 + 0.35 * p.value }] }));
   if (!cells.length) return null;
   const horizontal = dir === 'left' || dir === 'right';
   const rs = cells.map((c) => rowOf(w, c));
@@ -494,11 +547,24 @@ function Beam({ dir, cells, w, size }: { dir: Dir; cells: number[]; w: number; s
   const box = horizontal
     ? { left: c0 * size, top: r0 * size + size / 2 - thick * 1.5, width: len, height: thick * 3 }
     : { left: c0 * size + size / 2 - thick * 1.5, top: r0 * size, width: thick * 3, height: len };
+  // The spark sits on the edge between the last lit cell and whatever stopped the beam.
+  const last = cells[cells.length - 1];
+  const [dr, dc] = DELTA[dir];
+  const sx = (colOf(w, last) + 0.5 + dc * 0.5) * size;
+  const sy = (rowOf(w, last) + 0.5 + dr * 0.5) * size;
+  const sr = size * (crate ? 0.2 : 0.13);
   return (
-    <View pointerEvents="none" style={[styles.abs, box, { justifyContent: 'center', alignItems: 'center', zIndex: 3 }]}>
-      <View style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, backgroundColor: colors.danger, opacity: 0.18, borderRadius: thick }]} />
-      <View style={{ width: horizontal ? len : thick * 0.6, height: horizontal ? thick * 0.6 : len, backgroundColor: '#FFB3BA', borderRadius: thick }} />
-    </View>
+    <>
+      <View pointerEvents="none" style={[styles.abs, box, { justifyContent: 'center', alignItems: 'center', zIndex: 3 }]}>
+        <Animated.View style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, backgroundColor: colors.danger, borderRadius: thick }, halo]} />
+        <Animated.View style={[{ width: horizontal ? len : thick * 0.6, height: horizontal ? thick * 0.6 : len, backgroundColor: '#FFB3BA', borderRadius: thick }, core]} />
+      </View>
+      {end >= 0 && (
+        <Animated.View pointerEvents="none" style={[styles.abs, { left: sx - sr, top: sy - sr, width: sr * 2, height: sr * 2, borderRadius: sr, backgroundColor: crate ? '#FFE6C7' : '#FF8A95', opacity: crate ? 0.9 : 0.6, zIndex: 6 }, spark]}>
+          <View style={{ position: 'absolute', left: sr * 0.5, top: sr * 0.5, width: sr, height: sr, borderRadius: sr, backgroundColor: '#FFFFFF' }} />
+        </Animated.View>
+      )}
+    </>
   );
 }
 
@@ -516,7 +582,7 @@ function TrailGhost({ cell, w, size, color, seq }: { cell: number; w: number; si
   );
 }
 
-export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded, clues, dark, openingCells, palette, environment, landmark }: Props) {
+export function Board({ room, state, events, seq, cell: size, look, reducedMotion, hintCells, checkpointCell, onAction, inputEnabled, chapter, frozen, shielded, clues, dark, openingCells, palette, environment, landmark, attempt }: Props) {
   const w = room.width;
   const model = useMemo(() => deriveModel(room, state), [room, state]);
   const theme = useMemo(() => palette ?? environment?.palette ?? themeLook(look.theme, chapter ?? room.chapter), [palette, environment, look.theme, chapter, room.chapter]);
@@ -586,9 +652,10 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
       if (e.type === 'unlock') out.push({ id: `${seq}fu`, cell: e.at, text: 'Unlocked', color: colors.gold });
       if (e.type === 'checkpoint') out.push({ id: `${seq}fc`, cell: e.at, text: 'Checkpoint', color: colors.success });
       if (e.type === 'shielded') out.push({ id: `${seq}fs`, cell: e.at, text: 'Shield!', color: '#5CC8FF' });
+      if (e.type === 'push' && model.beams.some((b) => beamEnd(b, w, room.height) === e.to)) out.push({ id: `${seq}fb`, cell: e.to, text: 'Beam blocked', color: '#FFE6C7' });
     }
     return out;
-  }, [events, seq, reducedMotion, room, model.coresLeft]);
+  }, [events, seq, reducedMotion, room, model.coresLeft, model.beams, w]);
 
   const exitCell = useMemo(() => room.tiles.findIndex((t) => t.k === 'exit'), [room]);
   const rings = useMemo(() => {
@@ -599,9 +666,10 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
       if (e.type === 'teleport') out.push({ id: `${seq}rt`, cell: e.to, color: '#C77DFF' });
       if (e.type === 'pickup' && e.kind === 'core' && model.exitOpen && exitCell >= 0) out.push({ id: `${seq}rx`, cell: exitCell, color: theme.glow });
       if (e.type === 'win') out.push({ id: `${seq}rw`, cell: state.player, color: theme.glow });
+      if (e.type === 'push' && model.beams.some((b) => beamEnd(b, w, room.height) === e.to)) out.push({ id: `${seq}rb`, cell: e.to, color: '#FFB3BA' });
     }
     return out;
-  }, [events, seq, reducedMotion, model.exitOpen, exitCell, theme.glow, state.player]);
+  }, [events, seq, reducedMotion, model.exitOpen, model.beams, exitCell, theme.glow, state.player, w, room.height]);
   const flash = reducedMotion ? undefined : events.some((e) => e.type === 'win') ? theme.glow : events.some((e) => e.type === 'death') ? colors.danger : undefined;
 
   // Light pools under glowing things. Rebuilt only when what glows changes.
@@ -628,9 +696,20 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
     }
     enter.value = 0;
     enter.value = withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) });
-  }, [room.id, room.variant, reducedMotion, enter]);
+  }, [room.id, room.variant, attempt, reducedMotion, enter]);
+
+  // Undo winds the room back: a brief cool flash, so the step back is felt as well as seen.
+  const prevMoves = useRef({ moves: state.moves, attempt });
+  const [rewind, setRewind] = useState(0);
+  useEffect(() => {
+    const p = prevMoves.current;
+    if (!reducedMotion && p.attempt === attempt && state.moves < p.moves && state.status === 'playing') setRewind((r) => r + 1);
+    prevMoves.current = { moves: state.moves, attempt };
+  }, [seq, state.moves, state.status, attempt, reducedMotion]);
 
   const nudge = useBumpNudge(seq, events, state.player, w, size, reducedMotion);
+  const danger = useMemo(() => state.status === 'playing' && pipInDanger(model, state.player, w, room.height), [model, state.player, state.status, w, room.height]);
+  const pip = usePip(state, events, seq, w, danger, reducedMotion);
 
   const moveFrom = events.find((e): e is Extract<StepEvent, { type: 'move' }> => e.type === 'move');
 
@@ -741,19 +820,17 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           </View>
         ))}
         {model.beams.map((b) => (
-          <Beam key={`b${b.emitter}`} dir={b.dir} cells={b.cells} w={w} size={size} />
+          <Beam key={`b${b.emitter}`} dir={b.dir} cells={b.cells} w={w} size={size} end={beamEnd(b, w, room.height)} crate={state.blocks.includes(beamEnd(b, w, room.height))} reduced={reducedMotion} />
         ))}
         {blocks.map((b) => (
-          <Mover key={`blk${b.id}`} cell={b.cell} w={w} size={size} reduced={reducedMotion} z={5}>
-            <Crate size={size} />
+          <Mover key={`blk${b.id}`} cell={b.cell} w={w} size={size} reduced={reducedMotion} z={5} heavy>
+            <Thud cell={b.cell} size={size} reduced={reducedMotion}>
+              <Crate size={size} />
+            </Thud>
           </Mover>
         ))}
         {hintCells?.map((c, i) => (
-          <View key={`h${i}`} pointerEvents="none" style={[styles.abs, styles.center, { left: colOf(w, c) * size, top: rowOf(w, c) * size, width: size, height: size, zIndex: 6 }]}>
-            <View style={{ width: size * 0.42, height: size * 0.42, borderRadius: size, borderWidth: 2, borderColor: colors.success, backgroundColor: '#4CF2A033', alignItems: 'center', justifyContent: 'center' }}>
-              <Animated.Text style={{ color: colors.success, fontWeight: '800', fontSize: size * 0.22 }}>{i + 1}</Animated.Text>
-            </View>
-          </View>
+          <HintStep key={`h${i}${c}`} cell={c} n={i + 1} w={w} size={size} reduced={reducedMotion} />
         ))}
         {!dead &&
           !won &&
@@ -779,7 +856,7 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           <Animated.View style={[{ opacity: dead ? 0.35 : 1 }, nudge]}>
             <PlayerFx seq={seq} events={events} w={w} size={size} reduced={reducedMotion}>
               <Bob enabled={!reducedMotion && !dead} amount={size * 0.05} period={1400}>
-                <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} />
+                <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} mood={pip.mood} lookX={pip.look.x} lookY={pip.look.y} />
               </Bob>
             </PlayerFx>
           </Animated.View>
@@ -804,7 +881,11 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         ))}
         <Lighting id={`${room.id}${room.variant ?? ''}`} w={w} h={room.height} size={size} pools={[]} layer="vignette" />
         {!reducedMotion && <Motes W={w * size} H={room.height * size} color={theme.glow} count={Math.round((w * room.height) / 6)} seed={room.index} kind={environment?.particles} />}
+        {environment?.frost && <Frost W={w * size} H={room.height * size} reduced={reducedMotion} />}
+        {environment?.flicker && !reducedMotion && !won && <Flicker seed={room.index} />}
         {flash && <Flash key={`fl${seq}`} color={flash} seq={seq} />}
+        {rewind > 0 && <Flash key={`rw${rewind}`} color="#7FDBFF" seq={rewind} />}
+        {won && !reducedMotion && <WinLights cell={state.player} w={w} size={size} W={w * size} H={room.height * size} color={theme.glow} />}
         <Darkness visible={!!dark} cx={(colOf(w, state.player) + 0.5) * size} cy={(rowOf(w, state.player) + 0.5) * size} w={w * size} h={room.height * size} size={size} reduced={reducedMotion} />
         {dark &&
           clues?.map((c) =>

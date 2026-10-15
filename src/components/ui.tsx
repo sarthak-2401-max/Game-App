@@ -85,7 +85,14 @@ export function IconButton({ icon, onPress, label, disabled, size = TOUCH, badge
       }}
       style={({ pressed }) => [
         styles.iconBtn,
-        { width: size, height: size, opacity: disabled ? 0.35 : pressed ? 0.7 : 1, borderColor: active ? colors.cyan : colors.border },
+        {
+          width: size,
+          height: size,
+          opacity: disabled ? 0.35 : 1,
+          borderColor: active ? colors.cyan : pressed ? colors.text : colors.border,
+          backgroundColor: active ? '#0E2A33' : pressed ? '#1E2740' : colors.surface,
+          transform: [{ scale: pressed && !disabled ? 0.93 : 1 }],
+        },
       ]}
     >
       <Icon name={icon} size={size * 0.48} color={active ? colors.cyan : colors.text} />
