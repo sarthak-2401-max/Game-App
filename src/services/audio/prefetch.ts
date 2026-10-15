@@ -9,6 +9,8 @@ import { CHAPTERS } from '../../game/levels/chapters';
 import { CHAPTER_STORY, ROOM_ARRIVAL, ROOM_STORY, type StoryBeat } from '../../game/story';
 import { voiceKey, type VoiceSpeaker } from '../../game/voiceLines';
 import { chapterScenes } from '../story/storyScenes';
+import { BACKDROPS } from '../story/backdrops.generated';
+import { roomDesign } from '../../game/environments';
 import { log } from '../../utils/log';
 import { MUSIC_BEDS } from './musicBeds.generated';
 import { VOICE_CLIPS } from './voiceClips.generated';
@@ -31,6 +33,9 @@ function assetsForRoom(n: number): number[] {
   const out: (number | undefined)[] = [beatClip(ROOM_ARRIVAL[n - 1]), beatClip(ROOM_STORY[n - 1])];
   const id = roomId(n);
   for (const t of TRANSMISSIONS) if (t.room === id) out.push(clip(t.speaker, t.text));
+  // The painting behind the board, so a new place never opens on a blank background.
+  const env = roomDesign(n)?.env;
+  if (env) out.push(BACKDROPS[env]);
   // A chapter opening is the heaviest moment: several lines and a full-screen painting each.
   const ch = CHAPTERS.find((c) => c.firstRoom === n);
   const st = ch ? CHAPTER_STORY[ch.number - 1] : undefined;
