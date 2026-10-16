@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { Button, Panel, SectionTitle, Sheet, ToggleRow } from '../components/ui';
 import { APP } from '../config/app';
+import { POWERUPS } from '../config/powerups';
 import { adService } from '../services/ads/adService';
 import { showPrivacyOptions } from '../services/ads/consent';
 import { analytics } from '../services/analytics/analytics';
@@ -80,6 +81,31 @@ export function SettingsScreen() {
           <Text style={styles.dim}>Your progress is saved only on this device. Uninstalling the app deletes it.</Text>
           <Button label="Reset all progress" variant="danger" onPress={() => setConfirmStep(1)} />
         </Panel>
+
+        {__DEV__ && (
+          <>
+            <SectionTitle>Tester tools</SectionTitle>
+            <Panel>
+              <Text style={styles.dim}>Development builds only. Never shipped to players.</Text>
+              <Button
+                label="Give 50,000 coins + 50 of each power-up"
+                variant="reward"
+                onPress={() => {
+                  useApp.getState().update((sv) => ({
+                    ...sv,
+                    coins: sv.coins + 50_000,
+                    powerups: {
+                      ...sv.powerups,
+                      unlocked: POWERUPS.map((p) => p.id),
+                      inventory: Object.fromEntries(POWERUPS.map((p) => [p.id, (sv.powerups.inventory[p.id] ?? 0) + 50])),
+                    },
+                  }));
+                  toast('Added 50,000 coins and 50 of each power-up.', 'success');
+                }}
+              />
+            </Panel>
+          </>
+        )}
 
         <SectionTitle>About</SectionTitle>
         <Panel style={{ gap: 4 }}>
