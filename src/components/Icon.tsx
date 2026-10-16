@@ -6,7 +6,7 @@ export type IconName =
   | 'pause' | 'undo' | 'restart' | 'hint' | 'wait' | 'up' | 'down' | 'left' | 'right' | 'gear' | 'back'
   | 'lock' | 'check' | 'star' | 'gift' | 'calendar' | 'trophy' | 'play' | 'grid' | 'video' | 'close'
   | 'coin' | 'shield' | 'flame' | 'sound' | 'music' | 'vibrate' | 'motion' | 'info'
-  | 'compass' | 'bolt' | 'snow' | 'book' | 'cart' | 'voice';
+  | 'compass' | 'bolt' | 'snow' | 'book' | 'cart' | 'voice' | 'mute';
 
 // Icons are decorative: the surrounding control carries the accessible label.
 // react-native-svg passes props straight to the DOM on web, so use the web attribute there.
@@ -173,6 +173,13 @@ export function Icon({ name, size = 22, color = '#E8EEF9' }: { name: IconName; s
           <G>
             <Polygon points={`${s * 0.18},${s * 0.4} ${s * 0.34},${s * 0.4} ${s * 0.52},${s * 0.24} ${s * 0.52},${s * 0.76} ${s * 0.34},${s * 0.6} ${s * 0.18},${s * 0.6}`} fill={color} />
             <Path d={`M ${s * 0.64} ${s * 0.36} A ${s * 0.18} ${s * 0.18} 0 0 1 ${s * 0.64} ${s * 0.64}`} {...p} />
+          </G>
+        );
+      case 'mute':
+        return (
+          <G>
+            <Polygon points={`${s * 0.14},${s * 0.4} ${s * 0.3},${s * 0.4} ${s * 0.48},${s * 0.24} ${s * 0.48},${s * 0.76} ${s * 0.3},${s * 0.6} ${s * 0.14},${s * 0.6}`} fill={color} />
+            <Path d={`M ${s * 0.62} ${s * 0.38} L ${s * 0.84} ${s * 0.62} M ${s * 0.84} ${s * 0.38} L ${s * 0.62} ${s * 0.62}`} {...p} />
           </G>
         );
       case 'voice':

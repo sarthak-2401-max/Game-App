@@ -251,31 +251,67 @@ export function BlockGlyph({ s }: P) {
 }
 
 /** Pip, the maintenance robot. `shape` (from the character cosmetic) changes the head. */
-export function PlayerGlyph({ s, color, shape }: P & { color: string; shape: string }) {
+/** Pip's face: how it feels right now (see Board's Pip). */
+export type PipMood = 'idle' | 'blink' | 'happy' | 'alert' | 'hurt';
+
+export function PlayerGlyph({ s, color, shape, mood = 'idle', lookX = 0, lookY = 0 }: P & { color: string; shape: string; mood?: PipMood; lookX?: number; lookY?: number }) {
   const cx = s / 2;
   const headW = s * 0.56;
   const headH = s * 0.4;
   const headY = s * 0.2;
   const bodyY = headY + headH - s * 0.02;
+  // Eyes glance the way Pip last moved; alarm turns them amber and wide.
+  const eyeColor = mood === 'alert' ? '#FFC24D' : mood === 'hurt' ? '#FF6B7A' : '#9CF5FF';
+  const ex = lookX * s * 0.035;
+  const ey = headY + headH * 0.49 + lookY * s * 0.02;
+  const r = s * (mood === 'alert' ? 0.055 : 0.045);
+  const sw = Math.max(1.5, s * 0.03);
+  const eye = (x: number) => {
+    switch (mood) {
+      case 'blink':
+        return <Line key={x} x1={x - r} y1={ey} x2={x + r} y2={ey} stroke={eyeColor} strokeWidth={sw} strokeLinecap="round" />;
+      case 'happy':
+        return <Path key={x} d={`M ${x - r * 1.1} ${ey + r * 0.4} Q ${x} ${ey - r * 1.2} ${x + r * 1.1} ${ey + r * 0.4}`} stroke={eyeColor} strokeWidth={sw} strokeLinecap="round" fill="none" />;
+      case 'hurt':
+        return (
+          <G key={x}>
+            <Line x1={x - r} y1={ey - r} x2={x + r} y2={ey + r} stroke={eyeColor} strokeWidth={sw} strokeLinecap="round" />
+            <Line x1={x - r} y1={ey + r} x2={x + r} y2={ey - r} stroke={eyeColor} strokeWidth={sw} strokeLinecap="round" />
+          </G>
+        );
+      default:
+        return (
+          <G key={x}>
+            <Circle cx={x} cy={ey} r={r} fill={eyeColor} />
+            <Circle cx={x - r * 0.35} cy={ey - r * 0.35} r={r * 0.3} fill="#FFFFFF" opacity={0.8} />
+          </G>
+        );
+    }
+  };
+  const tip = mood === 'alert' || mood === 'hurt' ? '#FFC24D' : mood === 'happy' ? '#FFFFFF' : color;
   return (
     <Svg width={s} height={s}>
       <Circle cx={cx} cy={s * 0.5} r={s * 0.46} fill={color} fillOpacity={0.12} />
-      {/* antenna */}
+      {/* antenna: its light shows Pip's mood */}
       <Line x1={cx} y1={headY} x2={cx} y2={s * 0.08} stroke={color} strokeWidth={Math.max(1.5, s * 0.035)} strokeLinecap="round" />
-      <Circle cx={cx} cy={s * 0.07} r={s * 0.045} fill="#FFFFFF" />
-      {/* body */}
+      <Circle cx={cx} cy={s * 0.07} r={s * 0.08} fill={tip} opacity={0.25} />
+      <Circle cx={cx} cy={s * 0.07} r={s * 0.045} fill={mood === 'idle' || mood === 'blink' ? '#FFFFFF' : tip} />
+      {/* body, with a lit panel and treads */}
       <Rect x={cx - s * 0.2} y={bodyY} width={s * 0.4} height={s * 0.26} rx={s * 0.08} fill={color} opacity={0.85} />
       <Rect x={cx - s * 0.08} y={bodyY + s * 0.07} width={s * 0.16} height={s * 0.05} rx={s * 0.02} fill="#07090F" opacity={0.6} />
+      <Rect x={cx - s * 0.22} y={bodyY + s * 0.21} width={s * 0.44} height={s * 0.06} rx={s * 0.03} fill="#07090F" opacity={0.55} />
       {/* head */}
       {shape === 'diamond' ? (
         <Polygon points={`${cx},${headY - s * 0.04} ${cx + headW / 2},${headY + headH / 2} ${cx},${headY + headH + s * 0.04} ${cx - headW / 2},${headY + headH / 2}`} fill={color} />
       ) : (
         <Rect x={cx - headW / 2} y={headY} width={headW} height={headH} rx={shape === 'square' ? s * 0.05 : headH / 2} fill={color} />
       )}
+      {/* a soft highlight on top of the head, so Pip reads as a solid little object */}
+      <Rect x={cx - headW * 0.3} y={headY + headH * 0.06} width={headW * 0.6} height={headH * 0.12} rx={headH * 0.06} fill="#FFFFFF" opacity={0.28} />
       {/* visor */}
       <Rect x={cx - headW * 0.36} y={headY + headH * 0.26} width={headW * 0.72} height={headH * 0.46} rx={headH * 0.23} fill="#07131A" />
-      <Circle cx={cx - headW * 0.15} cy={headY + headH * 0.49} r={s * 0.045} fill="#9CF5FF" />
-      <Circle cx={cx + headW * 0.15} cy={headY + headH * 0.49} r={s * 0.045} fill="#9CF5FF" />
+      {eye(cx - headW * 0.15 + ex)}
+      {eye(cx + headW * 0.15 + ex)}
     </Svg>
   );
 }

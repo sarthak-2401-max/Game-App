@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, BackHandler, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { AppState, BackHandler, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRewardedOffer } from '../components/ads/RewardedOffer';
 import { Board, themeLook } from '../components/board/Board';
 import { Ambient } from '../components/Ambient';
+import { Backdrop } from '../components/game/Backdrop';
 import { PowerUpBar } from '../components/game/PowerUpBar';
 import { DPad } from '../components/game/DPad';
 import { RoomBanner } from '../components/game/RoomBanner';
@@ -121,6 +122,7 @@ export function GameScreen() {
     if (!feedBusy) setIntroFrom(useSession.getState().session?.state.moves ?? 0);
   }, [feedBusy]);
   const settings = app.save.settings;
+  const muted = !settings.sound && !settings.music && !settings.voiceover;
   const reduced = settings.reducedMotion;
 
   const room = session?.room;
@@ -199,6 +201,8 @@ export function GameScreen() {
           break;
         case 'push':
           sound.play('push');
+          // A crate is heavy: a firmer tap than walking into a wall.
+          haptics.medium();
           break;
         case 'switch':
           sound.play('switch');
@@ -350,7 +354,8 @@ export function GameScreen() {
     setDoubled(false);
     // Let the escape burst play before the result card slides up (never delays any input).
     if (resultTimer.current) clearTimeout(resultTimer.current);
-    resultTimer.current = setTimeout(() => setResult(next), reduced ? 0 : 550);
+    // Long enough for the room's ending: the hop, the door light and Pip rolling out.
+    resultTimer.current = setTimeout(() => setResult(next), reduced ? 0 : 1150);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [won, session]);
   useEffect(() => () => {
@@ -676,10 +681,13 @@ export function GameScreen() {
   return (
     <View style={[styles.root, { backgroundColor: palette.bg, paddingTop: insets.top + 4, paddingBottom: insets.bottom + 8 }]}>
       {backdrop !== undefined && (
-        <>
-          <Image source={backdrop} style={styles.backdrop} resizeMode="cover" accessibilityIgnoresInvertColors />
-          <View pointerEvents="none" style={[styles.backdrop, { backgroundColor: palette.bg, opacity: 0.62 }]} />
-        </>
+        <Backdrop
+          source={backdrop}
+          tint={palette.bg}
+          fx={room.width > 1 ? (state.player % room.width) / (room.width - 1) : 0.5}
+          fy={room.height > 1 ? Math.floor(state.player / room.width) / (room.height - 1) : 0.5}
+          reduced={reduced}
+        />
       )}
       <Ambient color={palette.glow} cy={0.48} strength={0.16} />
       {/* HUD */}
@@ -693,6 +701,12 @@ export function GameScreen() {
             {room.name}
           </Text>
         </View>
+        <IconButton
+          icon={muted ? 'mute' : 'sound'}
+          label={muted ? 'Turn sound on' : 'Mute all sound'}
+          size={36}
+          onPress={() => app.setSettings(muted ? { sound: true, music: true, voiceover: true } : { sound: false, music: false, voiceover: false })}
+        />
         <CoinBadge coins={app.save.coins} compact />
       </View>
       <View style={styles.statsRow}>
@@ -760,6 +774,7 @@ export function GameScreen() {
             openingCells={session.attempt === 1 ? openedCells(room) : undefined}
             palette={observation ? OBSERVATION_PALETTE : undefined}
             environment={environment}
+            attempt={session.attempt}
             landmark={design?.landmark}
           />
           {!reduced && <RoomBanner show={`${room.id}:${session.visit}`} kicker={design ? design.place : title} title={room.name} color={palette.glow} />}
@@ -1026,7 +1041,6 @@ function mechanicTip(tags: string[]): string {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 12 },
-  backdrop: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, width: '100%', height: '100%' },
   hudRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   hudTitle: { color: colors.textDim, ...type.tiny, textTransform: 'uppercase' },
   hudSub: { color: colors.text, ...type.h2 },

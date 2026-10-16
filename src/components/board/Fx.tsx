@@ -6,6 +6,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepe
 import { colOf, rowOf } from '../../game/grid';
 import type { StepEvent } from '../../game/types';
 import { hashString } from '../../utils/dates';
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 const ease = Easing.out(Easing.cubic);
 
@@ -36,10 +37,20 @@ export function PlayerFx({ seq, events, w, size, reduced, children }: { seq: num
     const move = events.find((e): e is Extract<StepEvent, { type: 'move' }> => e.type === 'move');
     const bump = events.find((e): e is Extract<StepEvent, { type: 'bump' }> => e.type === 'bump');
     if (win) {
-      sx.value = withDelay(90, withTiming(0.15, { duration: 420, easing: Easing.in(Easing.cubic) }));
-      sy.value = withDelay(90, withTiming(0.15, { duration: 420, easing: Easing.in(Easing.cubic) }));
-      rot.value = withDelay(90, withTiming(320, { duration: 420, easing: Easing.in(Easing.quad) }));
-      op.value = withDelay(260, withTiming(0, { duration: 260 }));
+      // A little victory hop on the threshold, then Pip rolls on through the open door.
+      const hop = size * 0.22;
+      rot.value = 0;
+      ty.value = withDelay(
+        140,
+        withSequence(
+          withTiming(-hop, { duration: 170, easing: Easing.out(Easing.quad) }),
+          withTiming(0, { duration: 150, easing: Easing.in(Easing.quad) }),
+          withDelay(80, withTiming(-size * 0.14, { duration: 460, easing: Easing.in(Easing.cubic) })),
+        ),
+      );
+      sy.value = withDelay(140, withSequence(withTiming(1.12, { duration: 170 }), withTiming(0.86, { duration: 150 }), withSpring(1, { damping: 8 }), withTiming(0.5, { duration: 380 })));
+      sx.value = withDelay(140, withSequence(withTiming(0.92, { duration: 170 }), withTiming(1.12, { duration: 150 }), withSpring(1, { damping: 8 }), withTiming(0.5, { duration: 380 })));
+      op.value = withDelay(620, withTiming(0, { duration: 360 }));
       return;
     }
     if (death) {
@@ -201,3 +212,84 @@ const styles = StyleSheet.create({
   floatText: { fontWeight: '900', letterSpacing: 0.4, textShadowColor: '#000000', textShadowRadius: 4, textShadowOffset: { width: 0, height: 1 } },
   ringBox: { position: 'absolute', alignItems: 'center', justifyContent: 'center', zIndex: 18 },
 });
+
+/**
+ * A room's ending: light pours up out of the open exit and the whole room warms to its glow.
+ * Mounted only on a win (and never with Reduced motion); two animated views, no per-frame work.
+ */
+export function WinLights({ cell, w, size, W, H, color }: { cell: number; w: number; size: number; W: number; H: number; color: string }) {
+  const p = useSharedValue(0);
+  useEffect(() => {
+    p.value = withDelay(120, withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) }));
+  }, [p]);
+  const room = useAnimatedStyle(() => ({ opacity: 0.16 * p.value }));
+  const pillarH = size * 3;
+  const pillar = useAnimatedStyle(() => ({ opacity: Math.min(1, p.value * 1.6) * (1 - 0.35 * p.value), transform: [{ translateY: (1 - p.value) * pillarH * 0.5 }, { scaleY: 0.2 + 0.8 * p.value }] }));
+  const x = colOf(w, cell) * size;
+  const y = rowOf(w, cell) * size;
+  return (
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { zIndex: 12 }]}>
+      <Animated.View style={[{ position: 'absolute', left: 0, top: 0, width: W, height: H, backgroundColor: color }, room]} />
+      <Animated.View style={[{ position: 'absolute', left: x + size * 0.12, top: y + size * 0.85 - pillarH, width: size * 0.76, height: pillarH }, pillar]}>
+        <Svg width={size * 0.76} height={pillarH}>
+          <Defs>
+            <LinearGradient id="winPillar" x1="0" y1="1" x2="0" y2="0">
+              <Stop offset="0" stopColor="#FFFFFF" stopOpacity={0.85} />
+              <Stop offset="0.25" stopColor={color} stopOpacity={0.55} />
+              <Stop offset="1" stopColor={color} stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <Rect x={0} y={0} width={size * 0.76} height={pillarH} rx={size * 0.3} fill="url(#winPillar)" />
+        </Svg>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Tired lights: the room dips dark in short, irregular stutters, then holds steady for a while. */
+export function Flicker({ seed }: { seed: number }) {
+  const o = useSharedValue(0);
+  useEffect(() => {
+    const r = (k: number) => (hashString(`${seed}:fl${k}`) % 1000) / 1000;
+    const hold = (ms: number) => withTiming(0, { duration: ms });
+    const dip = (a: number, ms: number) => withSequence(withTiming(a, { duration: 30 }), withTiming(a, { duration: ms }), withTiming(0, { duration: 40 }));
+    o.value = withRepeat(withSequence(hold(2200 + r(1) * 2400), dip(0.22, 50), hold(90), dip(0.14, 40), hold(3000 + r(2) * 3000), dip(0.18, 70)), -1);
+  }, [seed, o]);
+  const st = useAnimatedStyle(() => ({ opacity: o.value }));
+  return <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#000000', zIndex: 14 }, st]} />;
+}
+
+/** Frost creeping in from the corners of a cold room, breathing slowly. */
+export function Frost({ W, H, reduced }: { W: number; H: number; reduced: boolean }) {
+  const p = useSharedValue(0.7);
+  useEffect(() => {
+    if (!reduced) p.value = withRepeat(withTiming(1, { duration: 4200, easing: Easing.inOut(Easing.sin) }), -1, true);
+  }, [reduced, p]);
+  const st = useAnimatedStyle(() => ({ opacity: p.value }));
+  const r = Math.max(W, H) * 0.55;
+  const corners: [number, number][] = [
+    [0, 0],
+    [W, 0],
+    [0, H],
+    [W, H],
+  ];
+  return (
+    <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { zIndex: 13 }, st]}>
+      <Svg width={W} height={H}>
+        <Defs>
+          {corners.map(([cx, cy], i) => (
+            <RadialGradient key={i} id={`frost${i}`} cx={cx} cy={cy} r={r} gradientUnits="userSpaceOnUse">
+              <Stop offset="0" stopColor="#E8F7FF" stopOpacity={0.42} />
+              <Stop offset="0.35" stopColor="#BFE6FF" stopOpacity={0.12} />
+              <Stop offset="1" stopColor="#BFE6FF" stopOpacity={0} />
+            </RadialGradient>
+          ))}
+        </Defs>
+        {corners.map((_, i) => (
+          <Rect key={i} x={0} y={0} width={W} height={H} fill={`url(#frost${i})`} />
+        ))}
+        <Rect x={1} y={1} width={W - 2} height={H - 2} fill="none" stroke="#E8F7FF" strokeOpacity={0.35} strokeWidth={2} />
+      </Svg>
+    </Animated.View>
+  );
+}

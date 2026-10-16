@@ -31,6 +31,10 @@ export interface Environment {
   ambience: Ambience;
   /** The painting behind the board (scripts/make-backdrops.py). */
   backdrop: string;
+  /** Lights that stutter now and then (old wiring, failing power). */
+  flicker?: boolean;
+  /** Frost creeping in from the edges of the room. */
+  frost?: boolean;
 }
 
 const env = <T extends Record<string, Omit<Environment, 'id'>>>(e: T) => e;
@@ -63,6 +67,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'The circuit room that feeds Intake. Power cores were swapped in and out of these sockets.',
     palette: { bg: '#140B05', floor: '#3A2618', floorAlt: '#402A1B', wall: '#6E4528', wallEdge: '#E89A55', wallSide: '#43281A', glow: '#FFB547', accent: '#FFD27A' },
     floor: 'plate', wall: 'pipes', particles: 'sparks', props: ['gauge', 'cable', 'lamp'], decals: ['scorch', 'stripe'], ambience: 'buzz',
+    flicker: true,
     backdrop: 'A cramped copper electrical room with fuse panels, thick cables, glowing amber power sockets and sparks',
   },
   infirmary: {
@@ -114,6 +119,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'Short-stay cells with doors that only open on a signal. They were never meant for robots.',
     palette: { bg: '#060B10', floor: '#20303A', floorAlt: '#243541', wall: '#4E6878', wallEdge: '#B7D3E0', wallSide: '#2D404B', glow: '#38F2C8', accent: '#FF8E72' },
     floor: 'grate', wall: 'glass', particles: 'dust', props: ['lamp', 'sign', 'camera'], decals: ['stripe'], ambience: 'drip',
+    flicker: true,
     backdrop: 'A row of holding cells with glass doors and teal light strips, numbered doors and a long empty corridor',
   },
   'server-room': {
@@ -181,6 +187,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'Open lift shafts where the platforms fell. Crates are the only way across.',
     palette: { bg: '#0A0806', floor: '#2E2A26', floorAlt: '#34302B', wall: '#4D4A46', wallEdge: '#FFD84D', wallSide: '#2E2C29', glow: '#FFD84D', accent: '#FF7A59' },
     floor: 'grate', wall: 'panel', particles: 'dust', props: ['sign', 'lamp', 'cable'], decals: ['stripe', 'crack'], ambience: 'wind',
+    flicker: true,
     backdrop: 'A dark cargo lift hall with open shafts, hanging chains, yellow hazard railings and a broken lift cage',
   },
   'cold-storage': {
@@ -188,6 +195,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'Freezers for samples and supplies. The cooling still works, a little too well.',
     palette: { bg: '#040C16', floor: '#284052', floorAlt: '#2D485C', wall: '#A9D8F0', wallEdge: '#EAF8FF', wallSide: '#5E8BA6', glow: '#7FD8FF', accent: '#FFB547' },
     floor: 'ice', wall: 'ice', particles: 'snow', props: ['gauge', 'lamp', 'sign'], decals: ['frost'], ambience: 'wind',
+    flicker: true, frost: true,
     backdrop: 'A frozen cold storage room with frosted freezer doors, icicles, pale blue light and one warm amber lamp',
   },
   generator: {
@@ -195,6 +203,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'The backup generators, rationing what power is left. Every step costs light.',
     palette: { bg: '#0E0606', floor: '#2C1F1E', floorAlt: '#322322', wall: '#5A3A36', wallEdge: '#FF7A59', wallSide: '#3A2523', glow: '#FF7A59', accent: '#FFD84D' },
     floor: 'plate', wall: 'pipes', particles: 'embers', props: ['gauge', 'lamp', 'cable'], decals: ['scorch'], ambience: 'machine',
+    flicker: true,
     backdrop: 'A dim generator hall with big humming machines, red emergency lights and gauges near empty',
   },
 
@@ -257,6 +266,7 @@ export const ENVIRONMENTS_RAW = env({
     identity: 'An archive the fold dropped into the coolant line. Papers float, and the floor is giving way.',
     palette: { bg: '#030A14', floor: '#1A3346', floorAlt: '#1D3A50', wall: '#2D4F6A', wallEdge: '#FFD36E', wallSide: '#1B3346', glow: '#4CF2E0', accent: '#FFD36E' },
     floor: 'water', wall: 'shelves', particles: 'bubbles', props: ['lamp', 'sign'], decals: ['papers', 'crack'], ambience: 'drip',
+    flicker: true,
     backdrop: 'A half-flooded underground archive with tall bookshelves standing in turquoise water, floating papers and golden lamp light',
   },
   'shifting-rooms': {
