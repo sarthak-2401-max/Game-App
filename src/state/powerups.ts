@@ -59,3 +59,24 @@ export function consumePowerUp(save: SaveData, id: PowerUpId): SaveData | null {
     powerups: { ...save.powerups, inventory: { ...save.powerups.inventory, [id]: n - 1 }, used: save.powerups.used + 1 },
   };
 }
+
+/** Set once the player has read a power-up's explainer. */
+export const powerUpTipFlag = (id: PowerUpId) => `tip.${id}`;
+/** Set once a power-up's free first use is spent. */
+export const freeUseFlag = (id: PowerUpId) => `free.${id}`;
+
+export const needsPowerUpTip = (s: SaveData) => POWERUPS.find((p) => isPowerUpUnlocked(s, p.id) && !s.memory.flags[powerUpTipFlag(p.id)])?.id ?? null;
+
+/**
+ * Spends a power-up from play. The first use of each kind is the tutorial one and is free, so
+ * learning a power-up never costs the stock. Returns null if none are left.
+ */
+export function takePowerUp(save: SaveData, id: PowerUpId): { save: SaveData; free: boolean } | null {
+  if (powerUpCount(save, id) <= 0 || !isPowerUpUnlocked(save, id)) return null;
+  const key = freeUseFlag(id);
+  if (!save.memory.flags[key]) {
+    return { free: true, save: { ...save, powerups: { ...save.powerups, used: save.powerups.used + 1 }, memory: { flags: { ...save.memory.flags, [key]: 1 } } } };
+  }
+  const spent = consumePowerUp(save, id);
+  return spent && { save: spent, free: false };
+}

@@ -1,7 +1,9 @@
 // Voiceover: every story and WITNESS line has a recording in assets/voice (made by
 // scripts/make-voices.py), played with expo-audio. A line without a recording (one edited
 // since the last recording run) falls back to the device's text-to-speech. One line plays at a
-// time; a new line cuts off the old one. Subtitles are always on screen, so nothing is lost
+// time: `say` cuts off the old line (the player chose to hear something else), while `queue`
+// waits for it to finish (lines the game raises on its own, so WITNESS never talks over HALE).
+// Subtitles are always on screen, so nothing is lost
 // when voiceover is off or the phone is muted.
 import * as Speech from 'expo-speech';
 import { voiceKey, type VoiceSpeaker } from '../../game/voiceLines';
@@ -58,6 +60,8 @@ export class VoiceOver {
   private voices: Partial<Record<Speaker, string>> = {};
   private voicesLoaded: Promise<void> | null = null;
   private listeners = new Set<(speaking: boolean) => void>();
+  /** Lines waiting for the current one to finish. */
+  private waiting: { text: string; who: Speaker; onEnd?: (finished: boolean) => void; key?: string }[] = [];
 
   constructor(
     private engine: Engine = Speech,
@@ -130,6 +134,34 @@ export class VoiceOver {
    */
   say(text: string, who: Speaker, onEnd?: (finished: boolean) => void, key?: string): void {
     this.stop();
+    this.play(text, who, onEnd, key);
+  }
+
+  /**
+   * Plays a line after the one speaking now (and any already waiting), without cutting it off.
+   * The same line queued twice plays once. `stop()` drops everything waiting.
+   */
+  queue(text: string, who: Speaker, onEnd?: (finished: boolean) => void, key?: string): void {
+    if (!this.speaking) {
+      this.play(text, who, onEnd, key);
+      return;
+    }
+    const k = voiceKey(who, key ?? text);
+    const dup = this.waiting.find((w) => voiceKey(w.who, w.key ?? w.text) === k);
+    if (dup) {
+      dup.onEnd = onEnd;
+      return;
+    }
+    this.waiting.push({ text, who, onEnd, key });
+  }
+
+  /** Starts the next waiting line, if any. */
+  private next() {
+    const n = this.waiting.shift();
+    if (n) this.play(n.text, n.who, n.onEnd, n.key);
+  }
+
+  private play(text: string, who: Speaker, onEnd?: (finished: boolean) => void, key?: string): void {
     const line = speakable(text);
     if (!this.enabled || !this.appActive || !line) {
       onEnd?.(false);
@@ -145,6 +177,7 @@ export class VoiceOver {
       sound.duck(false);
       sound.setWitness(false);
       onEnd?.(true);
+      this.next();
     };
     this.setSpeaking(true);
     this.pending = onEnd ?? null;
@@ -204,6 +237,9 @@ export class VoiceOver {
     const pending = this.pending;
     // Invalidate the old line first so a late onStopped cannot end the next one.
     this.token++;
+    const dropped = this.waiting;
+    this.waiting = [];
+    dropped.forEach((w) => w.onEnd?.(false));
     this.setSpeaking(false);
     this.pending = null;
     if (!wasSpeaking) return;
@@ -220,11 +256,9 @@ export class VoiceOver {
     pending?.(false);
   }
 
-  /** Plays lines one after another; stopping (or a new line) ends the sequence. */
+  /** Plays lines one after another, after any line already speaking; stopping ends the sequence. */
   sayAll(lines: { text: string; who: Speaker; key?: string }[]) {
-    const [first, ...rest] = lines;
-    if (!first) return;
-    this.say(first.text, first.who, (finished) => finished && this.sayAll(rest), first.key);
+    for (const l of lines) this.queue(l.text, l.who, undefined, l.key);
   }
 }
 

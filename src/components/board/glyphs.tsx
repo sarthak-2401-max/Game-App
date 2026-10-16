@@ -1,7 +1,7 @@
 // Vector glyphs for every board element. Each hazard has a distinct silhouette so that
 // colour is never the only cue (spikes = triangles, lasers = lens + beam, drones = diamond eye).
 import React from 'react';
-import Svg, { Circle, G, Line, Path, Polygon, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, G, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { colors } from '../../theme/theme';
 import type { Dir, KeyColor } from '../../game/types';
 
@@ -24,28 +24,46 @@ export function Pips({ s, n, color }: P & { n: number; color: string }) {
   );
 }
 
+/**
+ * A floor trap in three-quarter view: a recessed steel plate with two rows of holes and a
+ * pyramid blade in each. Every blade has a lit face and a shaded face (light from the upper
+ * left), so it reads as solid. Raised blades stand tall and cast shadows; lowered ones barely
+ * peek out; a warning plate glows amber with blades half-way up.
+ */
 export function SpikesGlyph({ s, raised, warning }: P & { raised: boolean; warning?: boolean }) {
-  const pad = s * 0.18;
-  const w = (s - pad * 2) / 3;
-  const base = s - pad;
-  const h = raised ? s * 0.5 : s * 0.12;
-  const fill = raised ? colors.danger : warning ? colors.amber : '#5B2630';
+  const rise = raised ? 1 : warning ? 0.38 : 0.16;
+  const [lit, shade, tip] = raised ? ['#FF7A86', '#A3202C', '#FFE2E5'] : warning ? ['#FFC970', '#A8701A', '#FFF1D2'] : ['#7A4A52', '#3E2028', '#9A6A72'];
+  const rows = [
+    { y: 0.52, h: 0.3, bw: 0.075 },
+    { y: 0.72, h: 0.36, bw: 0.088 },
+  ];
+  const xs = [0.27, 0.5, 0.73];
   return (
     <Svg width={s} height={s}>
-      {warning && <Rect x={2} y={2} width={s - 4} height={s - 4} rx={s * 0.12} stroke={colors.amber} strokeWidth={2} strokeDasharray="4 3" fill="none" />}
-      {[0, 1, 2].map((i) => (
-        <Polygon
-          key={i}
-          points={`${pad + i * w},${base} ${pad + i * w + w / 2},${base - h} ${pad + (i + 1) * w},${base}`}
-          fill={fill}
-          stroke={raised ? '#FF9AA4' : 'none'}
-          strokeWidth={raised ? 1 : 0}
-        />
-      ))}
+      <Rect x={s * 0.1} y={s * 0.4} width={s * 0.8} height={s * 0.46} rx={s * 0.07} fill="#191317" />
+      <Rect x={s * 0.1} y={s * 0.38} width={s * 0.8} height={s * 0.42} rx={s * 0.07} fill={warning ? '#3A2A1A' : '#2B2228'} stroke={warning ? colors.amber : '#4A3A42'} strokeWidth={warning ? 1.5 : 1} />
+      <Line x1={s * 0.16} y1={s * 0.4} x2={s * 0.84} y2={s * 0.4} stroke="#FFFFFF" strokeOpacity={0.12} strokeWidth={1} />
+      {rows.map((r, ri) =>
+        xs.map((x) => {
+          const cx = x * s;
+          const cy = r.y * s;
+          const bw = r.bw * s;
+          const h = r.h * s * rise;
+          return (
+            <G key={`${ri}-${x}`}>
+              <Ellipse cx={cx} cy={cy} rx={bw * 1.05} ry={bw * 0.42} fill="#0B0709" />
+              {raised && <Ellipse cx={cx + bw * 0.9} cy={cy + bw * 0.1} rx={bw * 1.1} ry={bw * 0.35} fill="#000000" opacity={0.35} />}
+              <Polygon points={`${cx - bw},${cy} ${cx},${cy - h} ${cx},${cy + bw * 0.3}`} fill={lit} />
+              <Polygon points={`${cx},${cy + bw * 0.3} ${cx},${cy - h} ${cx + bw},${cy}`} fill={shade} />
+              <Line x1={cx} y1={cy - h} x2={cx - bw * 0.25} y2={cy - h * 0.55} stroke={tip} strokeWidth={1} strokeLinecap="round" />
+            </G>
+          );
+        }),
+      )}
       {warning && (
         <G>
-          <Rect x={s / 2 - 1.5} y={s * 0.16} width={3} height={s * 0.2} fill={colors.amber} />
-          <Circle cx={s / 2} cy={s * 0.44} r={1.8} fill={colors.amber} />
+          <Rect x={s / 2 - 1.5} y={s * 0.1} width={3} height={s * 0.16} rx={1} fill={colors.amber} />
+          <Circle cx={s / 2} cy={s * 0.31} r={1.8} fill={colors.amber} />
         </G>
       )}
     </Svg>

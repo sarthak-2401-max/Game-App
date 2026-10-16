@@ -103,6 +103,8 @@ interface Props {
 }
 
 const MOVE_MS = 110;
+/** How far a finger travels before a swipe counts as a step. */
+const SWIPE_PX = 16;
 
 export type BoardTheme = Palette;
 
@@ -328,6 +330,9 @@ function Darkness({ visible, cx, cy, w, h, size, reduced }: { visible: boolean; 
 }
 
 /** Gentle hover for actors and pickups so the room feels alive. */
+/** True when two cells touch, diagonals included. */
+const nearCell = (w: number, a: number, b: number) => Math.abs(colOf(w, a) - colOf(w, b)) <= 1 && Math.abs(rowOf(w, a) - rowOf(w, b)) <= 1;
+
 function Bob({ enabled, amount, period, children }: { enabled: boolean; amount: number; period: number; children: React.ReactNode }) {
   const v = useSharedValue(0);
   useEffect(() => {
@@ -339,6 +344,33 @@ function Bob({ enabled, amount, period, children }: { enabled: boolean; amount: 
   }, [enabled, amount, period, v]);
   const st = useAnimatedStyle(() => ({ transform: [{ translateY: v.value }] }));
   return <Animated.View style={st}>{children}</Animated.View>;
+}
+
+/** A hidden coin sits in shadow, only a faint glint, until Pip is next to it. */
+function Shrouded({ lit, size, reduced, children }: { lit: boolean; size: number; reduced: boolean; children: React.ReactNode }) {
+  const v = useSharedValue(lit ? 1 : 0);
+  useEffect(() => {
+    v.value = reduced ? (lit ? 1 : 0) : withTiming(lit ? 1 : 0, { duration: lit ? 420 : 700, easing: Easing.out(Easing.quad) });
+  }, [lit, reduced, v]);
+  const coin = useAnimatedStyle(() => ({ opacity: 0.1 + 0.9 * v.value }));
+  const dark = useAnimatedStyle(() => ({ opacity: 0.75 * (1 - v.value) }));
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <Animated.View style={[StyleSheet.absoluteFill, coin]}>{children}</Animated.View>
+      <Animated.View style={[StyleSheet.absoluteFill, dark]}>
+        <Svg width={size} height={size}>
+          <Defs>
+            <RadialGradient id="shroud" cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor="#000" stopOpacity="0.9" />
+              <Stop offset="0.7" stopColor="#000" stopOpacity="0.6" />
+              <Stop offset="1" stopColor="#000" stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          <Rect x={-size * 0.1} y={-size * 0.1} width={size * 1.2} height={size * 1.2} fill="url(#shroud)" />
+        </Svg>
+      </Animated.View>
+    </View>
+  );
 }
 
 // ---- Dynamic features ----------------------------------------------------------------------
@@ -444,6 +476,71 @@ function Mover({ cell, w, size, reduced, children, z = 1, heavy }: { cell: numbe
   return <Animated.View style={[{ position: 'absolute', left: 0, top: 0, width: size, height: size, zIndex: z }, style]}>{children}</Animated.View>;
 }
 
+interface InputCtx {
+  inputEnabled: boolean;
+  onAction?: (a: Action) => void;
+  player: number;
+  size: number;
+  w: number;
+  h: number;
+}
+
+const updateInput = (live: { current: InputCtx }, ctx: InputCtx) => {
+  live.current = ctx;
+};
+
+/** Swipes and taps on the board. One step per swipe, taken as soon as the finger has clearly travelled. */
+function boardGesture(live: { current: InputCtx }) {
+  const act = (a: Action) => {
+    const l = live.current;
+    if (l.inputEnabled && l.onAction) l.onAction(a);
+  };
+  const toDir = (dx: number, dy: number): Action => (Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up');
+  const swipe = { fired: false };
+  const pan = Gesture.Pan()
+    .runOnJS(true)
+    .minDistance(8)
+    .onStart(() => {
+      swipe.fired = false;
+    })
+    .onUpdate((e) => {
+      if (swipe.fired || Math.max(Math.abs(e.translationX), Math.abs(e.translationY)) < SWIPE_PX) return;
+      swipe.fired = true;
+      act(toDir(e.translationX, e.translationY));
+    })
+    .onEnd((e) => {
+      if (swipe.fired) return;
+      // A short, quick flick still counts: go by its speed when it barely moved.
+      const far = Math.max(Math.abs(e.translationX), Math.abs(e.translationY)) >= 8;
+      const fast = Math.hypot(e.velocityX, e.velocityY) > 350;
+      if (far || fast) {
+        swipe.fired = true;
+        act(far ? toDir(e.translationX, e.translationY) : toDir(e.velocityX, e.velocityY));
+      }
+    })
+    .onFinalize(() => {
+      swipe.fired = false;
+    });
+  const tap = Gesture.Tap()
+    .runOnJS(true)
+    .maxDistance(10)
+    .onEnd((e) => {
+      const l = live.current;
+      const c = Math.floor(e.x / l.size);
+      const r = Math.floor(e.y / l.size);
+      if (c < 0 || r < 0 || c >= l.w || r >= l.h) return;
+      const d = dirBetween(l.w, l.player, r * l.w + c);
+      if (d) act(d);
+    });
+  return Gesture.Exclusive(pan, tap);
+}
+
+/** Pip's face lives in its own component, so a blink re-renders only the glyph, not the board. */
+function PipFace({ size, color, shape, state, events, seq, w, danger, reduced }: { size: number; color: string; shape: string; state: GameState; events: StepEvent[]; seq: number; w: number; danger: boolean; reduced: boolean }) {
+  const pip = usePip(state, events, seq, w, danger, reduced);
+  return <PlayerGlyph s={size} color={color} shape={shape} mood={pip.mood} lookX={pip.look.x} lookY={pip.look.y} />;
+}
+
 /** A hint step: the markers pop in one after another, tracing the route. */
 function HintStep({ cell, n, w, size, reduced }: { cell: number; n: number; w: number; size: number; reduced: boolean }) {
   const p = useSharedValue(reduced ? 1 : 0);
@@ -525,14 +622,25 @@ function beamEnd(b: { emitter: number; dir: Dir; cells: number[] }, w: number, h
 }
 
 /**
- * A live laser: a hot core that shimmers, a soft halo, and a spark where it hits something.
- * When a crate stops it the spark flares white-hot, so the block reads at a glance.
+ * A live laser: a hot core that shimmers, pulses of light streaming out of the emitter, a soft
+ * halo, and a spark where it hits something. When a crate stops it the spark flares white-hot,
+ * so the block reads at a glance.
  */
 function Beam({ dir, cells, w, size, end, crate, reduced }: { dir: Dir; cells: number[]; w: number; size: number; end: number; crate: boolean; reduced: boolean }) {
   const p = useSharedValue(0);
+  const flow = useSharedValue(0);
   useEffect(() => {
     p.value = reduced ? 0.5 : withRepeat(withTiming(1, { duration: 420, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, [reduced, p]);
+    flow.value = 0;
+    if (!reduced) flow.value = withRepeat(withTiming(1, { duration: 360, easing: Easing.linear }), -1, false);
+  }, [reduced, p, flow]);
+  const gap = size * 0.5;
+  const sign = dir === 'right' || dir === 'down' ? 1 : -1;
+  const isH = dir === 'left' || dir === 'right';
+  const stream = useAnimatedStyle(() => {
+    const t = sign * flow.value * gap;
+    return { transform: [isH ? { translateX: t } : { translateY: t }] };
+  });
   const core = useAnimatedStyle(() => ({ opacity: 0.75 + 0.25 * p.value }));
   const halo = useAnimatedStyle(() => ({ opacity: 0.14 + 0.1 * p.value }));
   const spark = useAnimatedStyle(() => ({ transform: [{ scale: 0.8 + 0.35 * p.value }] }));
@@ -558,6 +666,24 @@ function Beam({ dir, cells, w, size, end, crate, reduced }: { dir: Dir; cells: n
       <View pointerEvents="none" style={[styles.abs, box, { justifyContent: 'center', alignItems: 'center', zIndex: 3 }]}>
         <Animated.View style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, backgroundColor: colors.danger, borderRadius: thick }, halo]} />
         <Animated.View style={[{ width: horizontal ? len : thick * 0.6, height: horizontal ? thick * 0.6 : len, backgroundColor: '#FFB3BA', borderRadius: thick }, core]} />
+        {!reduced && (
+          <View style={[styles.abs, { left: 0, top: 0, right: 0, bottom: 0, overflow: 'hidden', borderRadius: thick }]}>
+            <Animated.View style={[styles.abs, horizontal ? { left: -gap, top: 0, bottom: 0, width: len + gap * 2 } : { top: -gap, left: 0, right: 0, height: len + gap * 2 }, stream]}>
+              {Array.from({ length: Math.ceil(len / gap) + 2 }, (_, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.abs,
+                    horizontal
+                      ? { left: i * gap, top: thick * 1.5 - thick * 0.45, width: gap * 0.38, height: thick * 0.9 }
+                      : { top: i * gap, left: thick * 1.5 - thick * 0.45, height: gap * 0.38, width: thick * 0.9 },
+                    { borderRadius: thick, backgroundColor: '#FFFFFF', opacity: 0.75 },
+                  ]}
+                />
+              ))}
+            </Animated.View>
+          </View>
+        )}
       </View>
       {end >= 0 && (
         <Animated.View pointerEvents="none" style={[styles.abs, { left: sx - sr, top: sy - sr, width: sr * 2, height: sr * 2, borderRadius: sr, backgroundColor: crate ? '#FFE6C7' : '#FF8A95', opacity: crate ? 0.9 : 0.6, zIndex: 6 }, spark]}>
@@ -709,7 +835,6 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
 
   const nudge = useBumpNudge(seq, events, state.player, w, size, reducedMotion);
   const danger = useMemo(() => state.status === 'playing' && pipInDanger(model, state.player, w, room.height), [model, state.player, state.status, w, room.height]);
-  const pip = usePip(state, events, seq, w, danger, reducedMotion);
 
   const moveFrom = events.find((e): e is Extract<StepEvent, { type: 'move' }> => e.type === 'move');
 
@@ -736,28 +861,13 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
   const echoLeft = room.echo && room.echoTrack ? room.echoTrack.length + room.echo.linger - state.moves : 0;
   const echoOpacity = 0.55 * Math.min(1, Math.max(0.15, echoLeft / 6));
 
-  const act = (a: Action) => {
-    if (inputEnabled && onAction) onAction(a);
-  };
-  const pan = Gesture.Pan()
-    .runOnJS(true)
-    .minDistance(14)
-    .onEnd((e) => {
-      const { translationX: dx, translationY: dy } = e;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return;
-      act(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up');
-    });
-  const tap = Gesture.Tap()
-    .runOnJS(true)
-    .maxDistance(10)
-    .onEnd((e) => {
-      const c = Math.floor(e.x / size);
-      const r = Math.floor(e.y / size);
-      if (c < 0 || r < 0 || c >= w || r >= room.height) return;
-      const d = dirBetween(w, state.player, r * w + c);
-      if (d) act(d);
-    });
-  const gesture = Gesture.Exclusive(pan, tap);
+  // Input reads the latest props through a holder, so the gesture itself is created once. A gesture
+  // rebuilt on every render (blinks, timers, animations) could drop a swipe that was in flight.
+  const [live] = useState<{ current: InputCtx }>(() => ({ current: { inputEnabled, onAction, player: state.player, size, w, h: room.height } }));
+  useEffect(() => {
+    updateInput(live, { inputEnabled, onAction, player: state.player, size, w, h: room.height });
+  });
+  const [gesture] = useState(() => boardGesture(live));
 
   return (
     <GestureDetector gesture={gesture}>
@@ -813,10 +923,20 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
         ))}
         {model.items.map(({ index, item }) => (
           <View key={`i${index}`} pointerEvents="none" style={[styles.abs, { left: colOf(w, item.cell) * size, top: rowOf(w, item.cell) * size, width: size, height: size, zIndex: 2 }]}>
-            <Shadow size={size} scale={0.6} />
-            <Bob enabled={!reducedMotion} amount={size * 0.06} period={1600 + index * 170}>
-              {item.kind === 'core' ? <CoreGlyph s={size} /> : item.kind === 'coin' ? <CoinGlyph s={size} /> : <KeyGlyph s={size} color={item.color ?? 'gold'} />}
-            </Bob>
+            {item.kind === 'coin' && item.hidden ? (
+              <Shrouded lit={nearCell(w, state.player, item.cell)} size={size} reduced={reducedMotion}>
+                <Bob enabled={!reducedMotion} amount={size * 0.06} period={1600 + index * 170}>
+                  <CoinGlyph s={size} />
+                </Bob>
+              </Shrouded>
+            ) : (
+              <>
+                <Shadow size={size} scale={0.6} />
+                <Bob enabled={!reducedMotion} amount={size * 0.06} period={1600 + index * 170}>
+                  {item.kind === 'core' ? <CoreGlyph s={size} /> : item.kind === 'coin' ? <CoinGlyph s={size} /> : <KeyGlyph s={size} color={item.color ?? 'gold'} />}
+                </Bob>
+              </>
+            )}
           </View>
         ))}
         {model.beams.map((b) => (
@@ -856,7 +976,7 @@ export function Board({ room, state, events, seq, cell: size, look, reducedMotio
           <Animated.View style={[{ opacity: dead ? 0.35 : 1 }, nudge]}>
             <PlayerFx seq={seq} events={events} w={w} size={size} reduced={reducedMotion}>
               <Bob enabled={!reducedMotion && !dead} amount={size * 0.05} period={1400}>
-                <PlayerGlyph s={size} color={String(skin.color)} shape={String(skin.shape)} mood={pip.mood} lookX={pip.look.x} lookY={pip.look.y} />
+                <PipFace size={size} color={String(skin.color)} shape={String(skin.shape)} state={state} events={events} seq={seq} w={w} danger={danger} reduced={reducedMotion} />
               </Bob>
             </PlayerFx>
           </Animated.View>
