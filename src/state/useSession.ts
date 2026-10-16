@@ -5,7 +5,7 @@ import type { Action, Room } from '../game/types';
 import { analytics } from '../services/analytics/analytics';
 import { useApp } from './useApp';
 import { recordAttempt, recordFailure } from './progression';
-import { consumePowerUp } from './powerups';
+import { takePowerUp } from './powerups';
 import { memoryView, noteDeathMemory, noteHintMemory, noteReviveMemory } from './memory';
 import { resolveRoom } from '../game/observer/observer';
 import type { PowerUpId } from '../config/powerups';
@@ -146,12 +146,12 @@ export const useSession = create<SessionState>((set, get) => ({
     const blocked = S.powerUpBlocked(s, id);
     if (blocked) return blocked;
     const app = useApp.getState();
-    const spent = consumePowerUp(app.save, id);
+    const spent = takePowerUp(app.save, id);
     if (!spent) return 'none_left';
-    app.update(() => spent);
+    app.update(() => spent.save);
     set({ session: S.applyPowerUp(s, id) });
     if (id === 'pathfinder') app.update((sv) => noteHintMemory(sv, s.room));
-    analytics.track('powerup_used', { ...props(s), powerup: id });
+    analytics.track('powerup_used', { ...props(s), powerup: id, free: spent.free });
     return null;
   },
 

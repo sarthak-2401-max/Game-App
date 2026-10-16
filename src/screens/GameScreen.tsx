@@ -25,7 +25,7 @@ import { getInterlude, interludeAfter, isInterludeId } from '../game/observer/ro
 import { OBSERVATION_PALETTE } from '../theme/chapters';
 import { ENVIRONMENTS, roomDesign } from '../game/environments';
 import { BACKDROPS } from '../services/story/backdrops.generated';
-import { memoryView } from '../state/memory';
+import { hasFlag, memoryView, setFlag } from '../state/memory';
 import { parFor, starCriteria, starsForWin, type StarCriteria } from '../state/mastery';
 import { clueLabel, useWitness, type SpokenLine } from './game/useWitness';
 import { getPowerUp, POWERUP_TUNING, type PowerUpId } from '../config/powerups';
@@ -51,7 +51,7 @@ import {
   shouldShowInterstitial,
   type RewardLine,
 } from '../state/progression';
-import { buyPowerUp, powerUpCount, type PowerUpGrant } from '../state/powerups';
+import { buyPowerUp, freeUseFlag, needsPowerUpTip, powerUpCount, powerUpTipFlag, type PowerUpGrant } from '../state/powerups';
 import { describeRevive, reviveOffer, roomNeedsWait } from '../state/session';
 import { chapterIntroSeen, markChapterIntroSeen, markEpilogueSeen } from '../state/story';
 import { useApp } from '../state/useApp';
@@ -111,6 +111,7 @@ export function GameScreen() {
   const [story, setStory] = useState<StoryOverlay | null>(null);
   const [getMore, setGetMore] = useState<PowerUpId | null>(null);
   const [openClue, setOpenClue] = useState<string | null>(null);
+  const [tipFor, setTipFor] = useState<PowerUpId | null>(null);
   const handledWin = useRef<number>(-1);
   const resultTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const witness = useWitness(session, !!story);
@@ -130,7 +131,7 @@ export function GameScreen() {
   const failed = !!session && (session.state.status === 'dead' || session.timedOut);
   const won = session?.state.status === 'won';
   // Anything on top of the board stops input and the countdown (sheets, offers, ads, clues).
-  const overlayOpen = showHint || !!story || !!getMore || !!openClue || offerOpen;
+  const overlayOpen = showHint || !!story || !!getMore || !!openClue || !!tipFor || offerOpen;
   const inputEnabled = !!session && !paused && !failed && !won && !overlayOpen;
 
   // ---- Layout ----------------------------------------------------------------------------
@@ -186,6 +187,21 @@ export function GameScreen() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.room.id]);
+
+  // ---- New power-up explainer ----------------------------------------------------------------
+  // The first room after a power-up unlocks explains it, once, after any chapter story.
+  const storyOpen = !!story;
+  useEffect(() => {
+    if (!session || storyOpen) return;
+    const id = needsPowerUpTip(useApp.getState().save);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- opens once per power-up
+    if (id) setTipFor(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.room.id, storyOpen]);
+  const closeTip = () => {
+    if (tipFor) app.update((sv) => setFlag(sv, powerUpTipFlag(tipFor)));
+    setTipFor(null);
+  };
 
   // ---- Feedback for each action ------------------------------------------------------------
   useEffect(() => {
@@ -428,6 +444,10 @@ export function GameScreen() {
         setOpenClue(null);
         return true;
       }
+      if (tipFor) {
+        closeTip();
+        return true;
+      }
       if (!paused && !failed && !won) {
         S().setPaused(true);
         return true;
@@ -435,7 +455,8 @@ export function GameScreen() {
       return false;
     });
     return () => sub.remove();
-  }, [showHint, openClue, paused, failed, won, S]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showHint, openClue, tipFor, paused, failed, won, S]);
 
   // Keyboard (web / hardware keyboards).
   const onAction = useCallback(
@@ -611,6 +632,7 @@ export function GameScreen() {
         return;
       }
     }
+    const free = !hasFlag(app.save, freeUseFlag(id));
     const blocked = S().spendPowerUp(id);
     if (blocked) {
       if (blocked !== 'none_left') toast(BLOCK_TEXT[blocked], 'info');
@@ -620,7 +642,26 @@ export function GameScreen() {
     haptics.light();
     const def = getPowerUp(id);
     if (id === 'pathfinder') showRoute(POWERUP_TUNING.pathfinderSteps, 'pathfinder');
-    else toast(`${def.name} activated.`, 'success');
+    if (free) toast(`First ${def.name} is on the house. You still have ${powerUpCount(useApp.getState().save, id)}.`, 'success');
+    else if (id !== 'pathfinder') toast(`${def.name} activated.`, 'success');
+  };
+
+  const tipSheet = (id: PowerUpId) => {
+    const def = getPowerUp(id);
+    const free = !hasFlag(app.save, freeUseFlag(id));
+    return (
+      <Sheet visible title={`New power-up: ${def.name}`} onRequestClose={closeTip}>
+        <View style={{ alignItems: 'center' }}>
+          <Icon name={def.icon} size={44} color={def.color} />
+        </View>
+        <Text style={styles.center}>{def.description}</Text>
+        <Text style={styles.center}>{def.howTo}</Text>
+        <Text style={styles.centerDim}>
+          {free ? `Your first use is free. The number on the button is how many you have (${powerUpCount(app.save, id)}).` : `You have ${powerUpCount(app.save, id)}. Earn more from chapters or the shop.`}
+        </Text>
+        <Button label="Got it" onPress={closeTip} />
+      </Sheet>
+    );
   };
 
   const getMoreSheet = (id: PowerUpId) => {
@@ -728,7 +769,7 @@ export function GameScreen() {
       {/* Monitor: the room's instruction, and anything WITNESS has to say. */}
       <View style={styles.monitor}>
         <MonitorBar
-          item={witness.feed[0]}
+          item={overlayOpen ? undefined : witness.feed[0]}
           intro={introVisible && state.moves - introFrom < 3 ? room.intro : undefined}
           reducedMotion={reduced}
           watched={witness.watched}
@@ -951,6 +992,7 @@ export function GameScreen() {
         )}
       </Sheet>
       {getMore && getMoreSheet(getMore)}
+      {tipFor && tipSheet(tipFor)}
       {offerSheet}
       {openClue && <ClueSheet id={openClue} onClose={() => setOpenClue(null)} />}
       {story && <StoryCard kicker={story.kicker} title={story.title} beats={story.beats} scenes={story.scenes} onDone={story.onDone} />}

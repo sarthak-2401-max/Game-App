@@ -10,6 +10,8 @@ export interface PowerUpDef {
   name: string;
   /** One line, shown on the in-room button sheet and in the shop. */
   description: string;
+  /** When to reach for it, shown once when it unlocks. */
+  howTo: string;
   /** Unlocks once this campaign room has been escaped. */
   unlockAfterRoom: number;
   /** Granted once, the moment it unlocks. */
@@ -24,6 +26,7 @@ export const POWERUPS: readonly PowerUpDef[] = [
     id: 'pathfinder',
     name: 'Pathfinder',
     description: 'Lights up the next 5 steps of a working route from where you stand.',
+    howTo: 'Stuck on a room? Tap the compass under the board and follow the glowing numbers.',
     unlockAfterRoom: 5,
     starterCount: 2,
     coinPrice: 60,
@@ -34,6 +37,7 @@ export const POWERUPS: readonly PowerUpDef[] = [
     id: 'shield',
     name: 'Shield',
     description: 'Absorbs the next spike, laser, drone or fall. You stay where you were.',
+    howTo: 'Tap it before a risky step. The next hit is blocked and you stay put.',
     unlockAfterRoom: 20,
     starterCount: 2,
     coinPrice: 80,
@@ -44,6 +48,7 @@ export const POWERUPS: readonly PowerUpDef[] = [
     id: 'overclock',
     name: 'Overclock',
     description: 'Adds 5 moves in a move-limited room, or 20 seconds to a countdown.',
+    howTo: 'Tap it when your moves or the countdown are about to run out.',
     unlockAfterRoom: 30,
     starterCount: 2,
     coinPrice: 70,
@@ -54,6 +59,7 @@ export const POWERUPS: readonly PowerUpDef[] = [
     id: 'freeze',
     name: 'Freeze',
     description: 'Stops drones, platforms and timed traps for your next 3 actions.',
+    howTo: 'Tap it to stop everything that moves while you slip past.',
     unlockAfterRoom: 50,
     starterCount: 2,
     coinPrice: 100,

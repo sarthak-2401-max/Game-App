@@ -81,8 +81,8 @@ export function MonitorBar({
     else {
       setVoiced(false);
       const key = item.key;
-      // A cut-off earlier line reports back too: only this line's end counts.
-      voice.say(
+      // Queued behind whatever is speaking; a dropped line reports back too, so only this line's end counts.
+      voice.queue(
         item.text,
         item.speaker,
         () => {

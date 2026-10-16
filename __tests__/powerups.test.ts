@@ -5,7 +5,8 @@ import { drone } from '../src/game/levels/legend';
 import { getRoom, roomId } from '../src/game/levels';
 import { CHAPTER_STORY, EPILOGUE, ROOM_STORY } from '../src/game/story';
 import { defaultSave, migrate, sanitize } from '../src/services/storage/saveSchema';
-import { addPowerUp, buyPowerUp, consumePowerUp, grantChapterPowerUps, syncPowerUpUnlocks } from '../src/state/powerups';
+import { addPowerUp, buyPowerUp, consumePowerUp, grantChapterPowerUps, needsPowerUpTip, powerUpTipFlag, syncPowerUpUnlocks, takePowerUp } from '../src/state/powerups';
+import { setFlag } from '../src/state/memory';
 import { completeRoom, grantRewardedAd } from '../src/state/progression';
 import { act, applyPowerUp, newSession, powerUpBlocked } from '../src/state/session';
 import { markChapterIntroSeen } from '../src/state/story';
@@ -57,6 +58,26 @@ describe('power-up progression', () => {
     const c = consumePowerUp(s, 'shield')!;
     expect(c.powerups.inventory.shield).toBe(0);
     expect(c.powerups.used).toBe(1);
+  });
+
+  test('the first use of each power-up is free, then it spends stock', () => {
+    const s = syncPowerUpUnlocks(completed(5)).save;
+    const first = takePowerUp(s, 'pathfinder')!;
+    expect(first.free).toBe(true);
+    expect(first.save.powerups.inventory.pathfinder).toBe(2);
+    const second = takePowerUp(first.save, 'pathfinder')!;
+    expect(second.free).toBe(false);
+    expect(second.save.powerups.inventory.pathfinder).toBe(1);
+    expect(takePowerUp(addPowerUp(s, 'pathfinder', -2), 'pathfinder')).toBeNull();
+  });
+
+  test('each unlocked power-up is explained once', () => {
+    expect(needsPowerUpTip(completed(4))).toBeNull();
+    const s = syncPowerUpUnlocks(completed(20)).save;
+    expect(needsPowerUpTip(s)).toBe('pathfinder');
+    const seen = setFlag(s, powerUpTipFlag('pathfinder'));
+    expect(needsPowerUpTip(seen)).toBe('shield');
+    expect(needsPowerUpTip(setFlag(seen, powerUpTipFlag('shield')))).toBeNull();
   });
 
   test('a rewarded ad grants one power-up within the daily limit', () => {
