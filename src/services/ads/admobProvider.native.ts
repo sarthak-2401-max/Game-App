@@ -1,7 +1,9 @@
-// Google AdMob provider using react-native-google-mobile-ads (requires a development or
-// production build; the native module is not available in Expo Go).
+// Google Mobile Ads provider using react-native-google-mobile-ads (requires a development or
+// production build; the native module is not available in Expo Go). Serves AdMob unit ids and
+// Google Ad Manager unit paths alike; GAM requests also carry key-values (see gamTargeting).
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import type { AdUnitIds } from '../../config/ads';
+import { gamTargeting, isGamUnit, type AdUnitIds } from '../../config/ads';
 import { log } from '../../utils/log';
 import { isExpoGo } from '../../utils/runtime';
 import type { AdProvider, PresentationHandlers } from './types';
@@ -20,12 +22,22 @@ function loadLib(): Lib | null {
   }
 }
 
-export function createAdMobProvider(units: AdUnitIds | null): AdProvider | null {
+export function createAdMobProvider(units: AdUnitIds | null, network: 'admob' | 'gam' = 'admob'): AdProvider | null {
   const lib = loadLib();
   if (!lib) return null;
-  const { default: mobileAds, RewardedAd, InterstitialAd, AdEventType, RewardedAdEventType, TestIds, MaxAdContentRating } = lib;
-  const ids: AdUnitIds = units ?? { rewarded: TestIds.REWARDED, interstitial: TestIds.INTERSTITIAL };
+  const { default: mobileAds, RewardedAd, InterstitialAd, GAMInterstitialAd, AdEventType, RewardedAdEventType, TestIds, MaxAdContentRating } =
+    lib;
+  const testIds: AdUnitIds =
+    network === 'gam'
+      ? { rewarded: TestIds.GAM_REWARDED, interstitial: TestIds.GAM_INTERSTITIAL }
+      : { rewarded: TestIds.REWARDED, interstitial: TestIds.INTERSTITIAL };
+  const ids: AdUnitIds = units ?? testIds;
   const usingTestIds = !units;
+  const targeting = gamTargeting(Platform.OS, Constants.expoConfig?.version);
+  const requestOptions = (unitId: string) =>
+    isGamUnit(unitId)
+      ? { requestNonPersonalizedAdsOnly: nonPersonalized, customTargeting: targeting }
+      : { requestNonPersonalizedAdsOnly: nonPersonalized };
 
   let nonPersonalized = true;
   let rewarded: ReturnType<typeof RewardedAd.createForAdRequest> | null = null;
@@ -34,7 +46,7 @@ export function createAdMobProvider(units: AdUnitIds | null): AdProvider | null 
   let interstitialHandlers: PresentationHandlers | null = null;
 
   const makeRewarded = () => {
-    const ad = RewardedAd.createForAdRequest(ids.rewarded, { requestNonPersonalizedAdsOnly: nonPersonalized });
+    const ad = RewardedAd.createForAdRequest(ids.rewarded, requestOptions(ids.rewarded));
     ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => rewardedHandlers?.onEarned?.());
     ad.addAdEventListener(AdEventType.CLOSED, () => {
       const h = rewardedHandlers;
@@ -51,7 +63,8 @@ export function createAdMobProvider(units: AdUnitIds | null): AdProvider | null 
   };
 
   const makeInterstitial = () => {
-    const ad = InterstitialAd.createForAdRequest(ids.interstitial, { requestNonPersonalizedAdsOnly: nonPersonalized });
+    const Interstitial = isGamUnit(ids.interstitial) ? GAMInterstitialAd : InterstitialAd;
+    const ad = Interstitial.createForAdRequest(ids.interstitial, requestOptions(ids.interstitial));
     ad.addAdEventListener(AdEventType.CLOSED, () => {
       const h = interstitialHandlers;
       interstitialHandlers = null;
@@ -67,7 +80,7 @@ export function createAdMobProvider(units: AdUnitIds | null): AdProvider | null 
   };
 
   return {
-    name: usingTestIds ? `admob (test units, ${Platform.OS})` : `admob (${Platform.OS})`,
+    name: `${isGamUnit(ids.rewarded) ? 'gam' : 'admob'} (${usingTestIds ? 'test units, ' : ''}${Platform.OS})`,
     isSimulation: false,
     async initialize(opts) {
       nonPersonalized = opts.nonPersonalized;

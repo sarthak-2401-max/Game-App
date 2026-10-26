@@ -14,7 +14,7 @@
 | Expo Go | `npx expo start --go` | simulator | AdMob, UMP and ATT are native modules Expo Go does not contain, so the game falls back to the labelled simulator. |
 | Development build | `eas build --profile development` then `npx expo start --dev-client` | AdMob **test** units | The right way to test consent and real SDK callbacks. |
 | Preview (internal) | `eas build --profile preview` | AdMob test units | Release-mode build; `ORL_ADMOB_ALLOW_TEST_UNITS=1` keeps test ads on. Android produces an installable APK. |
-| Production | `eas build --profile production` | your real units | Without real unit IDs a release build shows **no ads** (never test ads, never the simulator). |
+| Production | `eas build --profile production` | your real units | The build **refuses to start** unless the app ids and unit ids for the platform being built are real and well-formed (or `ORL_ADS_MODE=off`). |
 
 The ad simulator can only ever appear when `__DEV__` is true. See `src/services/ads/providerFactory.ts`.
 
@@ -28,9 +28,10 @@ Set these in EAS (`eas env:create`, or the project's Environment variables page)
 | `ORL_ANDROID_PACKAGE` | Android application id | `io.github.sarthak2401max.oneroomleft` |
 | `ORL_ADMOB_IOS_APP_ID` | AdMob iOS app id (`ca-app-pub-…~…`) | Google test app id |
 | `ORL_ADMOB_ANDROID_APP_ID` | AdMob Android app id | Google test app id |
-| `ORL_ADMOB_IOS_REWARDED`, `ORL_ADMOB_IOS_INTERSTITIAL` | iOS ad unit ids (`ca-app-pub-…/…`) | empty → test units in dev, no ads in release |
+| `ORL_ADMOB_IOS_REWARDED`, `ORL_ADMOB_IOS_INTERSTITIAL` | iOS ad unit ids: AdMob (`ca-app-pub-…/…`) or Ad Manager path (`/NETWORK_CODE/…`) | empty → test units in dev; production build refuses to start |
 | `ORL_ADMOB_ANDROID_REWARDED`, `ORL_ADMOB_ANDROID_INTERSTITIAL` | Android ad unit ids | as above |
-| `ORL_ADS_MODE` | `admob`, `mock` (dev only) or `off` | `admob` |
+| `ORL_ADS_MODE` | `admob` (AdMob or GAM), `mock` (dev only) or `off` (also the only way to build production without ad ids) | `admob` |
+| `ORL_ADS_NETWORK` | `admob` or `gam`: which Google **test** units to use when no unit ids are set | `admob` |
 | `ORL_ADMOB_ALLOW_TEST_UNITS` | `1` lets a release build use Google test units | unset |
 | `EAS_PROJECT_ID` | optional override of the EAS project | `a9ed4e34-…` (set in `app.config.ts`) |
 

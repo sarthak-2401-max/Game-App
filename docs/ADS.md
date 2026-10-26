@@ -1,6 +1,6 @@
 # Ads
 
-The game uses **Google AdMob** through `react-native-google-mobile-ads` (v17, New Architecture). Every rewarded ad is optional, and every room can be finished without one.
+The game uses the **Google Mobile Ads SDK** through `react-native-google-mobile-ads` (v17, New Architecture). It serves either **AdMob** unit ids or **Google Ad Manager (GAM)** unit paths; see [Google Ad Manager](#google-ad-manager). Every rewarded ad is optional, and every room can be finished without one.
 
 ## What is real and what is not
 
@@ -46,6 +46,25 @@ Never during gameplay, never in onboarding. Shown only after a completed campaig
 4. In AdMob → Privacy & messaging, create a **GDPR** message (and a US state regulations message if you serve those regions) and an **IDFA explainer** for iOS. The in-app UMP flow shows whatever you publish there.
 5. Host an `app-ads.txt` on the developer website you list in the stores.
 6. Register your test devices in AdMob before testing release builds with real units. Never tap your own live ads.
+
+## Google Ad Manager
+
+The same SDK and code path serve GAM. A unit id that starts with `/` (`/NETWORK_CODE/one_room_left/rewarded`) is treated as a GAM unit:
+
+- Rewarded uses `RewardedAd`; interstitial uses `GAMInterstitialAd` (supports app events).
+- Every GAM request carries non-identifying key-values `app=one_room_left`, `plat=android|ios`, `ver=<app version>` (`gamTargeting` in `src/config/ads.ts`). Create these keys in GAM (Inventory → Key-values) if you want to target or report on them.
+- `requestNonPersonalizedAdsOnly` follows the UMP/ATT outcome exactly as for AdMob. UMP messages are managed in GAM → Privacy & messaging (or AdMob, if the app is linked there).
+- Development builds with no unit ids use Google's GAM test units when `ORL_ADS_NETWORK=gam`.
+
+Setup:
+
+1. GAM → Inventory → Apps: add the Android (and iOS) app. Copy its **app id** (`ca-app-pub-…~…`) into `ORL_ADMOB_ANDROID_APP_ID` / `ORL_ADMOB_IOS_APP_ID`. The SDK needs an app id at launch whichever network serves.
+2. Inventory → Ad units: create a **Rewarded** unit (reward amount 1, the game decides the actual reward) and an **Interstitial** unit (out-of-page/interstitial sizes 320×480 and 480×320). Put the full paths in the four `ORL_ADMOB_*_REWARDED` / `*_INTERSTITIAL` variables.
+3. Demand: AdX/Open Bidding through yield groups, or your own line items targeted to those units. Mediation SDK adapters need native packages and a config plugin; they are not wired in.
+4. `app-ads.txt`: add `google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0` with your GAM network's publisher id, plus any MCM parent / reseller lines your partner gives you.
+5. Production builds validate the format of every id and refuse Google's test publisher id.
+
+AdMob and GAM units can be mixed (for example GAM rewarded, AdMob interstitial); each is detected by its format.
 
 ## Consent timing
 

@@ -32,5 +32,4 @@
 
 ## Placeholders you must replace
 
-- `privacyPolicyUrl` and `supportEmail` in `src/config/app.ts`
-- AdMob app ids and unit ids (env vars, ADS.md)
+- AdMob or Ad Manager app ids and unit ids (EAS env vars, ADS.md). `privacyPolicyUrl` and `supportEmail` are already set.
