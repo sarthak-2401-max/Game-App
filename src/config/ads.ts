@@ -30,7 +30,8 @@ export const INTERSTITIAL_POLICY = {
 
 export interface AdUnitIds {
   rewarded: string;
-  interstitial: string;
+  /** Optional: null disables interstitials and keeps rewarded ads. */
+  interstitial: string | null;
 }
 
 /**

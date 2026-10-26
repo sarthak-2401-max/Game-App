@@ -62,9 +62,9 @@ export function createAdMobProvider(units: AdUnitIds | null, network: 'admob' | 
     return ad;
   };
 
-  const makeInterstitial = () => {
-    const Interstitial = isGamUnit(ids.interstitial) ? GAMInterstitialAd : InterstitialAd;
-    const ad = Interstitial.createForAdRequest(ids.interstitial, requestOptions(ids.interstitial));
+  const makeInterstitial = (unitId: string) => {
+    const Interstitial = isGamUnit(unitId) ? GAMInterstitialAd : InterstitialAd;
+    const ad = Interstitial.createForAdRequest(unitId, requestOptions(unitId));
     ad.addAdEventListener(AdEventType.CLOSED, () => {
       const h = interstitialHandlers;
       interstitialHandlers = null;
@@ -91,7 +91,7 @@ export function createAdMobProvider(units: AdUnitIds | null, network: 'admob' | 
       });
       await mobileAds().initialize();
       rewarded = makeRewarded();
-      interstitial = makeInterstitial();
+      interstitial = ids.interstitial ? makeInterstitial(ids.interstitial) : null;
     },
     loadRewarded() {
       rewarded?.load();

@@ -30,6 +30,8 @@ Set these in EAS (`eas env:create`, or the project's Environment variables page)
 | `ORL_ADMOB_ANDROID_APP_ID` | AdMob Android app id | Google test app id |
 | `ORL_ADMOB_IOS_REWARDED`, `ORL_ADMOB_IOS_INTERSTITIAL` | iOS ad unit ids: AdMob (`ca-app-pub-…/…`) or Ad Manager path (`/NETWORK_CODE/…`) | empty → test units in dev; production build refuses to start |
 | `ORL_ADMOB_ANDROID_REWARDED`, `ORL_ADMOB_ANDROID_INTERSTITIAL` | Android ad unit ids | as above |
+
+Interstitial units are optional: leave `ORL_ADMOB_*_INTERSTITIAL` unset in production to ship rewarded ads only.
 | `ORL_ADS_MODE` | `admob` (AdMob or GAM), `mock` (dev only) or `off` (also the only way to build production without ad ids) | `admob` |
 | `ORL_ADS_NETWORK` | `admob` or `gam`: which Google **test** units to use when no unit ids are set | `admob` |
 | `ORL_ADMOB_ALLOW_TEST_UNITS` | `1` lets a release build use Google test units | unset |
