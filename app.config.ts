@@ -12,11 +12,13 @@ const IOS_BUNDLE_ID = env.ORL_IOS_BUNDLE_ID ?? 'io.github.sarthak2401max.oneroom
 const ANDROID_PACKAGE = env.ORL_ANDROID_PACKAGE ?? 'io.github.sarthak2401max.oneroomleft';
 
 // Store builds must ship real, well-formed ad ids (AdMob ids or Google Ad Manager unit paths) and
-// never Google's test ids. Set ORL_ADS_MODE=off to ship a build without ads instead.
+// never Google's test ids. Interstitial units are optional (unset = rewarded ads only). Set
+// ORL_ADS_MODE=off to ship a build without ads instead.
 const GOOGLE_TEST_PUBLISHER = '3940256099942544';
 const APP_ID = /^ca-app-pub-\d{16}~\d{10}$/;
 const UNIT_ID = /^(ca-app-pub-\d{16}\/\d{10}|\/\d+(\/[\w.-]+)+)$/;
 if (env.EAS_BUILD_PROFILE === 'production' && env.ORL_ADS_MODE !== 'off') {
+  const optional = ['ORL_ADMOB_IOS_INTERSTITIAL', 'ORL_ADMOB_ANDROID_INTERSTITIAL'];
   const checks: [string, RegExp][] = [
     ['ORL_ADMOB_IOS_APP_ID', APP_ID],
     ['ORL_ADMOB_ANDROID_APP_ID', APP_ID],
@@ -29,6 +31,7 @@ if (env.EAS_BUILD_PROFILE === 'production' && env.ORL_ADS_MODE !== 'off') {
   const platform = env.EAS_BUILD_PLATFORM;
   const bad = checks
     .filter(([name]) => !platform || name.includes(`_${platform.toUpperCase()}_`))
+    .filter(([name]) => !(optional.includes(name) && !env[name]))
     .filter(([name, re]) => !re.test(env[name] ?? '') || env[name]!.includes(GOOGLE_TEST_PUBLISHER))
     .map(([name]) => name);
   if (bad.length) throw new Error(`Production build has missing, malformed or test ad ids: ${bad.join(', ')} (see docs/ADS.md)`);
@@ -102,7 +105,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       mode: env.ORL_ADS_MODE ?? 'admob',
       // admob | gam. Only picks which Google test units to use when no unit ids are set.
       network: env.ORL_ADS_NETWORK ?? 'admob',
-      // AdMob unit ids or Ad Manager paths (/NETWORK_CODE/...). Empty = Google test units. Production needs all four.
+      // AdMob unit ids or Ad Manager paths (/NETWORK_CODE/...). Empty = Google test units. Production needs
+      // the rewarded unit; an empty interstitial unit turns interstitials off.
       androidRewarded: env.ORL_ADMOB_ANDROID_REWARDED ?? '',
       androidInterstitial: env.ORL_ADMOB_ANDROID_INTERSTITIAL ?? '',
       iosRewarded: env.ORL_ADMOB_IOS_REWARDED ?? '',

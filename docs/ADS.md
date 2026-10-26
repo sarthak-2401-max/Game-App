@@ -21,7 +21,7 @@ The game uses the **Google Mobile Ads SDK** through `react-native-google-mobile-
 | Double reward | Completion sheet, first clear only | Base room reward again | 10 |
 | Free coins | Rewards → Coins | 15 coins | 5 |
 | Bonus room | Bonus Vault | Unlock one bonus room | 3 |
-| Interstitial | Only on "Next room" after a completed campaign room | none | 8 |
+| Interstitial | Only on "Next room" after a completed campaign room (off when no interstitial unit is set) | none | 8 |
 
 All values live in `src/config/economy.ts` and `src/config/ads.ts`. Offers are hidden entirely when the build has no ad source.
 

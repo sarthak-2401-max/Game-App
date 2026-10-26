@@ -32,7 +32,7 @@ export function readAdsExtra(): AdsExtra {
 function unitIds(extra: AdsExtra): AdUnitIds | null {
   const rewarded = Platform.OS === 'ios' ? extra.iosRewarded : extra.androidRewarded;
   const interstitial = Platform.OS === 'ios' ? extra.iosInterstitial : extra.androidInterstitial;
-  return rewarded && interstitial ? { rewarded, interstitial } : null;
+  return rewarded ? { rewarded, interstitial: interstitial || null } : null;
 }
 
 export function createAdProvider(): AdProvider | null {
