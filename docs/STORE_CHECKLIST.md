@@ -4,10 +4,10 @@
 
 - [ ] Choose final bundle id / package name and set `ORL_IOS_BUNDLE_ID`, `ORL_ANDROID_PACKAGE`
 - [x] `eas init` (project id a9ed4e34-a80e-4cd0-b66b-ed77b486890d is in `app.config.ts`)
-- [ ] Create AdMob apps and units; set all `ORL_ADMOB_*` variables for production
+- [ ] Create AdMob or Ad Manager apps and units (ADS.md); set all `ORL_ADMOB_*` variables for production
 - [ ] Publish UMP GDPR (and US states) messages and the iOS IDFA explainer in AdMob
-- [ ] Host the privacy policy (template in PRIVACY.md); set `privacyPolicyUrl` and `supportEmail`
-- [ ] Host `app-ads.txt` on your developer site
+- [ ] Enable GitHub Pages (Settings → Pages → GitHub Actions) so the privacy policy is live; `privacyPolicyUrl` and `supportEmail` are already set
+- [ ] Host `app-ads.txt` at the root of your developer site (a `sarthak-2401-max.github.io` repo or a custom domain; a project Pages path is not crawled)
 - [ ] Add a LICENSE if the source will be public
 
 ## Device QA (development and preview builds)

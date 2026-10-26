@@ -11,13 +11,27 @@ const TEST_ADMOB_APP_ID_IOS = 'ca-app-pub-3940256099942544~1458002511';
 const IOS_BUNDLE_ID = env.ORL_IOS_BUNDLE_ID ?? 'io.github.sarthak2401max.oneroomleft';
 const ANDROID_PACKAGE = env.ORL_ANDROID_PACKAGE ?? 'io.github.sarthak2401max.oneroomleft';
 
-// Store builds must never ship Google's test app ids.
-if (env.EAS_BUILD_PROFILE === 'production') {
-  const missing = [
-    !env.ORL_ADMOB_IOS_APP_ID && 'ORL_ADMOB_IOS_APP_ID',
-    !env.ORL_ADMOB_ANDROID_APP_ID && 'ORL_ADMOB_ANDROID_APP_ID',
-  ].filter(Boolean);
-  if (missing.length) throw new Error(`Production build is missing: ${missing.join(', ')} (see docs/BUILD.md)`);
+// Store builds must ship real, well-formed ad ids (AdMob ids or Google Ad Manager unit paths) and
+// never Google's test ids. Set ORL_ADS_MODE=off to ship a build without ads instead.
+const GOOGLE_TEST_PUBLISHER = '3940256099942544';
+const APP_ID = /^ca-app-pub-\d{16}~\d{10}$/;
+const UNIT_ID = /^(ca-app-pub-\d{16}\/\d{10}|\/\d+(\/[\w.-]+)+)$/;
+if (env.EAS_BUILD_PROFILE === 'production' && env.ORL_ADS_MODE !== 'off') {
+  const checks: [string, RegExp][] = [
+    ['ORL_ADMOB_IOS_APP_ID', APP_ID],
+    ['ORL_ADMOB_ANDROID_APP_ID', APP_ID],
+    ['ORL_ADMOB_IOS_REWARDED', UNIT_ID],
+    ['ORL_ADMOB_IOS_INTERSTITIAL', UNIT_ID],
+    ['ORL_ADMOB_ANDROID_REWARDED', UNIT_ID],
+    ['ORL_ADMOB_ANDROID_INTERSTITIAL', UNIT_ID],
+  ];
+  // EAS sets the platform on its builders; check only that platform so an Android-only launch works.
+  const platform = env.EAS_BUILD_PLATFORM;
+  const bad = checks
+    .filter(([name]) => !platform || name.includes(`_${platform.toUpperCase()}_`))
+    .filter(([name, re]) => !re.test(env[name] ?? '') || env[name]!.includes(GOOGLE_TEST_PUBLISHER))
+    .map(([name]) => name);
+  if (bad.length) throw new Error(`Production build has missing, malformed or test ad ids: ${bad.join(', ')} (see docs/ADS.md)`);
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -86,7 +100,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ads: {
       // admob | mock | off. "mock" only works in development builds.
       mode: env.ORL_ADS_MODE ?? 'admob',
-      // Leave empty to use Google's test ad units. Production builds must set all four.
+      // admob | gam. Only picks which Google test units to use when no unit ids are set.
+      network: env.ORL_ADS_NETWORK ?? 'admob',
+      // AdMob unit ids or Ad Manager paths (/NETWORK_CODE/...). Empty = Google test units. Production needs all four.
       androidRewarded: env.ORL_ADMOB_ANDROID_REWARDED ?? '',
       androidInterstitial: env.ORL_ADMOB_ANDROID_INTERSTITIAL ?? '',
       iosRewarded: env.ORL_ADMOB_IOS_REWARDED ?? '',

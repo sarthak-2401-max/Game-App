@@ -15,7 +15,7 @@ const SECTIONS: { title: string; body: string }[] = [
   },
   {
     title: 'Advertising',
-    body: 'The game shows ads through Google AdMob. Where required, you are asked for consent before any ads load, and on iPhone and iPad you are asked whether apps may track you. If you decline, ads are not personalised. You can change your choice any time from Settings, under Ad privacy choices.',
+    body: 'The game shows ads through Google (AdMob and Google Ad Manager). Where required, you are asked for consent before any ads load, and on iPhone and iPad you are asked whether apps may track you. If you decline, ads are not personalised. You can change your choice any time from Settings, under Ad privacy choices.',
   },
   {
     title: 'Rewarded ads are optional',

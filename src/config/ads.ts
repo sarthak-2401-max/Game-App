@@ -32,3 +32,20 @@ export interface AdUnitIds {
   rewarded: string;
   interstitial: string;
 }
+
+/**
+ * Google Ad Manager unit paths look like `/21234567890/one_room_left/rewarded`; AdMob unit ids look
+ * like `ca-app-pub-1234567890123456/1234567890`. Both are served by the same Google Mobile Ads SDK.
+ */
+export function isGamUnit(unitId: string): boolean {
+  return /^\/\d+(\/[\w.\-]+)+$/.test(unitId);
+}
+
+export function isAdMobUnit(unitId: string): boolean {
+  return /^ca-app-pub-\d{16}\/\d{10}$/.test(unitId);
+}
+
+/** Static Ad Manager key-values sent with every request (ignored by AdMob). Keep them non-identifying. */
+export function gamTargeting(platform: string, appVersion: string | undefined): Record<string, string> {
+  return { app: 'one_room_left', plat: platform, ver: appVersion ?? 'unknown' };
+}

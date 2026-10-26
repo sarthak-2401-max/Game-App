@@ -44,7 +44,9 @@ npx eas-cli@latest env:create --environment production --name ORL_ADMOB_IOS_APP_
 4. Privacy & messaging: publish a GDPR message, a US states message and the iOS IDFA explainer.
 5. `app-ads.txt` must sit at the root of the developer website you list in the stores. GitHub Pages project sites live under a path, so this needs a separate public repo named `sarthak-2401-max.github.io` containing `app-ads.txt` (AdMob shows you the line to put in it).
 
-A production build **refuses to start** if the bundle ids or AdMob app ids are missing, so placeholders can't ship by accident.
+Using **Google Ad Manager** instead of (or alongside) AdMob: follow the GAM setup in [ADS.md](ADS.md#google-ad-manager). The same six variables take the GAM app ids and unit paths.
+
+A production build **refuses to start** if the app ids or unit ids for the platform being built are missing, malformed or Google test ids, so placeholders can't ship by accident.
 
 ## 5. Build
 

@@ -1,5 +1,6 @@
 // Chooses the ad provider for this build:
-//   - mode "admob" (default): AdMob with configured unit IDs, or Google test units when none are set.
+//   - mode "admob" (default): Google Mobile Ads with the configured unit IDs (AdMob ids or Ad Manager
+//     paths), or Google test units when none are set (GAM test units when network is "gam").
 //   - mode "mock": the labelled development simulator (never allowed in production builds).
 //   - mode "off": no ads; every placement reports "unavailable" and the game carries on.
 // Expo Go has no AdMob native module, so development falls back to the simulator there.
@@ -14,6 +15,8 @@ import type { AdProvider } from './types';
 
 interface AdsExtra {
   mode?: 'admob' | 'mock' | 'off';
+  /** Which test units to fall back to when no unit IDs are set. Real units are detected by format. */
+  network?: 'admob' | 'gam';
   iosRewarded?: string;
   iosInterstitial?: string;
   androidRewarded?: string;
@@ -43,7 +46,7 @@ export function createAdProvider(): AdProvider | null {
     log.warn('ads', 'No AdMob unit IDs configured for this release build; ads are disabled');
     return null;
   }
-  const real = Platform.OS === 'web' || isExpoGo ? null : createAdMobProvider(units);
+  const real = Platform.OS === 'web' || isExpoGo ? null : createAdMobProvider(units, extra.network === 'gam' ? 'gam' : 'admob');
   if (real) return real;
   if (__DEV__) {
     log.info('ads', 'Using the development ad SIMULATOR (no real ads in this environment)');

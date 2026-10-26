@@ -8,7 +8,7 @@ This document describes what the code does today. It is not legal advice; have t
 |---|---|---|---|
 | Progress, coins, cosmetics, achievements, settings, streak, ad counters | On device (AsyncStorage) | Nobody | Gameplay |
 | Consent choices | On device (UMP SDK + save) | Google, as part of ad requests | Ad consent |
-| Advertising identifier (IDFA/AAID), IP address, device info | Collected by the Google Mobile Ads SDK | Google AdMob and its ad partners | Advertising, frequency capping, fraud prevention, measurement |
+| Advertising identifier (IDFA/AAID), IP address, device info | Collected by the Google Mobile Ads SDK | Google (AdMob / Ad Manager) and its ad partners | Advertising, frequency capping, fraud prevention, measurement |
 | Gameplay analytics events | Development console only | Nobody (no analytics SDK ships) | Debugging |
 
 The game has no account, no backend, no crash reporter and no third-party analytics. If you add any of those, update this file, the in-app Privacy screen, the hosted policy and the store forms.
@@ -46,7 +46,7 @@ Sarthak__10 ("we") publishes the mobile game One Room Left. Contact: sarthaksriv
 
 **What the game stores.** Your progress, settings and in-game currency are stored only on your device. We do not operate servers for the game and do not receive this data. Uninstalling the game deletes it.
 
-**Advertising.** The game shows ads provided by Google AdMob. Google may collect your device's advertising identifier, IP address and information about your device and ad interactions to show, measure and limit ads and to prevent fraud. Where required by law we ask for your consent first, and on iOS we ask whether apps may track you. You can change your choice at any time in the game under Settings → Ad privacy choices, and in your device's privacy settings. How Google uses data: https://policies.google.com/technologies/partner-sites
+**Advertising.** The game shows ads provided by Google (AdMob and Google Ad Manager). Google may collect your device's advertising identifier, IP address and information about your device and ad interactions to show, measure and limit ads and to prevent fraud. Where required by law we ask for your consent first, and on iOS we ask whether apps may track you. You can change your choice at any time in the game under Settings → Ad privacy choices, and in your device's privacy settings. How Google uses data: https://policies.google.com/technologies/partner-sites
 
 **Rewarded ads** are optional. You receive the in-game reward only if the ad completes.
 

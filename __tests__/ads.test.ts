@@ -1,4 +1,4 @@
-import { INTERSTITIAL_POLICY } from '../src/config/ads';
+import { gamTargeting, INTERSTITIAL_POLICY, isAdMobUnit, isGamUnit } from '../src/config/ads';
 import { ECONOMY } from '../src/config/economy';
 import { AdService } from '../src/services/ads/adService';
 import { MockAdProvider, type MockAdRequest } from '../src/services/ads/mockProvider';
@@ -140,5 +140,21 @@ describe('interstitial policy', () => {
     expect(shouldShowInterstitial(s, { ...ctx(20), consentFlowActive: true })).toBe(false);
     const capped = { ...s, ads: { ...s.ads, interstitialsToday: INTERSTITIAL_POLICY.maxPerDay } };
     expect(shouldShowInterstitial(capped, ctx(20))).toBe(false);
+  });
+});
+
+describe('ad unit formats', () => {
+  it('detects Ad Manager paths and AdMob ids', () => {
+    expect(isGamUnit('/21775744923/example/rewarded')).toBe(true);
+    expect(isGamUnit('/6499/example/interstitial')).toBe(true);
+    expect(isGamUnit('ca-app-pub-3940256099942544/5224354917')).toBe(false);
+    expect(isGamUnit('/notanumber/x')).toBe(false);
+    expect(isAdMobUnit('ca-app-pub-3940256099942544/5224354917')).toBe(true);
+    expect(isAdMobUnit('/21775744923/example/rewarded')).toBe(false);
+  });
+
+  it('sends only non-identifying GAM key-values', () => {
+    expect(gamTargeting('android', '1.0.0')).toEqual({ app: 'one_room_left', plat: 'android', ver: '1.0.0' });
+    expect(gamTargeting('ios', undefined).ver).toBe('unknown');
   });
 });
