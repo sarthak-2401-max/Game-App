@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Node 20+ and npm. Expo SDK 57 (React Native 0.86, New Architecture, React 19.2).
+- Node 20+ and npm. Expo SDK 58 (React Native 0.88, New Architecture, React 19.3).
 - For device builds: an Expo account and `eas-cli` (`npx eas-cli@latest ...`). No local Xcode/Android Studio needed when building in the cloud.
 - Python 3 + Pillow only if you want to regenerate the icon/audio assets.
 
